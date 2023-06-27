@@ -20,6 +20,12 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: us-east-1
 
+    - name: Install Elastic Beanstalk CLI
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y python3-pip
+        sudo pip3 install awsebcli --upgrade
+
     - name: Deploy to Elastic Beanstalk
       run: |
         eb init vota-informado-informacion --region us-east-1 --platform Python

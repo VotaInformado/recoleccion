@@ -18,7 +18,7 @@ jobs:
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-east-1
+        aws-region: sa-east-1
 
     - name: Install Elastic Beanstalk CLI
       run: |
@@ -28,5 +28,5 @@ jobs:
 
     - name: Deploy to Elastic Beanstalk
       run: |
-        eb init vota-informado-informacion --region us-east-1 --platform Python
-        eb deploy vi-informacion-env --staged
+        eb init vota-informado-informacion --region sa-east-1 --platform Python
+        eb deploy Vota-informado-informacion-env --staged

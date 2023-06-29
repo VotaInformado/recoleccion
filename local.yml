@@ -1,0 +1,40 @@
+version: '3'
+
+volumes:
+  local_postgres_data: {}
+  local_postgres_data_backups: {}
+
+services:
+  django.informacion:
+    build:
+      context: .
+      dockerfile: ./compose/local/django/Dockerfile
+    image: informacion_django_local
+    depends_on:
+      - postgres.informacion
+    volumes:
+      - .:/app
+    env_file:
+      - ./.envs/.local/.django
+      - ./.envs/.local/.postgres
+    ports:
+      - "8000:8000"
+    command: /start
+
+  postgres.informacion:
+    build:
+      context: .
+      dockerfile: ./compose/local/postgres/Dockerfile
+    image: informacion_postgres_local
+    volumes:
+      - local_postgres_data:/var/lib/postgresql/data
+      - local_postgres_data_backups:/backups
+    env_file:
+      - ./.envs/.local/.postgres
+    ports:
+      - "5434:5432"
+
+networks:
+  default:
+      name: local_network
+

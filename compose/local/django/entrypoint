@@ -1,14 +1,10 @@
 #!/bin/sh
 
-
-# N.B. If only .env files supported variable expansion...
-#export CELERY_BROKER_URL="${REDIS_URL}"
-
-if [ -z "${POSTGRES_USER}" ]; then
+if [ -z "${RDS_USERNAME}" ]; then
     base_postgres_image_default_user='postgres'
-    export POSTGRES_USER="${base_postgres_image_default_user}"
+    export RDS_USERNAME="${base_postgres_image_default_user}"
 fi
-export DATABASE_URL="postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}"
+export DATABASE_URL="postgres://${RDS_USERNAME}:${RDS_PASSWORD}@${RDS_HOSTNAME}:${RDS_PORT}/${RDS_DB_NAME}"
 
 postgres_ready() {
 python << END
@@ -18,11 +14,11 @@ import psycopg2
 
 try:
     psycopg2.connect(
-        dbname="${POSTGRES_DB}",
-        user="${POSTGRES_USER}",
-        password="${POSTGRES_PASSWORD}",
-        host="${POSTGRES_HOST}",
-        port="${POSTGRES_PORT}",
+        dbname="${RDS_DB_NAME}",
+        user="${RDS_USERNAME}",
+        password="${RDS_PASSWORD}",
+        host="${RDS_HOSTNAME}",
+        port="${RDS_PORT}",
     )
 except psycopg2.OperationalError as e:
     print(e)

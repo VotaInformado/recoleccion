@@ -83,11 +83,11 @@ WSGI_APPLICATION = "informacion.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": config.get("POSTGRES_DB"),
-        "USER": config.get("POSTGRES_USER"),
-        "PASSWORD": config.get("POSTGRES_PASSWORD"),
-        "HOST": config.get("POSTGRES_HOST"),
-        "PORT": config.get("POSTGRES_PORT"),
+        "NAME": config.get("RDS_DB_NAME"),
+        "USER": config.get("RDS_USERNAME"),
+        "PASSWORD": config.get("RDS_PASSWORD"),
+        "HOST": config.get("RDS_HOSTNAME"),
+        "PORT": config.get("RDS_PORT"),
     }
 }
 

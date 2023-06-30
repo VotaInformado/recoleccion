@@ -1,5 +1,5 @@
-POSTGRES_HOST=postgres.informacion
-POSTGRES_PORT=5432
-POSTGRES_DB=vota-informado-informacion
-POSTGRES_USER=postgresinfo
-POSTGRES_PASSWORD=password
+RDS_HOSTNAME=postgres.informacion
+RDS_PORT=5432
+RDS_DB_NAME=vota-informado-informacion
+RDS_USERNAME=postgresinfo
+RDS_PASSWORD=password

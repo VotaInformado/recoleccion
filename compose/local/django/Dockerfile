@@ -1,16 +1,15 @@
-FROM python:3.9-alpine
+FROM python:3.11
 
 ENV PYTHONUNBUFFERED 1
 
-RUN apk update \
+RUN apt-get update \
   # psycopg2 dependencies
-  && apk add --virtual build-deps gcc python3-dev musl-dev \
-  && apk add postgresql-dev \
-  && apk add postgresql-client
+  && apt-get install -y build-essential libpq-dev postgresql-client \
+  && apt-get clean
 
 # Requirements are installed here to ensure they will be cached.
 COPY ./requirements.txt /requirements.txt
-RUN pip install -r /requirements.txt
+RUN pip -v install -r /requirements.txt
 
 COPY ./compose/local/django/entrypoint /entrypoint
 RUN sed -i 's/\r//' /entrypoint

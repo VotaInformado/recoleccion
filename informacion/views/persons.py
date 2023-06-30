@@ -1,11 +1,14 @@
-"""Transaction views."""
-
-from django.http import HttpResponse, HttpResponseBadRequest
-from django.views.generic import View
-from informacion.models.person import Person
+# Django rest framework
 from rest_framework import viewsets, mixins
 
+# Serializers
+from informacion.serializers.persons import PersonModelSerializer
 
-class PersonViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
+# Models
+from informacion.models.person import Person
+
+
+class PersonViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.CreateModelMixin):
+    # TODO: sacar CreateModelMixin
     queryset = Person.objects.all()
-    
+    serializer_class = PersonModelSerializer

@@ -5,3 +5,4 @@ sqlparse==0.4.4
 typing_extensions==4.6.3
 psycopg2-binary==2.9.6
 pandas==2.0.3
+git+ssh://git@github.com/andres-fernandez-fuks/vota-informado-library.git#egg=library

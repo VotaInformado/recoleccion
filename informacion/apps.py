@@ -5,5 +5,5 @@ from django.apps import AppConfig
 class LibraryAppConfig(AppConfig):
     """Informacion app config."""
 
-    name = 'library'
+    name = 'django'
     verbose_name = 'library'

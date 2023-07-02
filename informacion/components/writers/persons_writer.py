@@ -1,4 +1,4 @@
-from library.models.person import Person
+from vi_library.models.person import Person
 from informacion.components.writers import Writer
 
 

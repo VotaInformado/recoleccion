@@ -2,7 +2,7 @@
 from rest_framework import serializers
 
 # Models
-from library.models.person import Person
+from vi_library.models.person import Person
 
 
 class PersonModelSerializer(serializers.ModelSerializer):

@@ -1,4 +1,4 @@
-from informacion.models.person import Person
+from library.models.person import Person
 from informacion.components.writers import Writer
 
 

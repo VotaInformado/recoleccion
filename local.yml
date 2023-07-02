@@ -9,6 +9,8 @@ services:
     build:
       context: .
       dockerfile: ./compose/local/django/Dockerfile
+      secrets:
+        - ssh_private_key
     image: informacion_django_local
     depends_on:
       - postgres.informacion
@@ -38,3 +40,6 @@ networks:
   default:
       name: local_network
 
+secrets:
+  ssh_private_key:
+    file: /home/andy/.ssh/id_ed25519

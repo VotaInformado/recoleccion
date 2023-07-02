@@ -1,7 +1,7 @@
 from dedupe import Gazetteer, console_label
 import os
 import pandas as pd
-from project.models import Person
+from library.models.person import Person
 from pprint import pp
 from project.utils import unidecode_text
 from datetime import date

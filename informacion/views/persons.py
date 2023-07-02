@@ -5,7 +5,7 @@ from rest_framework import viewsets, mixins
 from informacion.serializers.persons import PersonModelSerializer
 
 # Models
-from informacion.models.person import Person
+from library.models.person import Person
 
 
 class PersonViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.CreateModelMixin):

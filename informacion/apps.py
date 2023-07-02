@@ -2,8 +2,8 @@
 from django.apps import AppConfig
 
 
-class LibraryAppConfig(AppConfig):
+class InformacionAppConfig(AppConfig):
     """Informacion app config."""
 
-    name = 'django'
-    verbose_name = 'library'
+    name = 'informacion'
+    verbose_name = 'informacion'

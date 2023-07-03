@@ -6,10 +6,12 @@ from django.urls import include, path
 
 # Views
 from informacion.views import PersonViewSet
+from informacion.views.deputy_seats import DeputySeatsViewSet
 
 router = SimpleRouter()
 
 router.register(r"persons", PersonViewSet, basename="persons")
+router.register(r"deputy_seats", DeputySeatsViewSet, basename="deputy_seats")
 
 
 def health_check(request):

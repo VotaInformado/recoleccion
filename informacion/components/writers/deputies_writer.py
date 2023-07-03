@@ -1,6 +1,6 @@
-from project.writers.legislators_writer import LegislatorWriter
+from informacion.components.writers.legislators_writer import LegislatorWriter
 from pandas import DataFrame
-from project.models import DeputySeat
+from vi_library.models.deputy_seat import DeputySeat
 from datetime import datetime as dt
 from project import db
 from sqlalchemy import tuple_

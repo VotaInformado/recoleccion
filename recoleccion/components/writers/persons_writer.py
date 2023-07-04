@@ -1,5 +1,5 @@
 from vi_library.models.person import Person
-from informacion.components.writers import Writer
+from recoleccion.components.writers import Writer
 
 
 class PersonsWriter(Writer):

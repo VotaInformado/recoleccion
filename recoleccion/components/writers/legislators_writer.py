@@ -1,5 +1,5 @@
-from project.writers.writer import Writer
-from project.writers.persons_writer import PersonsWriter
+from recoleccion.components.writers import Writer
+from recoleccion.components.writers import PersonsWriter
 from pandas import DataFrame
 
 

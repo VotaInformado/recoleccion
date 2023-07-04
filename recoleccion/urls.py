@@ -5,8 +5,8 @@ from django.contrib import admin
 from django.urls import include, path
 
 # Views
-from informacion.views import PersonViewSet
-from informacion.views.deputy_seats import DeputySeatsViewSet
+from recoleccion.views import PersonViewSet
+from recoleccion.views.deputy_seats import DeputySeatsViewSet
 
 router = SimpleRouter()
 

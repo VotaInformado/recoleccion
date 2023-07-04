@@ -1,5 +1,11 @@
-RDS_HOSTNAME=postgres.informacion
+RDS_HOSTNAME=postgres.recoleccion
 RDS_PORT=5432
-RDS_DB_NAME=vota-informado-informacion
+RDS_DB_NAME=vota-informado-recoleccion
 RDS_USERNAME=postgresinfo
 RDS_PASSWORD=password
+
+POSTGRES_HOST=postgres.recoleccion
+POSTGRES_PORT=5432
+POSTGRES_DB=vota-informado-recoleccion
+POSTGRES_USER=postgresinfo
+POSTGRES_PASSWORD=password

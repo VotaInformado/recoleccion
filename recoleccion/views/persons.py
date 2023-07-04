@@ -2,7 +2,7 @@
 from rest_framework import viewsets, mixins
 
 # Serializers
-from informacion.serializers.persons import PersonModelSerializer
+from recoleccion.serializers.persons import PersonModelSerializer
 
 # Models
 from vi_library.models.person import Person

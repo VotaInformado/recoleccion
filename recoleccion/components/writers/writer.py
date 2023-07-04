@@ -2,9 +2,7 @@ from abc import ABC, abstractmethod
 from pandas import DataFrame
 
 
-
 class Writer(ABC):
-
     def write(self, data: DataFrame):
         existing = self.get_existing_by_key(data)
         written = []
@@ -28,7 +26,7 @@ class Writer(ABC):
     def create_element(self, row):
         # self.model should be defined in the child class
         return self.model.objects.create(**row)
-    
+
     def update_element(self, row):
         # self.model should be defined in the child class
         return self.model.objects.update(**row)

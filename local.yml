@@ -5,15 +5,15 @@ volumes:
   local_postgres_data_backups: {}
 
 services:
-  django.informacion:
+  django.recoleccion:
     build:
       context: .
       dockerfile: ./compose/local/django/Dockerfile
       secrets:
         - ssh_private_key
-    image: informacion_django_local
+    image: recoleccion_django_local
     depends_on:
-      - postgres.informacion
+      - postgres.recoleccion
     volumes:
       - .:/app
     env_file:
@@ -23,11 +23,11 @@ services:
       - "8000:8000"
     command: /start
 
-  postgres.informacion:
+  postgres.recoleccion:
     build:
       context: .
       dockerfile: ./compose/local/postgres/Dockerfile
-    image: informacion_postgres_local
+    image: recoleccion_postgres_local
     volumes:
       - local_postgres_data:/var/lib/postgresql/data
       - local_postgres_data_backups:/backups

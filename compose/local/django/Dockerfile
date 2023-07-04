@@ -17,7 +17,7 @@ RUN apt-get update \
   && apt-get clean
 
 COPY ./requirements /requirements
-RUN pip -v install -r /requirements/base.txt
+RUN pip -v install --no-cache-dir -r /requirements/base.txt
 
 COPY ./compose/local/django/entrypoint /entrypoint
 RUN sed -i 's/\r//' /entrypoint
@@ -33,6 +33,6 @@ ARG CACHEBUST
 ENV CACHEBUST=$CACHEBUST
 RUN echo "CACHEBUST value: $CACHEBUST"
 
-RUN pip install -r /requirements/extra.txt
+RUN pip install --no-cache-dir -r /requirements/extra.txt
 
 ENTRYPOINT ["/entrypoint"]

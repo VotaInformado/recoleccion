@@ -1,6 +1,8 @@
+from pandas import DataFrame
+
+# Project
 from recoleccion.components.writers import Writer
 from recoleccion.components.writers import PersonsWriter
-from pandas import DataFrame
 
 
 class LegislatorsWriter(Writer):

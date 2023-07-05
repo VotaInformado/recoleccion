@@ -80,16 +80,29 @@ WSGI_APPLICATION = "recoleccion.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": config.get("RDS_DB_NAME", None) or os.getenv("POSTGRES_DB"),
-        "USER": config.get("RDS_USERNAME", None) or os.getenv("POSTGRES_USER"),
-        "PASSWORD": config.get("RDS_PASSWORD", None) or os.getenv("POSTGRES_PASSWORD"),
-        "HOST": config.get("RDS_HOSTNAME", None) or os.getenv("POSTGRES_HOST"),
-        "PORT": config.get("RDS_PORT", None) or os.getenv("POSTGRES_PORT"),
+
+if os.getenv("ENV") == "testing":
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": "postgres",
+            "USER": "postgres",
+            "PASSWORD": "postgres",
+            "HOST": "localhost",
+            "PORT": 5432,
+        }
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": config.get("RDS_DB_NAME", None) or os.getenv("POSTGRES_DB"),
+            "USER": config.get("RDS_USERNAME", None) or os.getenv("POSTGRES_USER"),
+            "PASSWORD": config.get("RDS_PASSWORD", None) or os.getenv("POSTGRES_PASSWORD"),
+            "HOST": config.get("RDS_HOSTNAME", None) or os.getenv("POSTGRES_HOST"),
+            "PORT": config.get("RDS_PORT", None) or os.getenv("POSTGRES_PORT"),
+        }
+    }
 
 
 # Password validation

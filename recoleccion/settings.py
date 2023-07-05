@@ -81,7 +81,7 @@ WSGI_APPLICATION = "recoleccion.wsgi.application"
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 
-if os.getenv("ENV") == "testing":
+if os.getenv("ENV") == "testing":  # Github Actions only
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
@@ -96,11 +96,11 @@ else:
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
-            "NAME": config.get("RDS_DB_NAME", None) or os.getenv("POSTGRES_DB"),
-            "USER": config.get("RDS_USERNAME", None) or os.getenv("POSTGRES_USER"),
-            "PASSWORD": config.get("RDS_PASSWORD", None) or os.getenv("POSTGRES_PASSWORD"),
-            "HOST": config.get("RDS_HOSTNAME", None) or os.getenv("POSTGRES_HOST"),
-            "PORT": config.get("RDS_PORT", None) or os.getenv("POSTGRES_PORT"),
+            "NAME": config.get("RDS_DB_NAME"),
+            "USER": config.get("RDS_USERNAME"),
+            "PASSWORD": config.get("RDS_PASSWORD"),
+            "HOST": config.get("RDS_HOSTNAME"),
+            "PORT": config.get("RDS_PORT"),
         }
     }
 

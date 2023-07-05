@@ -10,6 +10,10 @@ jobs:
 
     services:
       postgres:
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: github_actions
         image: postgres:latest
         ports:
           - 5432:5432

@@ -10,14 +10,14 @@ class DeputyHistory(Resource):
     name = "DeputyHistory"
     key = "169de2eb-465f-4007-a4c2-39a5ba4c0df3"
     column_mappings = {
-        "DIPUTADO_ID": "deputy_id",
-        "DIPUTADO_NOMBRE": "name",
-        "DIPUTADO_APELLIDO": "last_name",
-        "DIPUTADO_GENERO": "gender",
-        "DIPUTADO_DISTRITO": "district",
-        "DIPUTADO_BLOQUE": "party",
-        "MANDATO_INICIO": "start_of_term",
-        "MANDATO_FIN": "end_of_term",
+        "diputado_id": "deputy_id",
+        "diputado_nombre": "name",
+        "diputado_apellido": "last_name",
+        # "DIPUTADO_GENERO": "gender",
+        "diputado_distrito": "district",
+        "diputado_bloque": "party",
+        "mandato_inicio": "start_of_term",
+        "mandato_fin": "end_of_term",
     }
 
     def clean_data(self, data):
@@ -36,8 +36,9 @@ class DeputySource(DataSource):
         DeputyHistory(),
     ]
 
-    def get_resources(self):
-        url = f"{self.base_url}/action/current_package_list_with_resources"
+    @classmethod
+    def get_resources(cls):
+        url = f"{cls.base_url}/action/current_package_list_with_resources"
         response = requests.request("GET", url)
         resources = []
         for dataset in response.json()["result"]:
@@ -46,8 +47,9 @@ class DeputySource(DataSource):
                     resources.append(Resource(resource["name"], resource["id"]))
         return resources
 
-    def get_resource(self, resource):
-        url = f"{self.base_url}/action/resource_show?id={resource.key}"
-        response = requests.request("GET", url)
+    @classmethod
+    def get_resource(cls, resource: DeputyHistory):
+        url = f"{cls.base_url}/action/resource_show?id={resource.key}"
+        response = requests.get(url)
         resource_url = response.json()["result"]["url"]
         return resource.clean_data(pd.read_csv(resource_url, sep=","))

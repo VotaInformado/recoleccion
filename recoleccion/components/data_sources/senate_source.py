@@ -11,16 +11,17 @@ class SenateHistory(Resource):
     name = "SenateHistory"
     key = "ExportarListadoSenadoresHistorico"
     column_mappings = {
-        "NOMBRE": "name",
-        "APELLIDO": "last_name",
-        "PROVINCIA": "province",
-        "PARTIDO POLITICO O ALIANZA": "party",
-        "INICIO PERIODO LEGAL": "start_of_term",
-        "CESE PERIODO LEGAL": "end_of_term",
+        "nombre": "name",
+        "apellido": "last_name",
+        "provincia": "province",
+        "partido politico o alianza": "party",
+        "inicio periodo legal": "start_of_term",
+        "cese periodo legal": "end_of_term",
     }
 
-    def clean_data(self, data):
-        data[["APELLIDO", "NOMBRE"]] = data["SENADOR"].str.split(",", 1, expand=True)
+    def clean_data(self, data: pd.DataFrame):
+        data.columns = [column.lower() for column in data.columns]
+        data[["apellido", "nombre"]] = data["senador"].str.split(",", n=1, expand=True)
         data = self.get_and_rename_relevant_columns(data)
         # Reemplazo los DNI en 0 por None para que no explote por duplicado
         data = data.replace(0, None)

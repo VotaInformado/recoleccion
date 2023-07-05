@@ -26,7 +26,8 @@ class Resource:
         """
         Get the relevant columns of the data as a DataFrame and rename them
         """
-        relevant_columns = data[[key for key, value in self.column_mappings.items()]]
+        data.columns = [column.lower() for column in data.columns]
+        relevant_columns = data[[key.lower() for key in self.column_mappings.keys()]]
         renamed = relevant_columns.rename(columns=self.column_mappings)
         return renamed
 

@@ -83,11 +83,11 @@ WSGI_APPLICATION = "recoleccion.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": config.get("RDS_DB_NAME"),
-        "USER": config.get("RDS_USERNAME"),
-        "PASSWORD": config.get("RDS_PASSWORD"),
-        "HOST": config.get("RDS_HOSTNAME"),
-        "PORT": config.get("RDS_PORT"),
+        "NAME": config.get("RDS_DB_NAME", None) or config.get("POSTGRES_DB"),
+        "USER": config.get("RDS_USERNAME", None) or config.get("POSTGRES_USER"),
+        "PASSWORD": config.get("RDS_PASSWORD", None) or config.get("POSTGRES_PASSWORD"),
+        "HOST": config.get("RDS_HOSTNAME", None) or config.get("POSTGRES_HOST"),
+        "PORT": config.get("RDS_PORT", None) or config.get("POSTGRES_PORT"),
     }
 }
 

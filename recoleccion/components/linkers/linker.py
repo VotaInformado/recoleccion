@@ -10,6 +10,8 @@ from recoleccion.exceptions.custom import LinkingException
 
 DUBIOUS_LOWER_LIMIT = 0.1
 DUBIOUS_UPPER_LIMIT = 0.7
+MIN_ACCEPTABLE_LOWER_LIMIT = 0.05
+MIN_ACCEPTABLE_UPPER_LIMIT = 0.6
 
 
 class Linker:
@@ -82,12 +84,14 @@ class Linker:
         max_conf_pair = max(possible_mappings, key=lambda x: self.confidence(x))
         min_conf_pair = min(possible_mappings, key=lambda x: self.confidence(x))
         max_confidence = max_conf_pair[1][0][1]
+        # el problema de este d_l_l es que si hay un match con 1e-10 por ej, lo va a tomar como válido
         dubious_lower_limit = max_confidence * DUBIOUS_LOWER_LIMIT
         dubious_upper_limit = max_confidence * DUBIOUS_UPPER_LIMIT
+        dubious_lower_limit = max(dubious_lower_limit, MIN_ACCEPTABLE_LOWER_LIMIT)
+        dubious_upper_limit = max(dubious_upper_limit, MIN_ACCEPTABLE_UPPER_LIMIT)
         certain_matches = []
         dubious_matches = []
         distinct_matches = []
-
         for messy_data_index, possible_maps in possible_mappings:
             if len(possible_maps) == 0:
                 continue  # No matches

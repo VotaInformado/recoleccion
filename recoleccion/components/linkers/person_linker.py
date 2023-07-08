@@ -42,6 +42,7 @@ class PersonLinker(Linker):
         self.train(messy_data)
         certain, _ = self.classify(messy_data)
         mapping = [None for x in range(data.shape[0])]
+
         for messy_data_index, canonical_data_index in certain:  # Probably could be done in paralell
             # canonical_data_id = (
             #     canonical_data_index + 1

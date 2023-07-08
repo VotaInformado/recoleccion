@@ -72,4 +72,4 @@ jobs:
     - name: Deploy to Elastic Beanstalk
       run: |
         eb init vota-informado-informacion --region sa-east-1 --platform Python
-        eb deploy Vota-informado-informacion-env --staged
+        eb deploy vi-informacion-env --staged

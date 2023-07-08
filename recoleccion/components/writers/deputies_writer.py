@@ -2,7 +2,7 @@ from datetime import datetime as dt
 
 # Project
 from vi_library.models.deputy_seat import DeputySeat
-from recoleccion.components.writers import LegislatorsWriter
+from .legislators_writer import LegislatorsWriter
 
 
 class DeputiesWriter(LegislatorsWriter):

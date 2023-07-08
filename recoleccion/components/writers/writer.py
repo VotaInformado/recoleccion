@@ -28,5 +28,4 @@ class Writer(ABC):
         return self.model.objects.create(**row)
 
     def update_element(self, row):
-        # self.model should be defined in the child class
         return self.model.objects.update(**row)

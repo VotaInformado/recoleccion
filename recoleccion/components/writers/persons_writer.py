@@ -1,5 +1,8 @@
+import pandas as pd
+
+# Project
 from vi_library.models.person import Person
-from recoleccion.components.writers import Writer
+from .writer import Writer
 
 
 class PersonsWriter(Writer):
@@ -15,12 +18,12 @@ class PersonsWriter(Writer):
     def get_key(self, row):
         return row["dni"] if "dni" in row else None
 
-    def create_element(self, row):
+    def create_element(self, row: pd.Series):
         person = Person.objects.create(
-            name=row.get("name", None),
-            last_name=row.get("last_name", None),
-            dni=row.get("dni", None),
-            gender=row.get("gender", None),
-            birthdate=row.get("birthdate", None),
+            name=row.get("name"),
+            last_name=row.get("last_name"),
+            dni=row.get("dni"),
+            sex=row.get("gender"),
+            date_of_birth=row.get("birthdate"),
         )
         return person

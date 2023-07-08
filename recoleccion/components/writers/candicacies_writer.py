@@ -1,5 +1,5 @@
-from recoleccion.components.writers import Writer
-from recoleccion.components.writers import PersonsWriter
+from .writer import Writer
+from .persons_writer import PersonsWriter
 
 class CandicaciesWriter(Writer):
 

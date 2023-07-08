@@ -1,19 +1,27 @@
-from vi_library.models import SenateSeat
-from recoleccion.components.writers import LegislatorsWriter
-from sqlalchemy import tuple_
+from django.db.models import Q
+import pandas as pd
+
+# Project
+from vi_library.models import SenateSeat, Person
+from .legislators_writer import LegislatorsWriter
 
 
 class SenatorsWriter(LegislatorsWriter):
+    model = SenateSeat
     def get_existing_by_key(self, data):
         unique_senators_seats = data.loc[
             data["person_id"].notnull() & data["start_of_term"].notnull() & data["end_of_term"].notnull(),
             ["person_id", "start_of_term", "end_of_term"],
         ].drop_duplicates()
-
         seats_info = set(unique_senators_seats.itertuples(index=False, name=None))
-        repeated_senators = SenateSeat.query.filter(
-            tuple_(SenateSeat.person_id, SenateSeat.start_of_term, SenateSeat.end_of_term).in_(seats_info)
-        ).all()
+        # need to cast uuid to str to compare
+        seats_info = tuple([tuple([str(seat[0]), seat[1], seat[2]]) for seat in seats_info])
+        id, s_date, f_date = seats_info[0]
+        person = Person.objects.get(id=id)
+        SenateSeat.objects.create(province="test", party="test", start_of_term=s_date, end_of_term=f_date, person=person)
+        repeated_senators = SenateSeat.objects.extra(
+            where=["(senate_seat.person_id::text,start_of_term,end_of_term) in %s"], params=[tuple(seats_info)]
+        )
         return {
             (senator.person_id, senator.start_of_term, senator.end_of_term): senator for senator in repeated_senators
         }
@@ -27,3 +35,8 @@ class SenatorsWriter(LegislatorsWriter):
             end_of_term=row.get("end_of_term"),
         )
         return senator_seat
+
+    def update_element(self, row: pd.Series):
+        row.pop("name")
+        row.pop("last_name")
+        return SenateSeat.update_or_raise(**row)

@@ -1,19 +1,26 @@
 from dedupe import Gazetteer, console_label
 import os
 import pandas as pd
-from vi_library.models.person import Person
 from pprint import pp
-from project.utils import unidecode_text
-from datetime import date
+
+# Project
+from vi_library.models.person import Person
+from recoleccion.exceptions.custom import LinkingException
+
 
 DUBIOUS_LOWER_LIMIT = 0.1
 DUBIOUS_UPPER_LIMIT = 0.7
 
 
 class Linker:
+    TRAINING_DIR = "recoleccion/components/linkers/training"
+
     def _save_training(self, gazetteer):
-        with open(f"./training/{self.__class__.__name__}.json", "w") as f:
+        with open(f"{self.TRAINING_DIR}/{self.__class__.__name__}.json", "w") as f:
             gazetteer.write_training(f)
+
+    def get_canonical_data(self):
+        return self.canonical_data
 
     def label_pairs(self, pairs, messy_data):
         """
@@ -55,13 +62,17 @@ class Linker:
         return match_records_ids, distinct_records_ids
 
     def train(self, messy_data):
-        if os.path.exists(f"training/{self.__class__.__name__}.json"):
-            with open(f"training/{self.__class__.__name__}.json") as f:
+        if len(messy_data) > len(self.canonical_data):
+            raise LinkingException(
+                f"There are more messy records ({len(messy_data)}) than canonical record ({len(self.canonical_data)})"
+            )
+        file_dir = f"{self.TRAINING_DIR}/{self.__class__.__name__}.json"
+        if os.path.exists(file_dir):
+            with open(file_dir) as f:
                 self.gazetteer.prepare_training(messy_data, self.canonical_data, training_file=f)
         else:
             self.gazetteer.prepare_training(messy_data, self.canonical_data)
             console_label(self.gazetteer)  # Run active learning because no training data exists
-
         self.gazetteer.train()
         self.gazetteer.index(self.canonical_data)
 
@@ -98,62 +109,3 @@ class Linker:
 
     def confidence(self, match):
         return match[1][0][1] if len(match[1]) > 0 else -1
-
-
-class PersonLinker(Linker):
-    fields = [
-        {"field": "name", "type": "String"},
-        {"field": "last_name", "type": "String"},
-    ]
-
-    def __init__(self):
-        self.gazetteer = Gazetteer(self.fields)
-        self.canonical_data = pd.DataFrame(
-            map(lambda x: (x.name, x.last_name, x.id), Person.query.all()), columns=["name", "last_name", "id"]
-        )
-        self.canonical_data[["name", "last_name"]] = self.canonical_data[["name", "last_name"]].applymap(
-            lambda x: unidecode_text(x)
-        )
-        self.canonical_data = self.canonical_data.to_dict(orient="index")
-
-    def link_persons(self, data):
-
-        messy_data = data.copy()
-        messy_data[["name", "last_name"]] = messy_data[["name", "last_name"]].applymap(lambda x: unidecode_text(x))
-        messy_data = self._date_to_str(messy_data)
-
-        messy_data = messy_data.to_dict(orient="index")
-        self.train(messy_data)
-        certain, _ = self.classify(messy_data)
-
-        mapping = [None for x in range(data.shape[0])]
-
-        for messy_data_index, canonical_data_index in certain:  # Probably could be done in paralell
-            canonical_data_id = (
-                canonical_data_index + 1
-            )  # Don't know why it's necessary maybe: `canonical_data[canonical_data_index].id`?
-            mapping[messy_data_index] = canonical_data_id
-
-        data["person_id"] = mapping
-        return data
-
-    def _date_to_str(self, data):
-        # Convert datetime
-        for datetime_column in data.select_dtypes(include=["datetime", "datetimetz"]).columns:
-            data[datetime_column] = data[datetime_column].dt.strftime("%Y-%m-%d")
-
-        # Convert date
-        for date_column in self._date_cols(data):
-            data[date_column] = data[date_column].map(lambda x: x.strftime("%Y-%m-%d"))
-
-        return data
-
-    def _date_cols(self, data):
-        date_cols = []
-        if data.shape[0] == 0:
-            return date_cols
-
-        for col, value in data.iloc[0].iteritems():
-            if isinstance(value, date):
-                date_cols.append(col)
-        return date_cols

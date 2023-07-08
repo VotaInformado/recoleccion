@@ -5,8 +5,6 @@ import sys
 
 
 def main():
-    print("AAAAA")
-    print(os.getenv("POSTGRES_DB"))
     """Run administrative tasks."""
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'recoleccion.settings')
     try:

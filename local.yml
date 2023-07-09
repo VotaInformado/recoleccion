@@ -42,4 +42,4 @@ networks:
 
 secrets:
   ssh_private_key:
-    file: /home/andy/.ssh/id_ed25519
+    file: ~/.ssh/id_ed25519

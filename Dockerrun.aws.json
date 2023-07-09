@@ -1,0 +1,10 @@
+{
+    "AWSEBDockerrunVersion": 2,
+    "containerDefinitions": [
+      {
+        "image": "vota-informado-recoleccion:latest",
+        "essential": true,
+        "memory": 128
+      }
+    ]
+  }

@@ -11,6 +11,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout Latest Repo
+        uses: actions/checkout@master
+        
       - name: Get Timestamp
         uses: gerred/actions/current-time@master
         id: current-time

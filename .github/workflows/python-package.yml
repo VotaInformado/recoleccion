@@ -14,6 +14,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
+      - name: Configure SSH key
+        run: |
+          mkdir -p ~/.ssh/
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+
       - name: Checkout repository
         uses: actions/checkout@v2
 
@@ -21,7 +27,7 @@ jobs:
         uses: docker-practice/actions-setup-docker@master
 
       - name: Build Docker image
-        run: docker compose -f local.yml build --build-arg CACHEBUST=$(openssl rand -base64 32)
+        run: docker compose -f local.yml build --build-arg CACHEBUST=$(openssl rand -base64 32)yy
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v1

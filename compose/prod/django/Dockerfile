@@ -29,3 +29,5 @@ ENV CACHEBUST=$CACHEBUST
 RUN echo "CACHEBUST value: $CACHEBUST"
 
 RUN pip install --no-cache-dir -r /requirements/extra.txt
+
+ENTRYPOINT ["/start"]

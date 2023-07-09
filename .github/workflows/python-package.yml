@@ -53,14 +53,13 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
+      - name: Install Elastic Beanstalk CLI
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-pip
+          sudo pip3 install awsebcli --upgrade
+
       - name: Deploy to Elastic Beanstalk
         run: |
-          aws elasticbeanstalk create-application-version \
-            --application-name vota-informado-recoleccion \
-            --version-label $GITHUB_SHA \
-            --source-bundle S3Bucket=s3://elasticbeanstalk-sa-east-1-344229115324,S3Key=vi-reco.zip
-
-          aws elasticbeanstalk update-environment \
-            --application-name vota-informado-recoleccion \
-            --environment-name vi-recoleccion-env \
-            --version-label $GITHUB_SHA
+          eb init vota-informado-informacion --region sa-east-1 --platform Python
+          eb deploy Vota-informado-informacion-env --staged

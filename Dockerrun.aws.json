@@ -1,10 +1,14 @@
+
 {
-    "AWSEBDockerrunVersion": 1,
-    "containerDefinitions": [
+    "AWSEBDockerrunVersion": "1",
+    "Image": {
+      "Name": "vota-informado-recoleccion:latest",
+      "Update": "true"
+    },
+    "Ports": [
       {
-        "image": "vota-informado-recoleccion:latest",
-        "essential": true,
-        "memory": 128
+        "ContainerPort": 80
       }
     ]
-  }
+}
+  

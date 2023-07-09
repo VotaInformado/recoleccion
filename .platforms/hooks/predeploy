@@ -1,0 +1,5 @@
+#!/bin/bash
+set -e
+
+echo "Running custom command on deployment..."
+docker exec -it $(docker-compose -f production.yml run --rm --service-ports django.recoleccion.prod) python manage.py migrate

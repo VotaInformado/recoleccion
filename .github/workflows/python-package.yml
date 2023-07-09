@@ -1,75 +1,60 @@
-name: Deploy to AWS Elastic Beanstalk
+name: Build and Deploy
+
 on:
   push:
     branches:
-      - docker
+      - main
+
+env:
+  AWS_REGION: us-east-1
+  DOCKER_IMAGE_NAME: your-docker-image-name
 
 jobs:
-  run-tests:
+  build:
     runs-on: ubuntu-latest
 
-    services:
-      postgres:
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: github_actions
-        image: postgres:latest
-        ports:
-          - 5432:5432
-        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
-
     steps:
-    - name: Configure SSH key
-      run: |
-        mkdir -p ~/.ssh/
-        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
-        chmod 600 ~/.ssh/id_ed25519
-        ssh-keyscan github.com >> ~/.ssh/known_hosts
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.x
+      - name: Set up Docker
+        uses: docker/setup-docker@v1
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
+      - name: Build Docker image
+        run: docker build -t $DOCKER_IMAGE_NAME .
 
-    - name: Run Django tests
-      env:
-        POSTGRES_HOST: localhost
-        POSTGRES_USER: postgres
-        POSTGRES_PASSWORD: postgres
-        POSTGRES_DB: postgres
-        POSTGRES_PORT: 5432
-      run: |
-        python manage.py test
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Push Docker image to Docker Hub
+        run: |
+          docker tag vi-informacion andy912/vota-informado-recoleccion
+          docker push andy912/vota-informado-recoleccion
 
   deploy:
-    needs: run-tests
+    needs: build
+
     runs-on: ubuntu-latest
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
 
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: sa-east-1
+      - name: Deploy to Elastic Beanstalk
+        run: |
+          aws elasticbeanstalk create-application-version \
+            --application-name vota-informado-recoleccion \
+            --version-label $GITHUB_SHA \
+            --source-bundle S3Bucket=s3://elasticbeanstalk-sa-east-1-344229115324,S3Key=vi-reco.zip
 
-    - name: Install Elastic Beanstalk CLI
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y python3-pip
-        sudo pip3 install awsebcli --upgrade
-
-    - name: Deploy to Elastic Beanstalk
-      run: |
-        eb init vota-informado-recoleccion --region sa-east-1 --platform Python
-        eb deploy vi-recoleccion-env --staged
+          aws elasticbeanstalk update-environment \
+            --application-name vota-informado-recoleccion \
+            --environment-name vi-recoleccion-env \
+            --version-label $GITHUB_SHA

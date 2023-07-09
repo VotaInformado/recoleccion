@@ -1,0 +1,14 @@
+
+{
+    "AWSEBDockerrunVersion": "1",
+    "Image": {
+      "Name": "andy912/vota-informado-recoleccion:latest",
+      "Update": "true"
+    },
+    "Ports": [
+      {
+        "ContainerPort": 80
+      }
+    ]
+}
+  

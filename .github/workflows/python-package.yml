@@ -35,8 +35,8 @@ jobs:
         with:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          application_name: <beanstalk application name>
-          environment_name: <beanstalk environment name>
+          application_name: vota-informado-recoleccion
+          environment_name: vi-recoleccion-env
           version_label: "docker-app-${{ steps.format-time.outputs.replaced }}"
-          region: us-west-2
+          region: sa-east-1
           deployment_package: deploy.zip

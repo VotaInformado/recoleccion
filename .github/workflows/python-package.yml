@@ -3,7 +3,7 @@ name: Build and Deploy
 on:
   push:
     branches:
-      - main
+      - docker
 
 env:
   AWS_REGION: us-east-1

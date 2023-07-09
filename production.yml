@@ -1,22 +1,13 @@
 version: '3'
 
 services:
-  django.recoleccion.prod:
+  django:
     build:
       context: .
-      dockerfile: ./compose/prod/django/Dockerfile
-      secrets:
-        - ssh_private_key
-    image: vi-recoleccion-prod
-    volumes:
-      - .:/app
+      dockerfile: Dockerfile
+    # image: andy912/vota-informado-recoleccion:latest
     env_file:
-      - ./.envs/.local/.django
-      - ./.envs/.local/.postgres
+      - .env # la crea elastic beanstalk
     ports:
-      - "8000:8000"
-    command: /start
+      - "80:8000"
 
-secrets:
-  ssh_private_key:
-    file: ~/.ssh/id_ed25519

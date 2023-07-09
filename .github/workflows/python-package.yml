@@ -4,40 +4,41 @@ on:
   push:
     branches:
       - docker
+      - docker-simplify
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  # build:
+  #   runs-on: ubuntu-latest
 
-    steps:
-      - name: Configure SSH key
-        run: |
-          mkdir -p ~/.ssh/
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+  #   steps:
+  #     - name: Configure SSH key
+  #       run: |
+  #         mkdir -p ~/.ssh/
+  #         echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
         
-      - name: Checkout repository
-        uses: actions/checkout@v2
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v2
 
-      - name: Set up Docker
-        uses: docker-practice/actions-setup-docker@master
+  #     - name: Set up Docker
+  #       uses: docker-practice/actions-setup-docker@master
 
-      - name: Build Docker image
-        run: docker compose -f production.yml build --build-arg CACHEBUST=$(openssl rand -base64 32)
+  #     - name: Build Docker image
+  #       run: docker compose -f production.yml build --build-arg CACHEBUST=$(openssl rand -base64 32)
 
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+  #     - name: Log in to Docker Hub
+  #       uses: docker/login-action@v1
+  #       with:
+  #         username: ${{ secrets.DOCKERHUB_USERNAME }}
+  #         password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-      - name: Push Docker image to Docker Hub
-        run: |
-          docker tag vi-recoleccion-prod andy912/vota-informado-recoleccion
-          docker push andy912/vota-informado-recoleccion
+  #     - name: Push Docker image to Docker Hub
+  #       run: |
+  #         docker tag vi-recoleccion-prod andy912/vota-informado-recoleccion
+  #         docker push andy912/vota-informado-recoleccion
 
 
   deploy:
-    needs: build
+    # needs: build
     runs-on: ubuntu-latest
 
     steps:

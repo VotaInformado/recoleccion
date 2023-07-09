@@ -61,5 +61,6 @@ jobs:
 
       - name: Deploy to Elastic Beanstalk
         run: |
-          eb init vota-informado-recoleccion --region sa-east-1 --platform Python
-          eb deploy vi-recoleccion-env --staged
+          eb init vota-informado-recoleccion --region sa-east-1 --platform docker
+          eb use vi-recoleccion-env
+          eb deploy --label ${{ GITHUB.SHA }}

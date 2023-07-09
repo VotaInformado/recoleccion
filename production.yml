@@ -1,10 +1,10 @@
 version: '3'
 
 services:
-  django.recoleccion:
+  django.recoleccion.prod:
     build:
       context: .
-      dockerfile: ./compose/local/django/Dockerfile
+      dockerfile: ./compose/prod/django/Dockerfile
       secrets:
         - ssh_private_key
     image: vi-recoleccion-prod

@@ -5,62 +5,35 @@ on:
     branches:
       - docker
 
-env:
-  AWS_REGION: us-east-1
-  DOCKER_IMAGE_NAME: your-docker-image-name
-
 jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    steps:
-
-      - name: Configure SSH key
-        run: |
-          mkdir -p ~/.ssh/
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
-
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Set up Docker
-        uses: docker-practice/actions-setup-docker@master
-
-      - name: Build Docker image
-        run: docker compose -f local.yml build --build-arg CACHEBUST=$(openssl rand -base64 32)yy
-
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_PASSWORD }}
-
-      - name: Push Docker image to Docker Hub
-        run: |
-          docker tag vi-informacion andy912/vota-informado-recoleccion
-          docker push andy912/vota-informado-recoleccion
 
   deploy:
-    needs: build
-
     runs-on: ubuntu-latest
 
     steps:
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
+      - name: Get Timestamp
+        uses: gerred/actions/current-time@master
+        id: current-time
+
+      - name: Run String Replace
+        uses: frabert/replace-string-action@master
+        id: format-time
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
+          pattern: '[:\.]+'
+          string: "${{ steps.current-time.outputs.time }}"
+          replace-with: '-'
+          flags: 'g'
 
-      - name: Install Elastic Beanstalk CLI
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y python3-pip
-          sudo pip3 install awsebcli --upgrade
+      - name: Generate Deployment Package
+        run: zip -r deploy.zip * -x "**node_modules**"
 
-      - name: Deploy to Elastic Beanstalk
-        run: |
-          eb init vota-informado-recoleccion --region sa-east-1 --platform docker
-          eb use vi-recoleccion-env
-          eb deploy --label ${{ GITHUB.SHA }}
+      - name: Deploy to EB
+        uses: einaregilsson/beanstalk-deploy@v16
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: <beanstalk application name>
+          environment_name: <beanstalk environment name>
+          version_label: "docker-app-${{ steps.format-time.outputs.replaced }}"
+          region: us-west-2
+          deployment_package: deploy.zip

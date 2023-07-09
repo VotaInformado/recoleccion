@@ -11,7 +11,7 @@ services:
       dockerfile: ./compose/local/django/Dockerfile
       secrets:
         - ssh_private_key
-    image: vi-informacion
+    image: vi-recoleccion
     depends_on:
       - postgres.recoleccion
     volumes:

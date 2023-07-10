@@ -37,12 +37,11 @@ RUN apt-get update -y
 
 # git ssh key
 RUN mkdir -p ~/.ssh \
-    cp $SSH_PRIVATE_KEY /root/.ssh/id_ssh \
-    && chmod 600 /root/.ssh/id_ssh \
-    && chmod 700 /root/.ssh \
-    && ls -l /root/.ssh \
-    && ssh-keyscan github.com >> /root/.ssh/known_hosts
-
+    cp $SSH_PRIVATE_KEY ~/.ssh/id_ssh \
+    && chmod 600 ~/.ssh/id_ssh \
+    && chmod 700 ~/.ssh \
+    && ls -l ~/.ssh \
+    && ssh-keyscan github.com >> ~/.ssh/known_hosts
 
 COPY . /app
 RUN pip3 install -r /app/requirements.txt

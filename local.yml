@@ -7,6 +7,8 @@ volumes:
 services:
   django.recoleccion:
     build:
+      secrets:
+        - ssh_private_key
       context: .
       dockerfile: ./compose/local/django/Dockerfile
     image: vi-recoleccion

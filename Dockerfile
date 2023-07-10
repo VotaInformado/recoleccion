@@ -47,8 +47,6 @@ RUN chmod 600 /root/.ssh/id_rsa \
 COPY . /app
 RUN pip3 install -r /app/requirements.txt
 
-RUN chmod +x /app/start_app.sh
-
 WORKDIR /app
 
 COPY ./compose/prod/django/start /start

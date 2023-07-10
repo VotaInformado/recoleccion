@@ -32,7 +32,7 @@
 
 # ENTRYPOINT ["/start"]
 
-FROM python:3.10.11
+FROM python:3.11
 RUN apt-get update -y
 
 RUN mkdir -p /root/.ssh
@@ -51,4 +51,8 @@ RUN chmod +x /app/start_app.sh
 
 WORKDIR /app
 
-ENTRYPOINT ["/app/start_app.sh"]
+COPY ./compose/prod/django/start /start
+RUN sed -i 's/\r//' /start
+RUN chmod +x /start
+
+ENTRYPOINT ["/start"]

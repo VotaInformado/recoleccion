@@ -11,11 +11,6 @@ RUN --mount=type=secret,id=ssh_private_key \
     && ls -l /root/.ssh \
     && ssh-keyscan github.com >> /root/.ssh/known_hosts
 
-RUN apt-get update \
-  && apt-get install -y git \
-  && apt-get install -y build-essential libpq-dev postgresql-client \
-  && apt-get clean
-
 COPY ./requirements /requirements
 RUN pip -v install --no-cache-dir -r /requirements/base.txt
 

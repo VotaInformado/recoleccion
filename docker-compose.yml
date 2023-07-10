@@ -3,14 +3,16 @@ version: '3'
 services:
   django:
     build:
+      secrets:
+        - ssh_private_key
       context: .
       dockerfile: Dockerfile
-      args:
-        SSH_PRIVATE_KEY: ~/.ssh/id_ssh
     # image: andy912/vota-informado-recoleccion:latest
     # env_file:
     #   - .env # la crea elastic beanstalk
     ports:
       - "80:8000"
 
-
+secrets:
+  ssh_private_key:
+    file: ~/.ssh/id_ed25519

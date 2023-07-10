@@ -9,8 +9,6 @@ services:
     build:
       context: .
       dockerfile: ./compose/local/django/Dockerfile
-      secrets:
-        - ssh_private_key
     image: vi-recoleccion
     depends_on:
       - postgres.recoleccion

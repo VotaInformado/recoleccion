@@ -1,6 +1,6 @@
 # AWS only
 
-version: '1'
+version: '3'
 
 services:
   django:

@@ -36,12 +36,13 @@ FROM python:3.10.11
 RUN apt-get update -y
 
 # git ssh key
-RUN mkdir -p /root/.ssh \
-    && echo "$SSH_KEY" > /root/.ssh/id_rsa \
-    && chmod 600 /root/.ssh/id_rsa \
+RUN mkdir -p ~/.ssh \
+    cp $SSH_PRIVATE_KEY /root/.ssh/id_ssh \
+    && chmod 600 /root/.ssh/id_ssh \
     && chmod 700 /root/.ssh \
     && ls -l /root/.ssh \
     && ssh-keyscan github.com >> /root/.ssh/known_hosts
+
 
 COPY . /app
 RUN pip3 install -r /app/requirements.txt

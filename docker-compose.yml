@@ -5,9 +5,12 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        SSH_PRIVATE_KEY: ~/.ssh/id_ssh
     # image: andy912/vota-informado-recoleccion:latest
-    env_file:
-      - .env # la crea elastic beanstalk
+    # env_file:
+    #   - .env # la crea elastic beanstalk
     ports:
       - "80:8000"
+
 

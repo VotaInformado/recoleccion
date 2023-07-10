@@ -1,0 +1,3 @@
+#!/bin/bash
+# copy ssh key into the project
+cp ~/.ssh/id_ssh /var/app/current/id_ssh

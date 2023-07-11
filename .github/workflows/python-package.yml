@@ -3,9 +3,7 @@ name: Build and Deploy
 on:
   push:
     branches:
-      - docker
-      - docker-simplify
-
+      - development
 jobs:
   run-tests:
     runs-on: ubuntu-latest

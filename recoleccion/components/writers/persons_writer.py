@@ -1,12 +1,21 @@
 import pandas as pd
 
 # Project
-from vi_library.models.person import Person
+from vi_library.models import Person, SocialData
 from .writer import Writer
 
 
 class PersonsWriter(Writer):
     model = Person
+
+    def write(self, data: pd.DataFrame, add_social_data=False):
+        written = []
+        for _, row in data.iterrows():
+            person = self.create_element(row)
+            written.append(person)
+            if add_social_data:
+                self.create_social_data(row, person)
+        return written
     
     def get_existing_by_key(self, data):
         if "dni" not in data.columns:
@@ -17,6 +26,12 @@ class PersonsWriter(Writer):
 
     def get_key(self, row):
         return row["dni"] if "dni" in row else None
+    
+    def create_social_data(self, row: pd.Series, person: Person):
+        social_data_fields = ["twitter", "facebook", "instagram", "youtube", "email", "phone", "tiktok"]
+        social_data = {key: value for key, value in row.items() if key in social_data_fields}
+        social_data["person"] = person
+        SocialData.objects.create(**social_data)
 
     def create_element(self, row: pd.Series):
         person = Person.objects.create(

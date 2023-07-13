@@ -26,9 +26,6 @@ class Migration(migrations.Migration):
                 ('date_of_birth', models.DateField(null=True)),
                 ('sex', models.CharField(choices=[('M', 'Masculino'), ('F', 'Femenino')], max_length=1, null=True)),
             ],
-            options={
-                'db_table': 'person',
-            },
         ),
         migrations.CreateModel(
             name='SenateSeat',
@@ -43,7 +40,6 @@ class Migration(migrations.Migration):
                 ('person', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='senate_seat', to='recoleccion.person')),
             ],
             options={
-                'db_table': 'senate_seat',
                 'unique_together': {('person_id', 'start_of_term', 'end_of_term')},
             },
         ),
@@ -55,13 +51,12 @@ class Migration(migrations.Migration):
                 ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
                 ('deputy_id', models.CharField(max_length=10)),
                 ('district', models.CharField(max_length=150)),
-                ('party', models.CharField(max_length=150)),
+                ('partyF', models.CharField(max_length=150)),
                 ('start_of_term', models.DateField()),
                 ('end_of_term', models.DateField()),
                 ('person', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='deputy_seat', to='recoleccion.person')),
             ],
             options={
-                'db_table': 'deputy_seat',
                 'unique_together': {('person_id', 'start_of_term', 'end_of_term')},
             },
         ),

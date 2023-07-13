@@ -20,7 +20,7 @@ class SenatorsWriter(LegislatorsWriter):
         person = Person.objects.get(id=id)
         SenateSeat.objects.create(province="test", party="test", start_of_term=s_date, end_of_term=f_date, person=person)
         repeated_senators = SenateSeat.objects.extra(
-            where=["(senate_seat.person_id::text,start_of_term,end_of_term) in %s"], params=[tuple(seats_info)]
+            where=["(recoleccion_senateseat.person_id::text,start_of_term,end_of_term) in %s"], params=[tuple(seats_info)]
         )
         return {
             (senator.person_id, senator.start_of_term, senator.end_of_term): senator for senator in repeated_senators

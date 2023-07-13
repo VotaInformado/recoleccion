@@ -32,6 +32,32 @@ class SenateHistory(Resource):
         return data
 
 
+class CurrentSenate(Resource):
+    name = "SenateHistory"
+    key = "ExportarListadoSenadores"
+    column_mappings = {
+        "nombre": "name",
+        "apellido": "last_name",
+        "provincia": "province",
+        "partido o alianza": "party",
+        "d_legal": "start_of_term",
+        "c_legal": "end_of_term",
+        "telefono": "phone",
+    }
+    correct_columns = {"twitter", "facebook", "instagram", "youtube", "email"}
+
+    def clean_data(self, data: pd.DataFrame):
+        data = self.get_and_rename_relevant_columns(data)
+        # Reemplazo los DNI en 0 por None para que no explote por duplicado
+        data = data.replace(0, None)
+        for column in ["name", "last_name", "province", "party"]:
+            data[column] = data[column].map(clean_text_formatting).astype(str)
+        for column in ["start_of_term", "end_of_term"]:
+            data[column] = pd.to_datetime(data[column], infer_datetime_format=True).dt.date
+        data["is_active"] = True
+        return data
+
+
 class SenateSource(DataSource):
     base_url = "https://www.senado.gob.ar/micrositios/DatosAbiertos"
     resources = [SenateHistory()]
@@ -39,10 +65,11 @@ class SenateSource(DataSource):
     def get_resources(self):
         return self.resources
 
-    def get_resource(self, resource):
+    def get_resource(self, resource: Resource):
         url = f"{self.base_url}/{resource.key}/json"
         response = requests.request("GET", url)
         soup = BeautifulSoup(response.text, features="html.parser")
         plain_text = soup.get_text()  # Obtengo el texto sin html
         rows = plain_text[plain_text.index("[") : plain_text.rfind("]") + 1]  # Me quedo solo con las filas
-        return resource.clean_data(pd.read_json(rows, orient="records"))
+        data = pd.read_json(rows, orient="records")
+        return resource.clean_data(data)

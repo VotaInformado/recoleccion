@@ -22,12 +22,12 @@ class DeputiesWriter(LegislatorsWriter):
         }
 
     def create_element(self, row):
-        senator_seat = DeputySeat(
+        senator_seat = DeputySeat.objects.create(
             person_id=int(row.get("person_id")),
-            deputy_id=row.get("deputy_id"),
             district=row.get("district"),
             party=row.get("party"),
             start_of_term=row.get("start_of_term"),
             end_of_term=row.get("end_of_term"),
+            is_active=row.get("is_active"),
         )
         return senator_seat

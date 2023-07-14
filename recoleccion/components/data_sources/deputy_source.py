@@ -65,6 +65,7 @@ class CurrentDeputies(DeputyHistory):
             data[column] = data[column].map(clean_text_formatting).astype(str)
         for column in ["start_of_term", "end_of_term"]:
             data[column] = pd.to_datetime(data[column], format="mixed")
+        data["is_active"] = True
         return data
 
 

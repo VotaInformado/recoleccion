@@ -17,7 +17,7 @@ MIN_ACCEPTABLE_UPPER_LIMIT = 0.6
 class Linker:
     TRAINING_DIR = "recoleccion/components/linkers/training"
 
-    def _save_training(self, gazetteer):
+    def _save_training(self, gazetteer: Gazetteer):
         with open(f"{self.TRAINING_DIR}/{self.__class__.__name__}.json", "w") as f:
             gazetteer.write_training(f)
 

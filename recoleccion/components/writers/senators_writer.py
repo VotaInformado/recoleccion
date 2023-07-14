@@ -16,9 +16,6 @@ class SenatorsWriter(LegislatorsWriter):
         seats_info = set(unique_senators_seats.itertuples(index=False, name=None))
         # need to cast uuid to str to compare
         seats_info = tuple([tuple([str(seat[0]), seat[1], seat[2]]) for seat in seats_info])
-        id, s_date, f_date = seats_info[0]
-        person = Person.objects.get(id=id)
-        SenateSeat.objects.create(province="test", party="test", start_of_term=s_date, end_of_term=f_date, person=person)
         repeated_senators = SenateSeat.objects.extra(
             where=["(recoleccion_senateseat.person_id::text,start_of_term,end_of_term) in %s"], params=[tuple(seats_info)]
         )

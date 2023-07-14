@@ -20,13 +20,50 @@ class DeputyHistory(Resource):
         "mandato_fin": "end_of_term",
     }
 
-    def clean_data(self, data):
-        data = self.get_and_rename_relevant_columns(data)
+    def get_raw_data(self):
+        url = f"{self.base_url}/action/resource_show?id={self.key}"
+        response = requests.get(url)
+        resource_url = response.json()["result"]["url"]
+        data = pd.read_csv(resource_url, sep=";")
+        return data
+
+    def get_clean_data(self):
+        raw_data: pd.DataFrame = self.get_raw_data()
+        data = self.get_and_rename_relevant_columns(raw_data)
         for column in ["name", "last_name", "district", "party"]:
             data[column] = data[column].map(clean_text_formatting).astype(str)
         for column in ["start_of_term", "end_of_term"]:
             data[column] = pd.to_datetime(data[column], infer_datetime_format=True)
+        return data
 
+
+class CurrentDeputies(DeputyHistory):
+    """There isn't actually a resource for current deputies.
+    We get the historic data and filter the ones that are current
+    """
+
+    column_mappings = {
+        "nombre": "name",
+        "apellido": "last_name",
+        # "DIPUTADO_GENERO": "gender",
+        "distrito": "district",
+        "bloque": "party",
+        "iniciamandato": "start_of_term",
+        "finalizamandato": "end_of_term",
+    }
+
+    FILE_PATH = "recoleccion/files/diputados.csv"
+
+    def get_raw_data(self):
+        return pd.read_csv(self.FILE_PATH)
+
+    def get_clean_data(self):
+        raw_data = self.get_raw_data()
+        data = self.get_and_rename_relevant_columns(raw_data)
+        for column in ["name", "last_name", "district", "party"]:
+            data[column] = data[column].map(clean_text_formatting).astype(str)
+        for column in ["start_of_term", "end_of_term"]:
+            data[column] = pd.to_datetime(data[column], format="mixed")
         return data
 
 
@@ -43,13 +80,10 @@ class DeputySource(DataSource):
         resources = []
         for dataset in response.json()["result"]:
             for resource in dataset["resources"]:
-                if resource["format"] == "CSV": #Faltaría manejo de errores y sino probar con JSON
+                if resource["format"] == "CSV":  # Faltaría manejo de errores y sino probar con JSON
                     resources.append(Resource(resource["name"], resource["id"]))
         return resources
 
     @classmethod
     def get_resource(cls, resource: DeputyHistory):
-        url = f"{cls.base_url}/action/resource_show?id={resource.key}"
-        response = requests.get(url)
-        resource_url = response.json()["result"]["url"]
-        return resource.clean_data(pd.read_csv(resource_url, sep=","))
+        return resource.get_clean_data()

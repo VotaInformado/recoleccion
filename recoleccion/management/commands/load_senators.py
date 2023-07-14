@@ -5,7 +5,7 @@ from django.core.management.base import BaseCommand
 from datetime import datetime as dt, timezone
 
 # Components
-from recoleccion.components.data_sources.senate_source import CurrentSenate, SenateSource
+from recoleccion.components.data_sources import CurrentSenate, SenateSource
 from recoleccion.components.linkers import PersonLinker
 from recoleccion.components.writers.persons_writer import PersonsWriter
 

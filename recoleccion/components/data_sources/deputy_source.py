@@ -7,6 +7,7 @@ from recoleccion.components.utils import clean_text_formatting
 
 
 class DeputyHistory(Resource):
+    base_url = "https://datos.hcdn.gob.ar:443/api/3"
     name = "DeputyHistory"
     key = "169de2eb-465f-4007-a4c2-39a5ba4c0df3"
     column_mappings = {
@@ -24,7 +25,7 @@ class DeputyHistory(Resource):
         url = f"{self.base_url}/action/resource_show?id={self.key}"
         response = requests.get(url)
         resource_url = response.json()["result"]["url"]
-        data = pd.read_csv(resource_url, sep=";")
+        data = pd.read_csv(resource_url)
         return data
 
     def get_clean_data(self):
@@ -68,7 +69,6 @@ class CurrentDeputies(DeputyHistory):
 
 
 class DeputySource(DataSource):
-    base_url = "https://datos.hcdn.gob.ar:443/api/3"
     resources = [
         DeputyHistory(),
     ]

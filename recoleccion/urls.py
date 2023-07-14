@@ -6,13 +6,14 @@ from django.urls import include, path
 
 # Views
 from recoleccion.views import PersonViewSet
-from recoleccion.views.deputy_seats import DeputySeatsViewSet
+from recoleccion.views.deputies import DeputiesViewSet
+from recoleccion.views.senate import SenateViewSet
 
 router = SimpleRouter()
 
 router.register(r"persons", PersonViewSet, basename="persons")
-router.register(r"deputy_seats", DeputySeatsViewSet, basename="deputy_seats")
-
+router.register(r"deputies", DeputiesViewSet, basename="deputy_seats")
+router.register(r"senators", SenateViewSet, basename="senators")
 
 def health_check(request):
     return HttpResponse("OK")
@@ -20,7 +21,6 @@ def health_check(request):
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("", health_check, name="health_check"),
     path("health/", health_check, name="health_check"),
-    path("info/", include(router.urls)),
+    path("", include(router.urls)),
 ]

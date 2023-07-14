@@ -8,7 +8,6 @@ from recoleccion.serializers.persons import PersonModelSerializer
 from vi_library.models.person import Person
 
 
-class PersonViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.CreateModelMixin):
-    # TODO: sacar CreateModelMixin
+class PersonViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
     queryset = Person.objects.all()
     serializer_class = PersonModelSerializer

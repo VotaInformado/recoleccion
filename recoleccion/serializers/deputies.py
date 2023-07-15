@@ -4,9 +4,6 @@ from rest_framework import serializers
 # Models
 from vi_library.models import DeputySeat
 
-# Person serializer
-from recoleccion.serializers.persons import PersonModelSerializer
-
 
 class DeputySeatModelSerializer(serializers.ModelSerializer):
 

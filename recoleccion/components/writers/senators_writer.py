@@ -23,13 +23,14 @@ class SenatorsWriter(LegislatorsWriter):
             (senator.person_id, senator.start_of_term, senator.end_of_term): senator for senator in repeated_senators
         }
 
-    def create_element(self, row):
-        senator_seat = SenateSeat(
+    def create_element(self, row: pd.Series):
+        senator_seat = SenateSeat.objects.create(
             person_id=int(row.get("person_id")),
             province=row.get("province"),
             party=row.get("party"),
             start_of_term=row.get("start_of_term"),
             end_of_term=row.get("end_of_term"),
+            is_active=row.get("is_active", False),
         )
         return senator_seat
 

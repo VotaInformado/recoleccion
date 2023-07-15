@@ -11,10 +11,15 @@ from recoleccion.serializers.deputies import DeputySeatModelSerializer
 
 class DeputiesViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
     queryset = DeputySeat.objects.all()
-    active_queryset = DeputySeat.objects.filter(is_active=True)
     serializer_class = DeputySeatModelSerializer
+
+    def get_queryset(self):
+        queryset = DeputySeat.objects.all()
+        if self.action == "get_active_deputies":
+            queryset = queryset.filter(is_active=True)
+        return queryset
 
     @action(detail=False, methods=["get"], url_path="active")
     def get_active_deputies(self, request):
-        serializer = DeputySeatModelSerializer(self.active_queryset, many=True)
+        serializer = DeputySeatModelSerializer(self.get_queryset(), many=True)
         return Response(serializer.data)

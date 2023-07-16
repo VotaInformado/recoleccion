@@ -33,7 +33,6 @@ class SenateHistory(Resource):
 
 
 class CurrentSenate(Resource):
-    name = "SenateHistory"
     key = "ExportarListadoSenadores"
     column_mappings = {
         "nombre": "name",

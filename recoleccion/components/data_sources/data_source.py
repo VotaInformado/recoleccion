@@ -1,3 +1,6 @@
+from recoleccion.utils.custom_logger import CustomLogger
+
+
 class Resource:
     """
     Representes a resource of a DataSource
@@ -9,6 +12,9 @@ class Resource:
     name = None
     key = None
     column_mappings = {}
+
+    def __init__(self):
+        self.logger = CustomLogger()
 
     def __str__(self):
         return self.name

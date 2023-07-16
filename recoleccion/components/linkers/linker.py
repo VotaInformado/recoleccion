@@ -4,7 +4,7 @@ import pandas as pd
 from pprint import pp
 
 # Project
-from vi_library.models.person import Person
+from recoleccion.models.person import Person
 from recoleccion.exceptions.custom import LinkingException
 
 

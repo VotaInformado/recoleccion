@@ -2,11 +2,10 @@
 from rest_framework import serializers
 
 # Models
-from vi_library.models import DeputySeat
+from recoleccion.models import DeputySeat
 
 
 class DeputySeatModelSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = DeputySeat
         fields = "__all__"
@@ -15,7 +14,6 @@ class DeputySeatModelSerializer(serializers.ModelSerializer):
 
 
 class ActiveDeputiesSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = DeputySeat
         fields = "__all__"

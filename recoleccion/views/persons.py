@@ -5,7 +5,7 @@ from rest_framework import viewsets, mixins
 from recoleccion.serializers.persons import PersonModelSerializer
 
 # Models
-from vi_library.models.person import Person
+from recoleccion.models.person import Person
 
 
 class PersonViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):

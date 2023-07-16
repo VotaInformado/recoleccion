@@ -4,7 +4,7 @@ from rest_framework import viewsets, mixins
 from rest_framework.decorators import action
 
 # Models
-from vi_library.models import SenateSeat
+from recoleccion.models import SenateSeat
 
 from recoleccion.serializers.senate import SenateSeatModelSerializer
 

@@ -1,2 +1,2 @@
-from vi_library.models.base import BaseModel
-from vi_library.models.person import Person
+from recoleccion.models.base import BaseModel
+from recoleccion.models.person import Person

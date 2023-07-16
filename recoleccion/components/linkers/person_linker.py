@@ -6,7 +6,7 @@ from datetime import date
 # Project
 from recoleccion.components.linkers import Linker
 from recoleccion.components.utils import unidecode_text
-from vi_library.models import Person
+from recoleccion.models import Person
 
 
 class PersonLinker(Linker):
@@ -19,8 +19,9 @@ class PersonLinker(Linker):
         self.gazetteer = Gazetteer(self.fields)
         self.canonical_data = self.get_canonical_data()
 
-
-    def get_canonical_data(self,):
+    def get_canonical_data(
+        self,
+    ):
         canonical_data = pd.DataFrame(
             map(lambda x: (x.name, x.last_name, x.id), Person.objects.all()), columns=["name", "last_name", "id"]
         )

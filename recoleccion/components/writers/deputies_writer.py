@@ -1,7 +1,7 @@
 from datetime import datetime as dt
 
 # Project
-from vi_library.models.deputy_seat import DeputySeat
+from recoleccion.models.deputy_seat import DeputySeat
 from .legislators_writer import LegislatorsWriter
 
 
@@ -15,11 +15,10 @@ class DeputiesWriter(LegislatorsWriter):
         # need to cast uuid to str to compare
         seats_info = tuple([tuple([str(seat[0]), seat[1], seat[2]]) for seat in seats_info])
         repeated_deputies = DeputySeat.objects.extra(
-            where=["(recoleccion_deputyseat.person_id::text,start_of_term,end_of_term) in %s"], params=[tuple(seats_info)]
+            where=["(recoleccion_deputyseat.person_id::text,start_of_term,end_of_term) in %s"],
+            params=[tuple(seats_info)],
         )
-        return {
-            (deputy.person_id, deputy.start_of_term, deputy.end_of_term): deputy for deputy in repeated_deputies
-        }
+        return {(deputy.person_id, deputy.start_of_term, deputy.end_of_term): deputy for deputy in repeated_deputies}
 
     def create_element(self, row):
         senator_seat = DeputySeat.objects.create(

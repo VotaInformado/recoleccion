@@ -1,7 +1,7 @@
 import pandas as pd
 
 # Project
-from vi_library.models import Person, SocialData
+from recoleccion.models import Person, SocialData
 from .writer import Writer
 
 
@@ -16,7 +16,7 @@ class PersonsWriter(Writer):
             if add_social_data:
                 self.create_social_data(row, person)
         return written
-    
+
     def get_existing_by_key(self, data):
         if "dni" not in data.columns:
             return {}
@@ -26,7 +26,7 @@ class PersonsWriter(Writer):
 
     def get_key(self, row):
         return row["dni"] if "dni" in row else None
-    
+
     def create_social_data(self, row: pd.Series, person: Person):
         social_data_fields = ["twitter", "facebook", "instagram", "youtube", "email", "phone", "tiktok"]
         social_data = {key: value for key, value in row.items() if key in social_data_fields}

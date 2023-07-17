@@ -5,9 +5,9 @@ from django.core.management.base import BaseCommand
 from datetime import datetime as dt, timezone
 
 # Components
-from recoleccion.components.data_sources.senate_source import SenateHistory, SenateSource
+from recoleccion.components.data_sources.senate_source import SenateHistory
 from recoleccion.components.linkers import PersonLinker
-
+from recoleccion.components.writers.senators_writer import SenatorsWriter
 
 
 class Command(BaseCommand):
@@ -20,15 +20,8 @@ class Command(BaseCommand):
     #     parser.add_argument("-year", type=int)
 
     def handle(self, *args, **options):
-        from recoleccion.components.writers.senators_writer import SenatorsWriter
-        print("Start getting senate at: ", dt.now())
-        cargos_senadores = SenateSource().get_resource(SenateHistory())
-        
-        print("Start linking senate at: ", dt.now())
+        senate_seats_data = SenateHistory.get_data()
         linker = PersonLinker()
-        linked_data = linker.link_persons(cargos_senadores)
-
-        print("Start writing senate at: ", dt.now())
+        linked_data = linker.link_persons(senate_seats_data)
         writer = SenatorsWriter()
         writer.write(linked_data)
-        print("End writing senate at: ", dt.now())

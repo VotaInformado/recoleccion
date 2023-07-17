@@ -3,13 +3,12 @@ import pandas as pd
 from bs4 import BeautifulSoup
 
 # Project
-from recoleccion.components.data_sources import DataSource, Resource
+from recoleccion.components.data_sources import DataSource
 from recoleccion.components.utils import clean_text_formatting
 
 
-class SenateHistory(Resource):
-    name = "SenateHistory"
-    key = "ExportarListadoSenadoresHistorico"
+class SenateHistory(DataSource):
+    url = "https://www.senado.gob.ar/micrositios/DatosAbiertos/ExportarListadoSenadoresHistorico/json"
     column_mappings = {
         "nombre": "name",
         "apellido": "last_name",
@@ -19,10 +18,18 @@ class SenateHistory(Resource):
         "cese periodo legal": "end_of_term",
     }
 
-    def clean_data(self, data: pd.DataFrame):
+    @classmethod
+    def get_raw_data(cls) -> pd.DataFrame:
+        response = requests.get(cls.url)
+        data = response.json()["table"]["rows"]
+        return pd.DataFrame(data)
+
+    @classmethod
+    def get_data(cls):
+        data = cls.get_raw_data()
         data.columns = [column.lower() for column in data.columns]
         data[["apellido", "nombre"]] = data["senador"].str.split(",", n=1, expand=True)
-        data = self.get_and_rename_relevant_columns(data)
+        data = cls.get_and_rename_relevant_columns(data)
         # Reemplazo los DNI en 0 por None para que no explote por duplicado
         data = data.replace(0, None)
         for column in ["name", "last_name", "province", "party"]:
@@ -32,8 +39,8 @@ class SenateHistory(Resource):
         return data
 
 
-class CurrentSenate(Resource):
-    key = "ExportarListadoSenadores"
+class CurrentSenate(DataSource):
+    url = "https://www.senado.gob.ar/micrositios/DatosAbiertos/ExportarListadoSenadores/json"
     column_mappings = {
         "nombre": "name",
         "apellido": "last_name",
@@ -45,8 +52,18 @@ class CurrentSenate(Resource):
     }
     correct_columns = {"twitter", "facebook", "instagram", "youtube", "email"}
 
-    def clean_data(self, data: pd.DataFrame):
-        data = self.get_and_rename_relevant_columns(data)
+    @classmethod
+    def get_raw_data(cls) -> pd.DataFrame:
+        response = requests.get(cls.url)
+        soup = BeautifulSoup(response.content, "html.parser")
+        table = soup.find("table", {"id": "tablaSenadores"})
+        data = pd.read_html(str(table))[0]
+        return data
+
+    @classmethod
+    def get_data(cls):
+        raw_data = cls.get_raw_data()
+        data = cls.get_and_rename_relevant_columns(raw_data)
         # Reemplazo los DNI en 0 por None para que no explote por duplicado
         data = data.replace(0, None)
         for column in ["name", "last_name", "province", "party"]:
@@ -55,20 +72,3 @@ class CurrentSenate(Resource):
             data[column] = pd.to_datetime(data[column], infer_datetime_format=True).dt.date
         data["is_active"] = True
         return data
-
-
-class SenateSource(DataSource):
-    base_url = "https://www.senado.gob.ar/micrositios/DatosAbiertos"
-    resources = [SenateHistory()]
-
-    def get_resources(self):
-        return self.resources
-
-    def get_resource(self, resource: Resource):
-        url = f"{self.base_url}/{resource.key}/json"
-        response = requests.request("GET", url)
-        soup = BeautifulSoup(response.text, features="html.parser")
-        plain_text = soup.get_text()  # Obtengo el texto sin html
-        rows = plain_text[plain_text.index("[") : plain_text.rfind("]") + 1]  # Me quedo solo con las filas
-        data = pd.read_json(rows, orient="records")
-        return resource.clean_data(data)

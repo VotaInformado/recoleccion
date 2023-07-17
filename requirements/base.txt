@@ -13,3 +13,5 @@ dedupe==2.0.23
 Faker==18.11.2
 gunicorn==20.1.0
 colorlog==6.7.0
+lxml==4.9.3
+html5lib==1.1

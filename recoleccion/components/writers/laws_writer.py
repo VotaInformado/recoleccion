@@ -28,7 +28,7 @@ class LawsWriter(Writer):
             return False
         
     def has_initial_file(self, initial_file: str):
-        has_file = initial_file and initial_file != "NULL" and not pd.isnull(initial_file)
+        return initial_file and initial_file != "NULL" and not pd.isnull(initial_file)
 
     def update_or_create_element(self, row: pd.Series):
         publication_date = row["publication_date"] if self.is_valid_date(row["publication_date"]) else None
@@ -43,12 +43,9 @@ class LawsWriter(Writer):
             "vetoed": vetoed,
             "initial_file": initial_file,
         }
-        try:
-            law = Law.objects.update_or_create(
-                law_number=row["law_number"],
-                defaults=law_info,
-            )
-        except Exception as e:
-            import pdb; pdb.set_trace()
-            print(e)
+
+        law = Law.objects.update_or_create(
+            law_number=row["law_number"],
+            defaults=law_info,
+        )
         return law

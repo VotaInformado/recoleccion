@@ -1,7 +1,7 @@
 from recoleccion.utils.custom_logger import CustomLogger
 
 
-class Resource:
+class DataSource:
     """
     Representes a resource of a DataSource
     It has:
@@ -12,10 +12,8 @@ class Resource:
     name = None
     key = None
     column_mappings = {}
-
-    def __init__(self):
-        self.logger = CustomLogger()
-
+    logger = CustomLogger()
+    
     def __str__(self):
         return self.name
 
@@ -28,28 +26,15 @@ class Resource:
         """
         raise NotImplementedError
 
-    def get_and_rename_relevant_columns(self, data):
+    @classmethod
+    def get_and_rename_relevant_columns(cls, data):
         """
         Get the relevant columns of the data as a DataFrame and rename them
         """
         data.columns = [column.lower() for column in data.columns]
-        correct_columns = list(getattr(self, "correct_columns", set()))
-        relevant_column_names = [key.lower() for key in self.column_mappings.keys()] + correct_columns
+        correct_columns = list(getattr(cls, "correct_columns", set()))
+        relevant_column_names = [key.lower() for key in cls.column_mappings.keys()] + correct_columns
         relevant_columns = data[relevant_column_names]
-        correct_columns = getattr(self, "correct_columns", set())
-        renamed = relevant_columns.rename(columns=self.column_mappings)
+        correct_columns = getattr(cls, "correct_columns", set())
+        renamed = relevant_columns.rename(columns=cls.column_mappings)
         return renamed
-
-
-class DataSource:
-    base_url = None
-    resources = []
-
-    def get_resources(self):
-        return self.resources
-
-    def get_resource(self, resource):
-        """
-        Recieves a Resource object and returns it as a DataFrame
-        """
-        raise NotImplementedError

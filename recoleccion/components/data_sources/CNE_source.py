@@ -4,11 +4,11 @@ from rarfile import RarFile
 from io import BytesIO
 
 # Project
-from recoleccion.components.data_sources import DataSource, Resource
+from recoleccion.components.data_sources import DataSource
 from recoleccion.components.utils import clean_text_formatting
 
 
-class Candidacies(Resource):
+class Candidacies(DataSource):
     name = "Candidacies"
     key = "candidaturas2021.rar"
     column_mappings = {

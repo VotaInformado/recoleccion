@@ -5,7 +5,7 @@ from django.core.management.base import BaseCommand
 from datetime import datetime as dt, timezone
 
 # Components
-from recoleccion.components.data_sources import CurrentDeputies, DeputySource
+from recoleccion.components.data_sources import CurrentDeputies
 from recoleccion.components.linkers import PersonLinker
 from recoleccion.components.writers.persons_writer import PersonsWriter
 from recoleccion.components.writers.deputies_writer import DeputiesWriter
@@ -16,7 +16,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         print("Start getting deputies at: ", dt.now())
-        deputies_data = DeputySource().get_resource(CurrentDeputies())
+        deputies_data = CurrentDeputies.get_data()
         persons_writer = PersonsWriter()  # TODO: make these class methods
         written_persons = persons_writer.write(deputies_data)
         linker = PersonLinker()

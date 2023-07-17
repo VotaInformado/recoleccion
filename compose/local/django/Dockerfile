@@ -1,4 +1,4 @@
-FROM python:3.11
+FROM python:3.10
 
 ENV PYTHONUNBUFFERED 1
 
@@ -12,6 +12,7 @@ RUN --mount=type=secret,id=ssh_private_key \
     && ssh-keyscan github.com >> /root/.ssh/known_hosts
 
 COPY ./requirements /requirements
+RUN pip install --no-cache-dir --upgrade pip
 RUN pip -v install --no-cache-dir -r /requirements/base.txt
 
 COPY ./compose/local/django/entrypoint /entrypoint

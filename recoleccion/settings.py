@@ -28,7 +28,14 @@ SECRET_KEY = "django-insecure-#covc2rqpt90ueh-$&u18u3b%wn^o)us#)7f^4k&lmfm7+=jss
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["vota-informado-recoleccion.sa-east-1.elasticbeanstalk.com", "177.71.161.197", "localhost", "0.0.0.0"]
+ALLOWED_HOSTS = [
+    "vota-informado-recoleccion.sa-east-1.elasticbeanstalk.com",
+    "177.71.161.197",
+    "localhost",
+    "0.0.0.0",
+    "127.0.0.0",
+    "127.0.0.1",
+]
 
 
 # Application definition
@@ -42,7 +49,10 @@ DJANGO_APPS = [
     "django.contrib.staticfiles",
 ]
 
-LOCAL_APPS = ["recoleccion.apps.RecoleccionAppConfig"]
+LOCAL_APPS = [
+    "recoleccion.apps.RecoleccionAppConfig",
+    "corsheaders",
+]
 
 INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS
 
@@ -54,6 +64,8 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.common.CommonMiddleware",
 ]
 
 ROOT_URLCONF = "recoleccion.urls"
@@ -133,3 +145,10 @@ STATIC_ROOT = "static"
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# CORS
+# https://github.com/adamchainz/django-cors-headers
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://votainformado-staging.s3-website-sa-east-1.amazonaws.com/",
+]

@@ -37,6 +37,13 @@ ALLOWED_HOSTS = [
     "127.0.0.1",
 ]
 
+# CORS
+# https://github.com/adamchainz/django-cors-headers
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://votainformado-staging.s3-website-sa-east-1.amazonaws.com",
+]
+
 
 # Application definition
 
@@ -145,10 +152,3 @@ STATIC_ROOT = "static"
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-# CORS
-# https://github.com/adamchainz/django-cors-headers
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "http://votainformado-staging.s3-website-sa-east-1.amazonaws.com/",
-]

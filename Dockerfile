@@ -1,14 +1,5 @@
-FROM python:3.11
+FROM python:3.10
 RUN apt-get update -y
-
-RUN mkdir -p /root/.ssh
-COPY id_ssh /root/.ssh/id_rsa
-
-# git ssh key
-RUN chmod 600 /root/.ssh/id_rsa \
-    && chmod 700 /root/.ssh/id_rsa \
-    && ls -l /root/.ssh \
-    && ssh-keyscan github.com >> /root/.ssh/known_hosts
 
 COPY . /app
 RUN pip3 install -r /app/requirements.txt

@@ -55,10 +55,8 @@ class CurrentSenate(DataSource):
     @classmethod
     def get_raw_data(cls) -> pd.DataFrame:
         response = requests.get(cls.url)
-        soup = BeautifulSoup(response.content, "html.parser")
-        table = soup.find("table", {"id": "tablaSenadores"})
-        data = pd.read_html(str(table))[0]
-        return data
+        data = response.json()["table"]["rows"]
+        return pd.DataFrame(data)
 
     @classmethod
     def get_data(cls):

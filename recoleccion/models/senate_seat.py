@@ -9,7 +9,7 @@ class SenateSeat(BaseModel):
         app_label = "recoleccion"
         unique_together = ("person_id", "start_of_term", "end_of_term")
 
-    person = models.ForeignKey("Person", on_delete=models.CASCADE, related_name="senate_seat")
+    person = models.ForeignKey("Person", on_delete=models.CASCADE, related_name="senate_seats")
     province = models.CharField(max_length=100)
     party = models.CharField(max_length=150)
     start_of_term = models.DateField()

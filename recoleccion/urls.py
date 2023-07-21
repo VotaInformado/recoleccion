@@ -8,11 +8,13 @@ from django.shortcuts import redirect
 # Views
 from recoleccion.views import PersonViewSet
 from recoleccion.views.deputies import DeputiesViewSet
+from recoleccion.views.legislators import LegislatorsViewSet
 from recoleccion.views.senate import SenateViewSet
 from recoleccion.views.laws import LawsViewSet
 
 router = SimpleRouter()
 
+router.register(r"legislators", LegislatorsViewSet, basename="legislators")
 router.register(r"persons", PersonViewSet, basename="persons")
 router.register(r"deputies", DeputiesViewSet, basename="deputy_seats")
 router.register(r"senators", SenateViewSet, basename="senators")

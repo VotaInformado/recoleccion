@@ -30,23 +30,37 @@ class LegislatorViewTestCase(APITestCase):
             last_seat = person["last_seat"]
             self.assertEquals(last_seat, LegislatorSeats.DEPUTY.label)
 
-    # def test_legislators_list_with_repeated_seats(self):
-    #     call_command("load_deputies")
-    #     chosen_person = Person.objects.first()
-    #     SenateSeat.objects.create(
-    #         person_id=chosen_person.pk,
-    #         province="Province",
-    #         party="A party",
-    #         start_of_term="2020-01-01",
-    #         end_of_term="2024-01-01",
-    #         is_active=False,
-    #     )
-    #     url = "/legislators/"
-    #     response = self.client.get(url)
-    #     self.assertEqual(response.status_code, 200)
-    #     for person in response.json():
-    #         legislator_seats = person["legislator_seats"]
-    #         if person["id"] == str(chosen_person.pk):
-    #             self.assertEquals(len(legislator_seats), 2)
-    #         else:
-    #             self.assertEquals(len(legislator_seats), 1)
+    def test_simple_legislators_retrieval(self):
+        call_command("load_deputies")
+        chosen_person = Person.objects.first()
+        url = f"/legislators/{chosen_person.pk}/"
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        keys = list(data.keys())
+        self.assertEqual(data["id"], str(chosen_person.pk))
+        self.assertEqual(data["name"], chosen_person.name)
+        self.assertEqual(data["last_name"], chosen_person.last_name)
+        self.assertEqual(data["last_seat"], LegislatorSeats(chosen_person.last_seat).label)
+        legislator_seats = data["legislator_seats"]
+        self.assertEquals(len(legislator_seats), 1)
+
+    def test_legislators_retrieval_with_repeated_seats(self):
+        call_command("load_deputies")
+        chosen_person = Person.objects.first()
+        SenateSeat.objects.create(
+            person_id=chosen_person.pk,
+            province="Province",
+            party="A party",
+            start_of_term="2020-01-01",
+            end_of_term="2024-01-01",
+            is_active=False,
+        )
+        url = f"/legislators/{chosen_person.pk}/"
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        legislator_seats = data["legislator_seats"]
+        self.assertEquals(data["id"], str(chosen_person.pk))
+        self.assertEquals(len(legislator_seats), 2)
+

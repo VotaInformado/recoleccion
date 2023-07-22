@@ -14,7 +14,6 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         laws_data = LawSource.get_data()
-        print("Start getting senators at: ", dt.now())
         writer = LawsWriter()
         written_laws = writer.write(laws_data)
         print(f"Finished writing {len(written_laws)} laws")

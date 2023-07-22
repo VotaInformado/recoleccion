@@ -16,7 +16,6 @@ class Command(BaseCommand):
     DIPUTIES_CAPACITY = 257
 
     def handle(self, *args, **options):
-        print("Start getting deputies at: ", dt.now())
         deputies_data = CurrentDeputies.get_data()
         linker = PersonLinker()
         linked_data = linker.link_persons(deputies_data)

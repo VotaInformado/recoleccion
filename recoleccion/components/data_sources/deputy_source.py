@@ -32,7 +32,7 @@ class DeputyHistory(DataSource):
         for column in ["name", "last_name", "district", "party"]:
             data[column] = data[column].map(clean_text_formatting).astype(str)
         for column in ["start_of_term", "end_of_term"]:
-            data[column] = pd.to_datetime(data[column], infer_datetime_format=True)
+            data[column] = pd.to_datetime(data[column]).dt.date
         return data
 
 
@@ -63,6 +63,6 @@ class CurrentDeputies(DataSource):
         for column in ["name", "last_name", "district", "party"]:
             data[column] = data[column].map(clean_text_formatting).astype(str)
         for column in ["start_of_term", "end_of_term"]:
-            data[column] = pd.to_datetime(data[column], format="mixed")
+            data[column] = pd.to_datetime(data[column], format="mixed").dt.date
         data["is_active"] = True
         return data

@@ -9,6 +9,7 @@ from .legislators_writer import LegislatorsWriter
 class SenatorsWriter(LegislatorsWriter):
     model = SenateSeat
 
+    @classmethod
     def get_existing_by_key(self, data):
         unique_senators_seats = data.loc[
             data["person_id"].notnull() & data["start_of_term"].notnull() & data["end_of_term"].notnull(),
@@ -25,6 +26,7 @@ class SenatorsWriter(LegislatorsWriter):
             (senator.person_id, senator.start_of_term, senator.end_of_term): senator for senator in repeated_senators
         }
 
+    @classmethod
     def create_element(self, row: pd.Series):
         senator_seat = SenateSeat.objects.create(
             person_id=int(row.get("person_id")),
@@ -36,6 +38,7 @@ class SenatorsWriter(LegislatorsWriter):
         )
         return senator_seat
 
+    @classmethod
     def update_element(self, row: pd.Series):
         row.pop("name")
         row.pop("last_name")

@@ -39,18 +39,25 @@ class PersonLinker(Linker):
         return messy_data
 
     def link_persons(self, data: pd.DataFrame):
-        messy_data = self.get_messy_data(data)
-        self.train(messy_data)
-        certain, _ = self.classify(messy_data)
-        mapping = [None for x in range(data.shape[0])]
-        for messy_data_index, canonical_data_index in certain:  # Probably could be done in paralell
-            # canonical_data_id = (
-            #     canonical_data_index + 1
-            # )  # Don't know why it's necessary maybe: `canonical_data[canonical_data_index].id`?
-            canonical_data_id = self.canonical_data[canonical_data_index]["id"]
-            mapping[messy_data_index] = canonical_data_id
+        try:
+            messy_data = self.get_messy_data(data)
+            self.train(messy_data)
+            certain, _ = self.classify(messy_data)
+            mapping = [None for x in range(data.shape[0])]
+            for messy_data_index, canonical_data_index in certain:  # Probably could be done in paralell
+                # canonical_data_id = (
+                #     canonical_data_index + 1
+                # )  # Don't know why it's necessary maybe: `canonical_data[canonical_data_index].id`?
+                canonical_data_id = self.canonical_data[canonical_data_index]["id"]
+                mapping[messy_data_index] = canonical_data_id
 
-        data["person_id"] = mapping
+            data["person_id"] = mapping
+        except ValueError as e:
+            if "second dataset is empty" in str(e):
+                # Shouldn't be an error, just means that there are no matches
+                data["person_id"] = None
+            else:
+                raise e
         return data
 
     def _convert_dates_to_str(self, data: pd.DataFrame) -> pd.DataFrame:

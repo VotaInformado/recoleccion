@@ -28,8 +28,8 @@ class PersonsWriter(Writer):
         return row["dni"] if "dni" in row else None
 
     def create_social_data(self, row: pd.Series, person: Person):
-        social_data_fields = ["twitter", "facebook", "instagram", "youtube", "email", "phone", "tiktok"]
-        social_data = {key: value for key, value in row.items() if key in social_data_fields}
+        SOCIAL_DATA_FIELDS = ("twitter", "facebook", "instagram", "youtube", "email", "phone", "tiktok")
+        social_data = {key: value for key, value in row.items() if key in SOCIAL_DATA_FIELDS}
         social_data["person"] = person
         SocialData.objects.create(**social_data)
 

@@ -9,6 +9,7 @@ from recoleccion.components.data_sources import CurrentDeputies
 from recoleccion.components.linkers import PersonLinker
 from recoleccion.components.writers.persons_writer import PersonsWriter
 from recoleccion.components.writers.deputies_writer import DeputiesWriter
+from recoleccion.models.deputy_seat import DeputySeat
 
 
 class Command(BaseCommand):
@@ -17,11 +18,8 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         print("Start getting deputies at: ", dt.now())
         deputies_data = CurrentDeputies.get_data()
-        persons_writer = PersonsWriter()  # TODO: make these class methods
-        written_persons = persons_writer.write(deputies_data)
         linker = PersonLinker()
         linked_data = linker.link_persons(deputies_data)
-        deputies_writer = DeputiesWriter()
-        written_deputies = deputies_writer.write(linked_data)
-        assert len(written_persons) == self.DIPUTIES_CAPACITY
-        assert len(written_deputies) == self.DIPUTIES_CAPACITY
+        written_deputies = DeputiesWriter.write(linked_data)
+        active_deputies = DeputySeat.objects.filter(is_active=True)
+        assert len(active_deputies) == self.DIPUTIES_CAPACITY

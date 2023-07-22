@@ -76,5 +76,4 @@ class LawProjectSource(DataSource):
         raw_df = pd.DataFrame(data)
         # first we filter all those projects with type different from "Ley"
         df = raw_df[raw_df["proyecto_tipo"] == "Ley"]
-        import pdb; pdb.set_trace()
         df = df.drop(columns=["_id", "proyecto_texto", "proyecto_texto_pdf"])

@@ -1,4 +1,5 @@
 from datetime import datetime as dt
+import pandas as pd
 
 # Project
 from recoleccion.models.deputy_seat import DeputySeat
@@ -6,6 +7,9 @@ from .legislators_writer import LegislatorsWriter
 
 
 class DeputiesWriter(LegislatorsWriter):
+    model = DeputySeat
+
+    @classmethod
     def get_existing_by_key(self, data):
         unique_deputies_seats = data.loc[
             data["person_id"].notnull() & data["start_of_term"].notnull() & data["end_of_term"].notnull(),
@@ -20,6 +24,7 @@ class DeputiesWriter(LegislatorsWriter):
         )
         return {(deputy.person_id, deputy.start_of_term, deputy.end_of_term): deputy for deputy in repeated_deputies}
 
+    @classmethod
     def create_element(self, row):
         senator_seat = DeputySeat.objects.create(
             person_id=int(row.get("person_id")),
@@ -30,3 +35,9 @@ class DeputiesWriter(LegislatorsWriter):
             is_active=row.get("is_active"),
         )
         return senator_seat
+
+    @classmethod
+    def update_element(self, row: pd.Series):
+        row.pop("name")
+        row.pop("last_name")
+        return DeputySeat.update_or_raise(**row)

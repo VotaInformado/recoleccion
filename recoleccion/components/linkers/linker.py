@@ -64,10 +64,10 @@ class Linker:
         return match_records_ids, distinct_records_ids
 
     def train(self, messy_data):
-        if len(messy_data) > len(self.canonical_data):
-            raise LinkingException(
-                f"There are more messy records ({len(messy_data)}) than canonical record ({len(self.canonical_data)})"
-            )
+        # if len(messy_data) > len(self.canonical_data):
+        #     raise LinkingException(
+        #         f"There are more messy records ({len(messy_data)}) than canonical record ({len(self.canonical_data)})"
+        #     )
         file_dir = f"{self.TRAINING_DIR}/{self.__class__.__name__}.json"
         if os.path.exists(file_dir):
             with open(file_dir) as f:

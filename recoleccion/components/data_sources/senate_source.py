@@ -35,7 +35,7 @@ class SenateHistory(DataSource):
         for column in ["name", "last_name", "province", "party"]:
             data[column] = data[column].map(clean_text_formatting).astype(str)
         for column in ["start_of_term", "end_of_term"]:
-            data[column] = pd.to_datetime(data[column], infer_datetime_format=True).dt.date
+            data[column] = pd.to_datetime(data[column]).dt.date
         return data
 
 
@@ -56,6 +56,7 @@ class CurrentSenate(DataSource):
     def get_raw_data(cls) -> pd.DataFrame:
         response = requests.get(cls.url)
         data = response.json()["table"]["rows"]
+        cls.logger.info(f"{len(data)} senators were retrieved from {cls.url}")
         return pd.DataFrame(data)
 
     @classmethod
@@ -67,6 +68,6 @@ class CurrentSenate(DataSource):
         for column in ["name", "last_name", "province", "party"]:
             data[column] = data[column].map(clean_text_formatting).astype(str)
         for column in ["start_of_term", "end_of_term"]:
-            data[column] = pd.to_datetime(data[column], infer_datetime_format=True).dt.date
+            data[column] = pd.to_datetime(data[column]).dt.date
         data["is_active"] = True
         return data

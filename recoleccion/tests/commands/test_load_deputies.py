@@ -5,6 +5,7 @@ from django.core.management import call_command
 
 from recoleccion.models.person import Person
 from recoleccion.models import DeputySeat
+from recoleccion.utils.enums.legislator_seats import LegislatorSeats
 
 
 class DeputiesLoadingTestCase(TestCase):
@@ -36,3 +37,8 @@ class DeputiesLoadingTestCase(TestCase):
         total_persons = Person.objects.count()
         self.assertEqual(total_deputies, self.DEPUTIES_CAPACITY + 1)
         self.assertEqual(total_persons, self.DEPUTIES_CAPACITY + 1)
+    
+    def test_loading_deputies_last_seat(self):
+        call_command("load_deputies")
+        any_person = Person.objects.first()
+        self.assertEqual(any_person.last_seat, LegislatorSeats.DEPUTY)

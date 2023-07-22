@@ -4,10 +4,11 @@ import pandas as pd
 # Project
 from recoleccion.models import SenateSeat, Person
 from .legislators_writer import LegislatorsWriter
-
+from recoleccion.utils.enums.legislator_seats import LegislatorSeats
 
 class SenatorsWriter(LegislatorsWriter):
     model = SenateSeat
+    seat_type = LegislatorSeats.SENATOR
 
     @classmethod
     def get_existing_by_key(self, data):

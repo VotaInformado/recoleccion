@@ -8,6 +8,7 @@ from .writer import Writer
 class PersonsWriter(Writer):
     model = Person
 
+    @classmethod
     def write(self, data: pd.DataFrame, add_social_data=False):
         written = []
         for _, row in data.iterrows():
@@ -17,6 +18,7 @@ class PersonsWriter(Writer):
                 self.create_social_data(row, person)
         return written
 
+    @classmethod
     def get_existing_by_key(self, data):
         if "dni" not in data.columns:
             return {}
@@ -24,15 +26,18 @@ class PersonsWriter(Writer):
         repeated_persons = Person.query.filter(Person.dni.in_(new_dnis)).all()
         return {person.dni: person for person in repeated_persons}
 
+    @classmethod
     def get_key(self, row):
         return row["dni"] if "dni" in row else None
 
+    @classmethod
     def create_social_data(self, row: pd.Series, person: Person):
         SOCIAL_DATA_FIELDS = ("twitter", "facebook", "instagram", "youtube", "email", "phone", "tiktok")
         social_data = {key: value for key, value in row.items() if key in SOCIAL_DATA_FIELDS}
         social_data["person"] = person
         SocialData.objects.create(**social_data)
 
+    @classmethod
     def create_element(self, row: pd.Series):
         person = Person.objects.create(
             name=row.get("name"),
@@ -40,5 +45,6 @@ class PersonsWriter(Writer):
             dni=row.get("dni"),
             sex=row.get("gender"),
             date_of_birth=row.get("birthdate"),
+            last_seat=row.get("seat_type"),
         )
         return person

@@ -3,10 +3,13 @@ from rest_framework import serializers
 
 # Models
 from recoleccion.models.person import Person
+from recoleccion.utils.enums.legislator_seats import LegislatorSeatSerializer
 
 
 class PersonModelSerializer(serializers.ModelSerializer):
+    last_seat = LegislatorSeatSerializer()
+
     class Meta:
         model = Person
-        fields = ["id", "dni", "name", "last_name", "date_of_birth", "sex"]
+        fields = "__all__"
         read_only_fields = ["id"]

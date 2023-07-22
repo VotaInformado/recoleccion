@@ -8,6 +8,12 @@ from .persons_writer import PersonsWriter
 class LegislatorsWriter(Writer):
 
     @classmethod
+    def update_legislators_last_seat(cls, written_legislators: list):
+        for legislator in written_legislators:
+            legislator.person.last_seat = cls.seat_type
+            legislator.person.save()
+
+    @classmethod
     def update_active_legislators(cls, written_legislators: list):
         deactivated_legislators = 0
         for legislator in cls.model.objects.filter(is_active=True):
@@ -26,6 +32,7 @@ class LegislatorsWriter(Writer):
         )
         written_legislators = super().write(non_duplicated_data)
         cls.update_active_legislators(written_legislators)
+        cls.update_legislators_last_seat(written_legislators)
 
 
     @classmethod
@@ -35,8 +42,8 @@ class LegislatorsWriter(Writer):
         # Se puede usar Dedupe.
         cls.logger.info(f"{len(missing_persons)} new persons will be written to the database")
         missing_persons.drop_duplicates(inplace=True, keep="last")
-        persons_writer = PersonsWriter()
-        written = persons_writer.write(missing_persons)
+        missing_persons["seat_type"] = cls.seat_type
+        written = PersonsWriter.write(missing_persons)
         for person in written:
             data.loc[
                 (data["name"] == person.name) & (data["last_name"] == person.last_name),

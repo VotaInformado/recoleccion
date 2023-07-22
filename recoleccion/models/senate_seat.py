@@ -14,4 +14,3 @@ class SenateSeat(BaseModel):
     party = models.CharField(max_length=150)
     start_of_term = models.DateField()
     end_of_term = models.DateField()
-    is_active = models.BooleanField(default=False)

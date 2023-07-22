@@ -24,3 +24,4 @@ class Person(BaseModel):
     date_of_birth = models.DateField(null=True)
     sex = models.CharField(choices=PersonSex.choices, max_length=1, null=True)
     last_seat = models.CharField(choices=LegislatorSeats.choices, max_length=10, null=True)
+    is_active = models.BooleanField(default=True)

@@ -8,7 +8,8 @@ from datetime import datetime as dt, timezone
 from recoleccion.components.data_sources import CurrentSenate
 from recoleccion.components.linkers import PersonLinker
 from recoleccion.components.writers.senators_writer import SenatorsWriter
-from recoleccion.models.senate_seat import SenateSeat
+from recoleccion.models.person import Person
+from recoleccion.utils.enums.legislator_seats import LegislatorSeats
 
 
 class Command(BaseCommand):
@@ -19,6 +20,6 @@ class Command(BaseCommand):
         linker = PersonLinker()
         linked_data = linker.link_persons(senators_data)
         written_senators = SenatorsWriter.write(linked_data)
-        active_senators = SenateSeat.objects.filter(is_active=True)
+        active_senators = Person.objects.filter(is_active=True, last_seat=LegislatorSeats.SENATOR)
         assert len(active_senators) == self.SENATE_CAPACITY
         # TODO: probablemente se necesite un refactor

@@ -10,11 +10,15 @@ from recoleccion.serializers.senate import SenateSeatModelSerializer
 
 
 class SenateViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
-    queryset = SenateSeat.objects.all()
-    active_queryset = SenateSeat.objects.filter(is_active=True)
     serializer_class = SenateSeatModelSerializer
+
+    def get_queryset(self):
+        queryset = SenateSeat.objects.all()
+        if self.action == "get_active_senators":
+            queryset = queryset.filter(person__is_active=True)
+        return queryset
 
     @action(detail=False, methods=["get"], url_path="active")
     def get_active_senators(self, request):
-        serializer = SenateSeatModelSerializer(self.active_queryset, many=True)
+        serializer = SenateSeatModelSerializer(self.get_queryset(), many=True)
         return Response(serializer.data)

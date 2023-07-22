@@ -34,6 +34,8 @@ class BaseModel(models.Model):
                 unique_fields = cls._meta.unique_together[0]
                 filter_kwargs = {field: kwargs[field] for field in unique_fields}
                 instance = cls.objects.filter(**filter_kwargs).first()
+            else:
+                instance = None
         if not instance:
             if raise_if_not_found:
                 raise Exception(f"Instance of {cls.__name__} not found")

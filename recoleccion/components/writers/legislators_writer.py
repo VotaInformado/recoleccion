@@ -6,23 +6,6 @@ from .persons_writer import PersonsWriter
 
 
 class LegislatorsWriter(Writer):
-
-    @classmethod
-    def update_legislators_last_seat(cls, written_legislators: list):
-        for legislator in written_legislators:
-            legislator.person.last_seat = cls.seat_type
-            legislator.person.save()
-
-    @classmethod
-    def update_active_legislators(cls, written_legislators: list):
-        deactivated_legislators = 0
-        for legislator in cls.model.objects.filter(is_active=True):
-            if legislator not in written_legislators:
-                legislator.is_active = False
-                legislator.save()
-                deactivated_legislators += 1
-        cls.logger.info(f"{deactivated_legislators} {cls.model.__name__}s were deactivated")
-
     @classmethod
     def write(cls, data: DataFrame):
         cls.logger.info(f"Received {len(data)} legislators to write")
@@ -30,26 +13,18 @@ class LegislatorsWriter(Writer):
         non_duplicated_data = completed_data.drop_duplicates(
             subset=["person_id", "start_of_term", "end_of_term"], keep="last"
         )
-        written_legislators = super().write(non_duplicated_data)
-        cls.update_active_legislators(written_legislators)
-        cls.update_legislators_last_seat(written_legislators)
-
+        super().write(non_duplicated_data)
 
     @classmethod
-    def add_missing_persons(cls, data: DataFrame):
-        missing_persons = data[data["person_id"].isnull()][["name", "last_name"]]
-        # Aca pueden quedar personas duplicadas entre sí, pero escritas distintas
-        # Se puede usar Dedupe.
-        cls.logger.info(f"{len(missing_persons)} new persons will be written to the database")
-        missing_persons.drop_duplicates(inplace=True, keep="last")
-        missing_persons["seat_type"] = cls.seat_type
-        written = PersonsWriter.write(missing_persons)
+    def add_missing_persons(cls, persons_data: DataFrame):
+        persons_data["seat_type"] = cls.seat_type
+        written = PersonsWriter.write(persons_data)
         for person in written:
-            data.loc[
-                (data["name"] == person.name) & (data["last_name"] == person.last_name),
+            persons_data.loc[
+                (persons_data["name"] == person.name) & (persons_data["last_name"] == person.last_name),
                 "person_id",
             ] = person.id
-        return data
+        return persons_data
 
     @classmethod
     def get_key(cls, row):

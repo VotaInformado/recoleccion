@@ -35,7 +35,6 @@ class SenatorsWriter(LegislatorsWriter):
             party=row.get("party"),
             start_of_term=row.get("start_of_term"),
             end_of_term=row.get("end_of_term"),
-            is_active=row.get("is_active", False),
         )
         return senator_seat
 

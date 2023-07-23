@@ -54,11 +54,12 @@ DJANGO_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    'drf_yasg',
+    "corsheaders",
 ]
 
 LOCAL_APPS = [
     "recoleccion.apps.RecoleccionAppConfig",
-    "corsheaders",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS

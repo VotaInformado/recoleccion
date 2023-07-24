@@ -22,6 +22,7 @@ class SenateHistory(DataSource):
     def get_raw_data(cls) -> pd.DataFrame:
         response = requests.get(cls.url)
         data = response.json()["table"]["rows"]
+        cls.logger.info(f"{len(data)} senator seats were retrieved from {cls.url}")
         return pd.DataFrame(data)
 
     @classmethod

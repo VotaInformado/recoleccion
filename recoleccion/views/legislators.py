@@ -2,9 +2,6 @@
 from rest_framework import viewsets, mixins
 from recoleccion.serializers.legislators import LegislatorDetailsSerializer, LegislatorInfoSerializer
 
-# Serializers
-from recoleccion.serializers.persons import PersonModelSerializer
-
 # Models
 from recoleccion.models.person import Person
 

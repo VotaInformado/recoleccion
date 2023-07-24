@@ -6,30 +6,50 @@ import uuid
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('recoleccion', '0002_legislatorseat_is_active'),
+        ("recoleccion", "0002_legislatorseat_is_active"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='SocialData',
+            name="SocialData",
             fields=[
-                ('created_at', models.DateTimeField(auto_now_add=True, help_text='Date time on which the object was created.', verbose_name='created at')),
-                ('modified_at', models.DateTimeField(auto_now=True, help_text='Date time on which the object was last modified.', verbose_name='updated at')),
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('twitter', models.CharField(max_length=200, null=True)),
-                ('facebook', models.CharField(max_length=200, null=True)),
-                ('instagram', models.CharField(max_length=200, null=True)),
-                ('linkedin', models.CharField(max_length=200, null=True)),
-                ('tiktok', models.CharField(max_length=200, null=True)),
-                ('youtube', models.CharField(max_length=200, null=True)),
-                ('email', models.CharField(max_length=150, null=True)),
-                ('phone', models.CharField(max_length=50, null=True)),
-                ('person', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='social_data', to='recoleccion.person')),
+                (
+                    "created_at",
+                    models.DateTimeField(
+                        auto_now_add=True,
+                        help_text="Date time on which the object was created.",
+                        verbose_name="created at",
+                    ),
+                ),
+                (
+                    "modified_at",
+                    models.DateTimeField(
+                        auto_now=True,
+                        help_text="Date time on which the object was last modified.",
+                        verbose_name="updated at",
+                    ),
+                ),
+                # ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
+                ("id", models.AutoField(primary_key=True, editable=False, serialize=False)),
+                ("uuid", models.UUIDField(default=uuid.uuid4, editable=False)),
+                ("twitter", models.CharField(max_length=200, null=True)),
+                ("facebook", models.CharField(max_length=200, null=True)),
+                ("instagram", models.CharField(max_length=200, null=True)),
+                ("linkedin", models.CharField(max_length=200, null=True)),
+                ("tiktok", models.CharField(max_length=200, null=True)),
+                ("youtube", models.CharField(max_length=200, null=True)),
+                ("email", models.CharField(max_length=150, null=True)),
+                ("phone", models.CharField(max_length=50, null=True)),
+                (
+                    "person",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, related_name="social_data", to="recoleccion.person"
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
     ]

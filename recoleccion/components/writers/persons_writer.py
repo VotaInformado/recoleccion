@@ -94,6 +94,8 @@ class PersonsWriter(Writer):
             "sex": row.get("gender", None),
             "date_of_birth": row.get("birthdate", None),
             "last_seat": row.get("seat_type", None),
-            "is_active": row.get("is_active", False)
         }
+        is_active = row.get("is_active", None)
+        if is_active is not None:
+            info["is_active"] = is_active
         return Person.update_or_raise(**info)

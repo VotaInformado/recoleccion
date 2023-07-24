@@ -1,3 +1,4 @@
+import io
 import requests
 import pandas as pd
 
@@ -6,8 +7,8 @@ from recoleccion.components.data_sources import DataSource
 from recoleccion.components.utils import clean_text_formatting
 
 
-class DeputyHistory(DataSource):
-    url = "https://datos.hcdn.gob.ar:443/api/3/action/resource_show?id=169de2eb-465f-4007-a4c2-39a5ba4c0df3"
+class DeputiesHistory(DataSource):
+    url = "https://datos.hcdn.gob.ar:443/dataset/a80e0fa7-d73a-4ed1-9dec-80465e368951/resource/169de2eb-465f-4007-a4c2-39a5ba4c0df3/download/diputados2.1.csv"
     column_mappings = {
         "diputado_id": "deputy_id",
         "diputado_nombre": "name",
@@ -21,9 +22,9 @@ class DeputyHistory(DataSource):
     @classmethod
     def get_raw_data(cls):
         response = requests.get(cls.url)
-        resource_url = response.json()["result"]["url"]
-        data = pd.read_csv(resource_url)
-        return data
+        csv_data = response.content
+        df = pd.read_csv(io.StringIO(csv_data.decode('utf-8')))
+        return df
 
     @classmethod
     def get_data(cls):

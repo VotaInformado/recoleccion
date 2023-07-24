@@ -1,11 +1,11 @@
 from django.test import TestCase
-from recoleccion.components.data_sources import DeputyHistory
-from recoleccion.components.data_sources.deputy_source import DeputyHistory, CurrentDeputies
+from recoleccion.components.data_sources import DeputiesHistory
+from recoleccion.components.data_sources.deputy_source import DeputiesHistory, CurrentDeputies
 
 
 class DeputySourceTestCase(TestCase):
     def test_correct_deputies_history_data_extraction(self):
-        deputy_seats = DeputyHistory.get_data()
+        deputy_seats = DeputiesHistory.get_data()
         self.assertGreater(len(deputy_seats), 0)
 
     def test_correct_current_deputies_data_extraction(self):

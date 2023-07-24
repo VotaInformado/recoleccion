@@ -5,29 +5,44 @@ import uuid
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('recoleccion', '0004_alter_deputyseat_deputy_id'),
+        ("recoleccion", "0004_alter_deputyseat_deputy_id"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Law',
+            name="Law",
             fields=[
-                ('created_at', models.DateTimeField(auto_now_add=True, help_text='Date time on which the object was created.', verbose_name='created at')),
-                ('modified_at', models.DateTimeField(auto_now=True, help_text='Date time on which the object was last modified.', verbose_name='updated at')),
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('law_number', models.IntegerField(unique=True)),
-                ('title', models.TextField()),
-                ('summary', models.TextField()),
-                ('tags', models.TextField(null=True)),
-                ('publication_date', models.DateField(null=True)),
-                ('associated_decree', models.CharField(max_length=15, null=True)),
-                ('vetoed', models.BooleanField(default=False)),
-                ('initial_file', models.FileField(help_text='Expediente inicial', null=True, upload_to='laws')),
+                (
+                    "created_at",
+                    models.DateTimeField(
+                        auto_now_add=True,
+                        help_text="Date time on which the object was created.",
+                        verbose_name="created at",
+                    ),
+                ),
+                (
+                    "modified_at",
+                    models.DateTimeField(
+                        auto_now=True,
+                        help_text="Date time on which the object was last modified.",
+                        verbose_name="updated at",
+                    ),
+                ),
+                # ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
+                ("id", models.AutoField(primary_key=True, editable=False, serialize=False)),
+                ("uuid", models.UUIDField(default=uuid.uuid4, editable=False)),
+                ("law_number", models.IntegerField(unique=True)),
+                ("title", models.TextField()),
+                ("summary", models.TextField()),
+                ("tags", models.TextField(null=True)),
+                ("publication_date", models.DateField(null=True)),
+                ("associated_decree", models.CharField(max_length=15, null=True)),
+                ("vetoed", models.BooleanField(default=False)),
+                ("initial_file", models.FileField(help_text="Expediente inicial", null=True, upload_to="laws")),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
     ]

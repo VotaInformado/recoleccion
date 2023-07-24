@@ -19,7 +19,9 @@ class Migration(migrations.Migration):
             fields=[
                 ('created_at', models.DateTimeField(auto_now_add=True, help_text='Date time on which the object was created.', verbose_name='created at')),
                 ('modified_at', models.DateTimeField(auto_now=True, help_text='Date time on which the object was last modified.', verbose_name='updated at')),
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
+                # ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
+                ('id', models.AutoField(primary_key=True, editable=False, serialize=False)),
+                ('uuid', models.UUIDField(default=uuid.uuid4, editable=False)),
                 ('dni', models.CharField(max_length=8, null=True, unique=True, validators=[django.core.validators.MinLengthValidator(7)])),
                 ('name', models.CharField(max_length=100)),
                 ('last_name', models.CharField(max_length=100)),
@@ -32,7 +34,9 @@ class Migration(migrations.Migration):
             fields=[
                 ('created_at', models.DateTimeField(auto_now_add=True, help_text='Date time on which the object was created.', verbose_name='created at')),
                 ('modified_at', models.DateTimeField(auto_now=True, help_text='Date time on which the object was last modified.', verbose_name='updated at')),
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
+                # ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
+                ('id', models.AutoField(primary_key=True, editable=False, serialize=False)),
+                ('uuid', models.UUIDField(default=uuid.uuid4, editable=False)),
                 ('province', models.CharField(max_length=100)),
                 ('party', models.CharField(max_length=150)),
                 ('start_of_term', models.DateField()),
@@ -48,7 +52,9 @@ class Migration(migrations.Migration):
             fields=[
                 ('created_at', models.DateTimeField(auto_now_add=True, help_text='Date time on which the object was created.', verbose_name='created at')),
                 ('modified_at', models.DateTimeField(auto_now=True, help_text='Date time on which the object was last modified.', verbose_name='updated at')),
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
+                # ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
+                ('id', models.AutoField(primary_key=True, editable=False, serialize=False)),
+                ('uuid', models.UUIDField(default=uuid.uuid4, editable=False)),
                 ('deputy_id', models.CharField(max_length=10)),
                 ('district', models.CharField(max_length=150)),
                 ('party', models.CharField(max_length=150)),

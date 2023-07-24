@@ -54,7 +54,7 @@ DJANGO_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    'drf_yasg',
+    "drf_yasg",
     "corsheaders",
 ]
 
@@ -153,3 +153,4 @@ STATIC_ROOT = "static"
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+INTERNAL_MOCK_ENABLED = True

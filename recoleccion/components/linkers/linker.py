@@ -85,6 +85,7 @@ class Linker:
         max_conf_pair = max(possible_mappings, key=lambda x: self.confidence(x))
         min_conf_pair = min(possible_mappings, key=lambda x: self.confidence(x))
         max_confidence = max_conf_pair[1][0][1]
+        # TODO: ver esto porque se ve que puede llegar a romper accediendo a un indice que no existe
         dubious_lower_limit = max_confidence * DUBIOUS_LOWER_LIMIT
         dubious_upper_limit = max_confidence * DUBIOUS_UPPER_LIMIT
         # el problema de este d_l_l es que si hay un match con 1e-10 por ej, lo va a tomar como válido

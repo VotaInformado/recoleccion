@@ -59,6 +59,16 @@ def mock_data_source_json(src_file):
     return pd.read_json(file_dir)
 
 
+def mock_data_source_csv(src_file):
+    """Mocks a data source json file"""
+    base_dir = "recoleccion/tests/test_helpers/files/"
+    file_dir = base_dir + src_file
+    return pd.read_csv(file_dir)
+
+
 def get_file_data_length(src_file):
-    data = mock_data_source_json(src_file)
+    if ".json" in src_file:
+        data = mock_data_source_json(src_file)
+    else:
+        data = mock_data_source_csv(src_file)
     return len(data)

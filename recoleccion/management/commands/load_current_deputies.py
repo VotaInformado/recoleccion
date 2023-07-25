@@ -13,12 +13,12 @@ from recoleccion.utils.enums.legislator_seats import LegislatorSeats
 
 
 class Command(BaseCommand):
-    DIPUTIES_CAPACITY = 257
+    DEPUTIES_CAPACITY = 257
 
     def handle(self, *args, **options):
         deputies_data = CurrentDeputies.get_data()
         linker = PersonLinker()
         linked_data = linker.link_persons(deputies_data)
-        written_deputies = DeputiesWriter.write(linked_data)
+        written_deputies = DeputiesWriter.write(linked_data, update_active_persons=True)
         active_deputies = Person.objects.filter(is_active=True, last_seat=LegislatorSeats.DEPUTY)
-        assert len(active_deputies) == self.DIPUTIES_CAPACITY
+        assert len(active_deputies) == self.DEPUTIES_CAPACITY

@@ -15,3 +15,6 @@ class DeputySeat(BaseModel):
     party = models.CharField(max_length=150)
     start_of_term = models.DateField()
     end_of_term = models.DateField()
+
+    def __str__(self):
+        return f"{self.person.name} {self.person.last_name}: {self.start_of_term} - {self.end_of_term}"

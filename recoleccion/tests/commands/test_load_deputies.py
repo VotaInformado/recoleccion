@@ -47,18 +47,19 @@ class DeputiesLoadingTestCase(TestCase):
         any_person = Person.objects.first()
         self.assertEqual(any_person.last_seat, LegislatorSeats.DEPUTY)
 
-    # def test_loading_deputies_history_with_current_deputies_loaded(self):
-    #     DEPUTY_NAME = "STELLA MARIS"
-    #     DEPUTY_LAST_NAME = "OLALLA"
-    #     mocked_deputies = mck.get_file_data_length("fake_current_senate.json")
-    #     with mck.mock_method(PersonsWriter, "update_active_persons", return_value=None):
-    #         with mck.mock_class_attribute(LoadCurrentDeputiesCommand, "SENATE_CAPACITY", mocked_deputies):
-    #             with mck.mock_class_attribute(LoadDeputiesHistoryCommand, "SENATE_CAPACITY", mocked_deputies):
-    #                 with mck.mock_method(CurrentDeputies, "get_raw_data", mck.mock_data_source_json("fake_current_senate.json")):
-    #                     with mck.mock_method(DeputiesHistory, "get_raw_data", mck.mock_data_source_json("fake_senate_history.json")):
-    #                         call_command("load_current_deputies")
-    #                         call_command("load_deputies_history")
-    #     senator = Person.objects.get(name=DEPUTY_NAME, last_name=DEPUTY_LAST_NAME)
-    #     self.assertTrue(senator.is_active)
-    #     senator_seats = DeputySeat.objects.filter(person=senator)
-    #     self.assertEqual(len(senator_seats), 2)
+    def test_loading_deputies_history_with_current_deputies_loaded(self):
+        # The files are created so that there is a deputy that has been in two seats
+        DEPUTY_NAME = "Hilda Clelia"
+        DEPUTY_LAST_NAME = "Aguirre"
+        mocked_deputies = mck.get_file_data_length("fake_current_deputies.csv")
+        with mck.mock_method(PersonsWriter, "update_active_persons", return_value=None):
+            with mck.mock_class_attribute(LoadCurrentDeputiesCommand, "DEPUTIES_CAPACITY", mocked_deputies):
+                with mck.mock_class_attribute(LoadDeputiesHistoryCommand, "DEPUTIES_CAPACITY", mocked_deputies):
+                    with mck.mock_method(CurrentDeputies, "get_raw_data", mck.mock_data_source_csv("fake_current_deputies.csv")):
+                        with mck.mock_method(DeputiesHistory, "get_raw_data", mck.mock_data_source_csv("fake_deputies_history.csv")):
+                            call_command("load_current_deputies")
+                            call_command("load_deputies_history")
+        deputy = Person.objects.get(name=DEPUTY_NAME, last_name=DEPUTY_LAST_NAME)
+        self.assertTrue(deputy.is_active)
+        deputy_seats = DeputySeat.objects.filter(person=deputy)
+        self.assertEqual(len(deputy_seats), 2)

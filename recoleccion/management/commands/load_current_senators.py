@@ -19,6 +19,6 @@ class Command(BaseCommand):
         senators_data = CurrentSenate.get_data()
         linker = PersonLinker()
         linked_data = linker.link_persons(senators_data)
-        written_senators = SenatorsWriter.write(linked_data)
+        written_senators = SenatorsWriter.write(linked_data, update_active_persons=True)
         active_senators = Person.objects.filter(is_active=True, last_seat=LegislatorSeats.SENATOR)
         assert len(active_senators) == self.SENATE_CAPACITY

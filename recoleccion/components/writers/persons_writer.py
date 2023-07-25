@@ -16,14 +16,14 @@ class PersonsWriter(Writer):
         missing_persons.drop_duplicates(subset=["name", "last_name"], inplace=True, keep="last")
         cls.logger.info(f"{len(missing_persons)} new persons will be written to the database")
         return missing_persons
-    
+
     @classmethod
     def get_existing_persons(cls, data: pd.DataFrame):
         existing_persons = data[data["person_id"].notnull()]
         existing_persons.drop_duplicates(subset=["person_id"], inplace=True, keep="last")
         cls.logger.info(f"{len(existing_persons)} persons will be updated in the database")
         return existing_persons
-    
+
     @classmethod
     def update_active_persons(cls, modified_persons: list, seat_type: str):
         deactivated_persons = 0
@@ -35,7 +35,7 @@ class PersonsWriter(Writer):
         cls.logger.info(f"{deactivated_persons} persons were deactivated")
 
     @classmethod
-    def write(cls, data: pd.DataFrame, add_social_data=False):
+    def write(cls, data: pd.DataFrame, add_social_data=False, update_active_persons=False):
         cls.logger.info(f"Received {len(data)} persons to write")
         modified_persons = []
         missing_persons = cls.get_missing_persons(data)
@@ -49,7 +49,8 @@ class PersonsWriter(Writer):
             person = cls.update_element(row)
             modified_persons.append(person)
         seat_type = data.iloc[0]["seat_type"]
-        cls.update_active_persons(modified_persons, seat_type)
+        if update_active_persons:
+            cls.update_active_persons(modified_persons, seat_type)
         return modified_persons
 
     @classmethod
@@ -73,17 +74,19 @@ class PersonsWriter(Writer):
 
     @classmethod
     def create_element(self, row: pd.Series):
-        person = Person.objects.create(
-            name=row.get("name"),
-            last_name=row.get("last_name"),
-            dni=row.get("dni"),
-            sex=row.get("gender"),
-            date_of_birth=row.get("birthdate"),
-            last_seat=row.get("seat_type"),
-            is_active=row.get("is_active", False)
-        )
-        return person
-    
+        info = {
+            "name": row.get("name"),
+            "last_name": row.get("last_name"),
+            "dni": row.get("dni", None),
+            "sex": row.get("gender", None),
+            "date_of_birth": row.get("birthdate", None),
+            "last_seat": row.get("seat_type", None),
+        }
+        is_active = row.get("is_active", None)
+        if is_active is not None:
+            info["is_active"] = is_active
+        return Person.objects.create(**info)
+
     @classmethod
     def update_element(self, row: pd.Series):
         info = {

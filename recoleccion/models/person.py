@@ -25,3 +25,9 @@ class Person(BaseModel):
     sex = models.CharField(choices=PersonSex.choices, max_length=1, null=True)
     last_seat = models.CharField(choices=LegislatorSeats.choices, max_length=10, null=True)
     is_active = models.BooleanField(default=False)
+
+    def __str__(self):
+        base_str = f"{self.name} {self.last_name}, last seat: {self.last_seat}"
+        if self.is_active:
+            return f"{base_str} (active)"
+        return base_str

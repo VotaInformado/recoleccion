@@ -67,8 +67,8 @@ class SenatorHistoryLoadingTestCase(TestCase):
             call_command("load_senators_history")
 
     def test_loading_senators_history_with_current_senators_loaded(self):
-        SENATOR_NAME = "STELLA MARIS"
-        SENATOR_LAST_NAME = "OLALLA"
+        SENATOR_NAME = "Stella Maris"
+        SENATOR_LAST_NAME = "Olalla"
         mocked_senators = mck.get_file_data_length("fake_current_senate.json")
         with mck.mock_method(PersonsWriter, "update_active_persons", return_value=None):
             with mck.mock_class_attribute(LoadCurrentSenatorsCommand, "SENATE_CAPACITY", mocked_senators):

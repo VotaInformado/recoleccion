@@ -22,11 +22,26 @@ def clean_text_formatting(text, capitalize=True):
     return cleaner_text
 
 
+def digitize_text(text):
+    # substracts all non digit characters
+    if isna(text) or not text:
+        return text
+    
+    return "".join([char for char in text if char.isdigit()])
+
+
 def capitalize_text(text):
     words = text.split()
     capitalized_words = [word.capitalize() for word in words]
     text = " ".join(capitalized_words)
     return text
+
+
+def trim_extra_spaces(text):
+    if isna(text) or not text:
+        return text
+
+    return " ".join(text.split())
 
 
 def unidecode_text(text):

@@ -7,6 +7,7 @@ from datetime import date
 from recoleccion.components.linkers import Linker
 from recoleccion.components.utils import unidecode_text
 from recoleccion.models import Person
+from recoleccion.utils.custom_logger import CustomLogger
 
 
 class PersonLinker(Linker):
@@ -16,6 +17,7 @@ class PersonLinker(Linker):
     ]
 
     def __init__(self):
+        self.logger = CustomLogger(self.__class__.__name__)
         self.gazetteer = Gazetteer(self.fields)
         self.canonical_data = self.get_canonical_data()
 
@@ -39,23 +41,25 @@ class PersonLinker(Linker):
         return messy_data
 
     def link_persons(self, data: pd.DataFrame):
+        self.logger.info(f"Linking {len(data)} persons...")
         try:
+            linked_persons = 0
             messy_data = self.get_messy_data(data)
             self.train(messy_data)
             certain, _ = self.classify(messy_data)
             mapping = [None for x in range(data.shape[0])]
             for messy_data_index, canonical_data_index in certain:  # Probably could be done in paralell
-                # canonical_data_id = (
-                #     canonical_data_index + 1
-                # )  # Don't know why it's necessary maybe: `canonical_data[canonical_data_index].id`?
                 canonical_data_id = self.canonical_data[canonical_data_index]["id"]
                 mapping[messy_data_index] = canonical_data_id
+                linked_persons += 1
 
             data["person_id"] = mapping
+            self.logger.info(f"Linked {linked_persons} persons")
         except ValueError as e:
             if "second dataset is empty" in str(e):
                 # Shouldn't be an error, just means that there are no matches
                 data["person_id"] = None
+                self.logger.info(f"Linked 0 persons")
             else:
                 raise e
         return data

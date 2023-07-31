@@ -34,7 +34,7 @@ class DataSource:
         data.columns = [column.lower() for column in data.columns]
         correct_columns = list(getattr(cls, "correct_columns", set()))
         relevant_column_names = [key.lower() for key in cls.column_mappings.keys()] + correct_columns
-        relevant_columns = data[relevant_column_names]
-        correct_columns = getattr(cls, "correct_columns", set())
+        existing_columns = [column for column in relevant_column_names if column in data.columns]
+        relevant_columns = data[existing_columns]
         renamed = relevant_columns.rename(columns=cls.column_mappings)
         return renamed

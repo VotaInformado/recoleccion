@@ -1,18 +1,18 @@
 # Base command
 from django.core.management.base import BaseCommand
 
-# Dates
-from datetime import datetime as dt
+# Django
+from django.db import transaction
 
 # Components
-from recoleccion.components.writers.laws_writer import LawsWriter
-from recoleccion.components.data_sources.laws_source import LawSource
+from recoleccion.components.data_sources.law_projects_source import DeputyLawProjects
+from recoleccion.components.writers.law_projects_writer import LawProjectsWriter
+
 
 class Command(BaseCommand):
     help = "Load laws from the deputy source"
-    
+
+    @transaction.atomic
     def handle(self, *args, **options):
-        laws_data = LawSource.get_data()
-        writer = LawsWriter()
-        written_laws = writer.write(laws_data)
-        print(f"Finished writing {len(written_laws)} laws")
+        laws_data = DeputyLawProjects.get_data()
+        written_projects = LawProjectsWriter.write(laws_data)

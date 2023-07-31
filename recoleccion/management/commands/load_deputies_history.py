@@ -1,5 +1,6 @@
 # Base command
 from django.core.management.base import BaseCommand
+from django.db import transaction
 
 # Dates
 from datetime import datetime as dt, timezone
@@ -28,6 +29,7 @@ class Command(BaseCommand):
                 f"{active_deputies} active deputies found in the database, {self.DEPUTIES_CAPACITY} expected"
             )
 
+    @transaction.atomic
     def handle(self, *args, **options):
         self.check_current_deputies()
         deputies_data = DeputiesHistory.get_data()

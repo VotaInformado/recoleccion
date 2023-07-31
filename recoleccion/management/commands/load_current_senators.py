@@ -1,5 +1,6 @@
 # Base command
 from django.core.management.base import BaseCommand
+from django.db import transaction
 
 # Dates
 from datetime import datetime as dt, timezone
@@ -15,6 +16,7 @@ from recoleccion.utils.enums.legislator_seats import LegislatorSeats
 class Command(BaseCommand):
     SENATE_CAPACITY = 72
 
+    
     def handle(self, *args, **options):
         senators_data = CurrentSenate.get_data()
         linker = PersonLinker()

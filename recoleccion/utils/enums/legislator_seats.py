@@ -1,6 +1,5 @@
 from django.db import models
 from rest_framework import serializers
-import json
 
 class LegislatorSeats(models.TextChoices):
     SENATOR = "SENATOR", "Senador"

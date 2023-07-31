@@ -17,6 +17,7 @@ class BaseModel(models.Model):
     )
     id = models.AutoField(primary_key=True, editable=False, serialize=False)
     uuid = models.UUIDField(default=uuid.uuid4, editable=False)
+    
 
     def __str__(self):
         return f"{self.__class__.__name__}\n{self.__dict__}"

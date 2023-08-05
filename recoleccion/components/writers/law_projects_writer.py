@@ -65,3 +65,23 @@ class LawProjectsWriter(Writer):
             cls.logger.warning(f"An error occurred while updating or creating law project with id {project_id}: {e}")
             return None, False
         return law_project, was_created
+
+    @classmethod
+    def update_day_orders(cls, data: pd.DataFrame):
+        cls.logger.info(f"Received {len(data)} day orders to update...")
+        updated, not_found = [], []
+        for i in data.index:
+            row = data.loc[i]
+            project_id = row.get("project_id")
+            day_order = row.get("day_order")
+            project = LawProject.objects.filter(deputies_project_id=project_id).first()
+            if project:
+                project.deputies_day_order = day_order
+                project.save()
+                cls.logger.info(f"Updated day order for project {project_id}")
+                updated.append(project)
+            else:
+                cls.logger.warning(f"Project {project_id} not found, day order {day_order} not updated")
+                not_found.append(project_id)
+        cls.logger.info(f"Updated {len(updated)} day orders")
+        cls.logger.info(f"{len(not_found)} day orders not found")

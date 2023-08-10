@@ -313,7 +313,7 @@ class DeputyLawProjectsSource(DataSource):
             project_text = project.find(class_="dp-texto")
             project_info = cls.extract_project_info(metadata)
             project_info["title"] = project_text.get_text()
-            project_info.pop("Publicado en:")
+            project_info.pop("Publicado en:", None)
             projects_info.append(project_info)
             added += 1
 
@@ -348,3 +348,6 @@ class DeputyLawProjectsSource(DataSource):
         ).tolist()
         cls.logger.info(f"Projects retrieved: {projects_retrieved}")
         return data, total_added
+    
+
+

@@ -62,3 +62,5 @@ class LawSource(DataSource):
         data = cls.get_and_rename_relevant_columns(data)
         data["publication_date"] = data["publication_date"].map(cls.extract_dates_from_datetimes)
         return data
+    
+

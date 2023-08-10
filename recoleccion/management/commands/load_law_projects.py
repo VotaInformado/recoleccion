@@ -5,7 +5,7 @@ from django.core.management.base import BaseCommand
 from django.db import transaction
 
 # Components
-from recoleccion.components.data_sources.law_projects_source import DeputyLawProjects
+from recoleccion.components.data_sources.law_projects_source import HCDNLawProjects
 from recoleccion.components.writers.law_projects_writer import LawProjectsWriter
 
 
@@ -14,5 +14,5 @@ class Command(BaseCommand):
 
     @transaction.atomic
     def handle(self, *args, **options):
-        laws_data = DeputyLawProjects.get_data()
+        laws_data = HCDNLawProjects.get_data()
         written_projects = LawProjectsWriter.write(laws_data)

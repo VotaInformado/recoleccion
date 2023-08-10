@@ -19,6 +19,8 @@ class LawProject(BaseModel):
     source = models.CharField(max_length=100, null=True)
     deputies_day_order = models.IntegerField(null=True)
     senate_day_order = models.IntegerField(null=True)
+    text = models.TextField(null=True)
+    link = models.CharField(max_length=250, null=True)
 
     @property
     def project_id(self):

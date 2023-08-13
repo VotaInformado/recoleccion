@@ -89,9 +89,9 @@ class DeputiesLawProyectsText(DataSource):
     @classmethod
     def get_text(cls, number, source, year):
         cls.logger.info(f"Getting text for project: {number}-{source}-{year}")
-        cls.QUERY_DATA["strNumExp"] = "3087"
-        cls.QUERY_DATA["strNumExpOrig"] = "D"
-        cls.QUERY_DATA["strNumExpAnio"] = "2023"
+        cls.QUERY_DATA["strNumExp"] = number
+        cls.QUERY_DATA["strNumExpOrig"] = source
+        cls.QUERY_DATA["strNumExpAnio"] = year
 
         response = cls.session.post(
             cls.base_url, data=cls.QUERY_DATA, headers=cls.POST_HEADERS

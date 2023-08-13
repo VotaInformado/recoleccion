@@ -27,7 +27,7 @@ class Command(BaseCommand):
 
     def worker(self, projects_queue, data_queue, stop_event):
         try:
-            while not projects_queue.empty() and not stop_event.is_set():
+            while not projects_queue.empty() or not stop_event.is_set():
                 project = projects_queue.get(timeout=10)
                 if project.origin_chamber == "Diputados":  # ProjectChambers.DEPUTIES:
                     num, source, year = project.deputies_project_id.split("-")
@@ -57,7 +57,7 @@ class Command(BaseCommand):
         writer_thread = Process(target=self.writer, args=(data_queue, stop_writer))
         writer_thread.start()
         try:
-            for i in range(10):
+            for i in range(5):
                 t = Process(
                     target=self.worker, args=(projects_queue, data_queue, stop_workers)
                 )
@@ -66,16 +66,18 @@ class Command(BaseCommand):
             while True:
                 if projects_queue.empty() and data_queue.empty():
                     break
+                self.logger.info(f"Projects queue size: {projects_queue.qsize()}")
+                self.logger.info(f"Data queue size: {data_queue.qsize()}")
                 sleep(1)
+            stop_writer.set()
             for t in threads:
                 t.join()
-            stop_writer.set()
             writer_thread.join()
         except:
+            import pdb; pdb.set_trace()
             self.logger.info("Exception occurred. Stopping threads...")
             stop_workers.set()
             stop_writer.set()
             for t in threads:
                 t.join()
             writer_thread.join()
-            raise

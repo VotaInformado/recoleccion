@@ -109,6 +109,29 @@ class DeputiesLawProyectsText(DataSource):
             link = link_to_text["href"]
             text = cls._get_html_text(link)
         if text is None or not cls.len_gt(text, 10):
-            link = cls._get_infobase_url(number, source, year)
-            text = cls._get_text_from_infobase(link)
+            infobase_link = cls._get_infobase_url(number, source, year)
+            infobase_text = cls._get_text_from_infobase(infobase_link)
+            if cls.len_gt(infobase_text, 10):
+                text = infobase_text
+                link = infobase_link
         return text, link
+
+
+class SenateLawProyectsText(DataSource):
+    session = requests.Session()
+    base_url = "https://www.senado.gov.ar/parlamentario/comisiones/verExp/verExp.php?origen=sen&numExp={number}&anoExp={year}&tipoExp={source}"
+    GET_HEADERS = {
+        "Referer": "https://www.senado.gov.ar/parlamentario/comisiones/verExp/verExp.php",
+    }
+
+    @classmethod
+    def get_text(cls, number, source, year):
+        cls.logger.info(f"Getting text for project: {number}-{source}-{year}")
+        url = cls.base_url.format(number=number, source=source, year=year)
+        response = cls.session.get(url, headers=cls.GET_HEADERS)
+        soup = BeautifulSoup(response.content, "html.parser")
+        text_container = soup.find("div", attrs={"class": "texto"})
+        if not text_container:
+            return "", ""
+        text = text_container.get_text("\n", strip=True)
+        return text, url

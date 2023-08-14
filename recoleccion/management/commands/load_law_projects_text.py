@@ -43,7 +43,7 @@ class Command(BaseCommand):
 
         while not projects_queue.empty() and not stop_event.is_set():
             try:
-                project = projects_queue.get(timeout=10)
+                project = projects_queue.get(timeout=2)
                 if project.origin_chamber == "Diputados":  # ProjectChambers.DEPUTIES:
                     num, source, year = project.deputies_project_id.split("-")
                     text, link = DeputiesLawProyectsText.get_text(num, source, year)
@@ -52,7 +52,7 @@ class Command(BaseCommand):
                 self.logger.info(f"Projects queue empty. Stopping {this_process.name}")
                 break
             except Exception as e:
-                self.logger.error(f"Error in worker {this_process.name}: {e}")
+                self.logger.error(f"Error in worker {this_process.name}: {str(e)}")
 
     @process
     def writer(self, data_queue, stop_event):
@@ -67,7 +67,7 @@ class Command(BaseCommand):
             except Empty:
                 pass
             except Exception as e:
-                self.logger.error(f"Error in writer: {e}")
+                self.logger.error(f"Error in writer: {str(e)}")
 
     def handle(self, *args, **options):
         self.num_processes = options.get("processes", self.num_processes)

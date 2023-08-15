@@ -2,6 +2,7 @@ from recoleccion.components.data_sources import DataSource
 from bs4 import BeautifulSoup
 import requests
 from recoleccion.utils.pdf_reader import Pdf
+from recoleccion.components.utils import len_gt
 from io import BytesIO
 import re
 
@@ -79,14 +80,6 @@ class DeputiesLawProyectsText(DataSource):
         return text
 
     @classmethod
-    def len_gt(cls, text, length):
-        try:
-            text[length]
-            return True
-        except IndexError:
-            return False
-
-    @classmethod
     def get_text(cls, number, source, year):
         cls.logger.info(f"Getting text for project: {number}-{source}-{year}")
         cls.QUERY_DATA["strNumExp"] = number
@@ -108,10 +101,10 @@ class DeputiesLawProyectsText(DataSource):
         elif link_to_text:
             link = link_to_text["href"]
             text = cls._get_html_text(link)
-        if text is None or not cls.len_gt(text, 10):
+        if text is None or not len_gt(text, 10):
             infobase_link = cls._get_infobase_url(number, source, year)
             infobase_text = cls._get_text_from_infobase(infobase_link)
-            if cls.len_gt(infobase_text, 10):
+            if infobase_text and len_gt(infobase_text, 10):
                 text = infobase_text
                 link = infobase_link
         return text, link
@@ -119,19 +112,75 @@ class DeputiesLawProyectsText(DataSource):
 
 class SenateLawProyectsText(DataSource):
     session = requests.Session()
-    base_url = "https://www.senado.gov.ar/parlamentario/comisiones/verExp/verExp.php?origen=sen&numExp={number}&anoExp={year}&tipoExp={source}"
-    GET_HEADERS = {
-        "Referer": "https://www.senado.gov.ar/parlamentario/comisiones/verExp/verExp.php",
-    }
+    domain = "https://www.senado.gob.ar"
+    base_url = "https://www.senado.gob.ar/parlamentario/comisiones/verExp/{number}.{year}/{source}/PL"
+
+    @classmethod
+    def _get_pdf_text(cls, url):  # TODO: remove duplicate
+        cls.logger.info(f"Getting text from pdf: {url}")
+        response = cls.session.get(url, stream=True)
+        stream = BytesIO(response.content)
+        pdf = Pdf(stream)
+        return pdf.get_text_and_close()
+
+    @classmethod
+    def _get_final_text(cls, soup):
+        final_text_container = soup.find("div", {"id": "textoDefinitivo"})
+        link = final_text_container.find("a")
+        if link and link["href"]:
+            return cls._get_pdf_text(link["href"])
+        else:
+            return final_text_container.get_text("\n", strip=True)
+
+    @classmethod
+    def _get_final_text_link(cls, soup):
+        final_text_container = soup.find("div", {"id": "textoDefinitivo"})
+        link = final_text_container.find("a")
+        if link and link["href"]:
+            return link["href"]
+        return None
+
+    @classmethod
+    def _get_initial_text(cls, page):
+        initial_text_container = page.find("div", {"id": "textoOriginal"})
+        link = initial_text_container.find("a")
+        if link and link["href"]:
+            link = (
+                link["href"]
+                if link["href"].startswith("http")
+                else cls.domain + link["href"]
+            )
+            return cls._get_pdf_text(link)
+        else:
+            return initial_text_container.get_text("\n", strip=True)
+
+    @classmethod
+    def _get_initial_text_link(cls, page):
+        initial_text_container = page.find("div", {"id": "textoOriginal"})
+        link = initial_text_container.find("a")
+        if link:
+            return (
+                link["href"]
+                if link["href"].startswith("http")
+                else cls.domain + link["href"]
+            )
+        else:
+            return None
 
     @classmethod
     def get_text(cls, number, source, year):
         cls.logger.info(f"Getting text for project: {number}-{source}-{year}")
+        number = str(int(number))  # remove leading zeros
+        source = source.upper()
+        year = year[-2:] if len(year) > 2 else year
         url = cls.base_url.format(number=number, source=source, year=year)
-        response = cls.session.get(url, headers=cls.GET_HEADERS)
+        response = cls.session.get(url)
         soup = BeautifulSoup(response.content, "html.parser")
-        text_container = soup.find("div", attrs={"class": "texto"})
-        if not text_container:
-            return "", ""
-        text = text_container.get_text("\n", strip=True)
-        return text, url
+        text = cls._get_final_text(soup)
+        link = url or cls._get_final_text_link(soup)
+        if text is None or not len_gt(text, 20):
+            initial_text = cls._get_initial_text(soup)
+            if initial_text and len_gt(initial_text, 10):
+                text = initial_text
+                link = cls._get_initial_text_link(soup)
+        return text, link

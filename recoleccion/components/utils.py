@@ -65,3 +65,14 @@ def chunk(it, size):
     # does not pad the last tuple with None values
     it = iter(it)
     return iter(lambda: tuple(islice(it, size)), ())
+
+
+def len_gt(text, length):
+    # returns True if the text has more than <length> characters
+    # without calculating the len of the text and thus avoiding
+    # iterating over the whole text
+    try:
+        text[length]
+        return True
+    except IndexError:
+        return False

@@ -1,6 +1,7 @@
 from django.test import TestCase
 from recoleccion.components.data_sources.law_projects_text_source import (
     DeputiesLawProyectsText,
+    SenateLawProyectsText,
 )
 from unittest import skip
 
@@ -28,3 +29,18 @@ class DeputiesLawProjectsTextTestCase(TestCase):
     #         "https://www4.hcdn.gob.ar/dependencias/dsecretaria/Periodo2023/PDF2023/TP2023/2528-D-2023.pdf",
     #     )
     #     self.assertLess(len(text), 10)
+
+
+class SenateLawsProjectTextTestCase(TestCase):
+    @skip("Not mocked")
+    def test_get_text_parses_correctly_number_and_year_and_retrieves_ok(self):
+        text, link = SenateLawProyectsText.get_text("0003", "S", "2023")
+
+        self.assertIn(
+            "CREACION DEL INSTITUTO DE COROS DE LA REPÚBLICA",
+            text,
+        )
+        self.assertEqual(
+            link,
+            "https://www.senado.gob.ar/parlamentario/parlamentaria/465308/downloadPdf",
+        )

@@ -7,14 +7,16 @@ from django.db import transaction
 # Components
 from recoleccion.components.data_sources.law_projects_text_source import (
     DeputiesLawProyectsText,
+    SenateLawProyectsText,
 )
 from recoleccion.components.writers.law_projects_writer import LawProjectsWriter
 from recoleccion.utils.custom_logger import CustomLogger
 from recoleccion.models.law_project import LawProject
 from recoleccion.utils.enums.project_chambers import ProjectChambers
-from multiprocessing import Process, Queue, Event, current_process
+from multiprocessing import Process, Queue, Event, current_process, active_children
 from queue import Empty
 from time import sleep
+
 
 DEFAULT_PROCESS_NUMBER = 5
 
@@ -48,11 +50,16 @@ class Command(BaseCommand):
                     num, source, year = project.deputies_project_id.split("-")
                     text, link = DeputiesLawProyectsText.get_text(num, source, year)
                     data_queue.put((project, text, link))
+                elif project.origin_chamber == "Senado":
+                    num, source, year = project.senate_project_id.split("-")
+                    text, link = SenateLawProyectsText.get_text(num, source, year)
+                    # TODO: if text is empty try to get text with deputies Projects source
+                    data_queue.put((project, text, link))
             except Empty:
                 self.logger.info(f"Projects queue empty. Stopping {this_process.name}")
                 break
             except Exception as e:
-                self.logger.error(f"Error in worker {this_process.name}: {str(e)}")
+                self.logger.error(f"Error in worker {this_process.name}: {repr(e)}")
 
     @process
     def writer(self, data_queue, stop_event):
@@ -67,7 +74,7 @@ class Command(BaseCommand):
             except Empty:
                 pass
             except Exception as e:
-                self.logger.error(f"Error in writer: {str(e)}")
+                self.logger.error(f"Error in writer: {repr(e)}")
 
     def handle(self, *args, **options):
         self.num_processes = options.get("processes", self.num_processes)
@@ -92,14 +99,23 @@ class Command(BaseCommand):
                 )
                 self.workers.append(t)
                 t.start()
-            while True:
-                if self.projects_queue.empty() and self.data_queue.empty():
-                    break
+            while not self.projects_queue.empty():
                 self.logger.info(
                     f"Working...\n\t- Projects queue size: {self.projects_queue.qsize()}\n\t- Data queue size: {self.data_queue.qsize()}"
                 )
                 sleep(1)
-            self._stop_threads()
+            self.stop_workers.set()
+            for t in self.workers:
+                t.join()
+            self.logger.info("All workers stopped")
+            while not self.data_queue.empty():
+                self.logger.info(
+                    f"Working...\n\t- Projects queue size: {self.projects_queue.qsize()}\n\t- Data queue size: {self.data_queue.qsize()}"
+                )
+                sleep(1)
+            self.stop_writer.set()
+            self.writer_thread.join()
+            self.logger.info("All processes stopped")
         except:
             self.logger.error("Exception occurred. Stopping threads...")
             self.logger.info(
@@ -111,16 +127,14 @@ class Command(BaseCommand):
             self._stop_threads()
 
     def _stop_threads(self):
-        self.stop_writer.set()
+        # To dont need to flush queues
+        self.projects_queue.cancel_join_thread()
+        self.data_queue.cancel_join_thread()
         self.stop_workers.set()
-        self.logger.info("Cleaning queues...")
-        while not self.projects_queue.empty():
-            self.projects_queue.get()
-        while not self.data_queue.empty():
-            self.data_queue.get()
         for t in self.workers:
             t.join()
         self.logger.info("Workers joined")
+        self.stop_writer.set()
         self.writer_thread.join()
         self.logger.info("Writer joined")
         self.logger.info("All processes stopped")

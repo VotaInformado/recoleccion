@@ -348,3 +348,6 @@ class DeputyLawProjectsSource(DataSource):
         data["source"] = "Diputados"
         cls.logger.info(f"Retrieved {len(data)} projects")
         return data, total_added
+    
+
+

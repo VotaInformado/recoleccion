@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('recoleccion', '0016_remove_lawproject_deputies_file_and_more'),
+        ('recoleccion', '0019_personlinking'),
     ]
 
     operations = [

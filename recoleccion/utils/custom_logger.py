@@ -1,3 +1,4 @@
+import os
 import logging
 import colorlog
 
@@ -6,7 +7,7 @@ from django.conf import settings
 
 
 class CustomLogger:
-    def __init__(self, name=__name__, log_level=None):
+    def __init__(self, name=__name__, log_file_path=None, log_level=None):
         self.logger = logging.getLogger(name)
         log_level = log_level or getattr(settings, "log_level", None) or "INFO"
         self.logger.setLevel(log_level)
@@ -41,6 +42,16 @@ class CustomLogger:
 
         # add ch to logger
         self.logger.addHandler(ch)
+
+        if log_file_path:
+            log_dir = os.path.dirname(log_file_path)
+            os.makedirs(log_dir, exist_ok=True)
+
+            fh = logging.FileHandler(log_file_path)
+            fh.setLevel(log_level)
+            fh.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+
+            self.logger.addHandler(fh)
 
     def debug(self, message, exc_info=False):
         self.logger.debug(message, exc_info=exc_info)

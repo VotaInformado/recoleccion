@@ -6,3 +6,4 @@ from .social_data import SocialData
 from .law import Law
 from .law_project import LawProject
 from .vote import Vote
+from .person_linking import PersonLinking, PersonLinkingDecisions

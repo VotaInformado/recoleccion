@@ -55,11 +55,13 @@ class PersonLinker(Linker):
 
             data["person_id"] = mapping
             self.logger.info(f"Linked {linked_persons} persons")
+            unlinked_persons = data["person_id"].isnull().sum()
+            self.logger.info(f"{unlinked_persons} persons remain unlinked")
         except ValueError as e:
             if "second dataset is empty" in str(e):
                 # Shouldn't be an error, just means that there are no matches
                 data["person_id"] = None
-                self.logger.info(f"Linked 0 persons")
+                self.logger.info("Linked 0 persons")
             else:
                 raise e
         return data

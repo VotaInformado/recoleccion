@@ -301,8 +301,11 @@ class DeputyLawProjectsSource(DataSource):
         return response
 
     @classmethod
-    def retrieve_items(cls, page, projects_info: List[dict]) -> int:
-        response = cls.send_request(page)
+    def retrieve_items(cls, page, first_time: bool, projects_info: List[dict]) -> int:
+        if first_time:
+            response = cls.send_request(page_number=1)  # always, the POST request
+        if page != 1:
+            response = cls.send_request(page_number=page)
         page_content = response.content
 
         soup = BeautifulSoup(page_content, "html.parser")
@@ -313,7 +316,7 @@ class DeputyLawProjectsSource(DataSource):
             project_text = project.find(class_="dp-texto")
             project_info = cls.extract_project_info(metadata)
             project_info["title"] = project_text.get_text()
-            project_info.pop("Publicado en:")
+            project_info.pop("Publicado en:", None)
             projects_info.append(project_info)
             added += 1
 
@@ -325,26 +328,23 @@ class DeputyLawProjectsSource(DataSource):
         return date.strftime("%Y-%m-%d")
 
     @classmethod
-    def get_data(cls, starting_page: int, step_size: int, projects_info=list) -> int:
+    def get_data(cls, starting_page: int, first_time: bool, step_size: int, projects_info=list) -> int:
         ending_page = starting_page + step_size
         cls.logger.info(f"Retrieving data from page {starting_page}...")
         projects_info = []
         total_added = 0
         for i in range(starting_page, ending_page):
-            added = cls.retrieve_items(page=i, projects_info=projects_info)
+            added = cls.retrieve_items(page=i, first_time=first_time, projects_info=projects_info)
             total_added += added
             if not added:
                 break
         data = pd.DataFrame(projects_info)
         data = cls.get_and_rename_relevant_columns(data)
+        if "publication_date" not in data.columns:
+            cls.logger.warning(f"No data retrieved from page {starting_page}, re-trying...")
+            # especial, para marcar un problema con la request, reintentar
+            return -1, -1
         data["publication_date"] = data["publication_date"].apply(cls.fix_date_format)
         data["source"] = "Diputados"
         cls.logger.info(f"Retrieved {len(data)} projects")
-        projects_retrieved = data.apply(
-            lambda row: row["deputies_project_id"]
-            if not pd.isna(row["deputies_project_id"])
-            else row["senate_project_id"],
-            axis=1,
-        ).tolist()
-        cls.logger.info(f"Projects retrieved: {projects_retrieved}")
         return data, total_added

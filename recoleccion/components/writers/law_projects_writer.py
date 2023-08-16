@@ -22,7 +22,7 @@ class LawProjectsWriter(Writer):
             if was_created:
                 cls.logger.info(f"Created law project {element.project_id}")
                 written.append(element)
-            else:
+            elif element:
                 cls.logger.info(f"Updated law project {element.project_id}")
                 updated.append(element)
         cls.logger.info(f"Created {len(written)} law projects")
@@ -31,7 +31,7 @@ class LawProjectsWriter(Writer):
 
     @classmethod
     def update_law(cls, law_number: str, law_project: LawProject):
-        law = Law.objects.filter(number=law_number).first()
+        law = Law.objects.filter(law_number=law_number).first()
         if law:
             law.law_project = law_project
             law.save()
@@ -59,7 +59,7 @@ class LawProjectsWriter(Writer):
                     defaults=row.to_dict(),
                 )
             if law:
-                cls.update_law(law_project, law)
+                cls.update_law(law, law_project)
         except Exception as e:
             project_id = deputies_project_id or senate_project_id
             cls.logger.warning(f"An error occurred while updating or creating law project with id {project_id}: {e}")

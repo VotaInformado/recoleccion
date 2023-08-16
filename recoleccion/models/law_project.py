@@ -1,3 +1,4 @@
+import re
 from django.db import models
 
 # Base model
@@ -20,6 +21,111 @@ class LawProject(BaseModel):
     deputies_day_order = models.IntegerField(null=True)
     senate_day_order = models.IntegerField(null=True)
 
+    FORMAT_1 = r"\d{1,4}-[A-Z]{1,3}-\d{2}$"  # 70-S-21, 3042-D-21
+    FORMAT_2 = r"\d{1,4}-[A-Z]{1,3}-\d{4}$"  # 70-S-2021, 3042-D-2021
+    FORMAT_3 = r"0*(\d{4})-[A-Z]{1,3}-\d{4}$"  # 0070-S-2021, 0070-D-2021, 070-S-2021
+    FORMAT_4 = r"\d{1,4}-\d{2}$"  # 70-21, 3042-21
+    CHAMBER_IDS = ["S", "D", "CD", "PE", "JMG", "OV"]
+
     @property
     def project_id(self):
         return self.deputies_project_id or self.senate_project_id
+
+    @classmethod
+    def recognize_format(cls, project_id):
+        if re.match(cls.FORMAT_3, project_id):  # FORMAT_3 is the most restrictive
+            return cls.FORMAT_3
+        elif re.match(cls.FORMAT_1, project_id):
+            return cls.FORMAT_1
+        elif re.match(cls.FORMAT_2, project_id):
+            return cls.FORMAT_2
+        elif re.match(cls.FORMAT_4, project_id):
+            return cls.FORMAT_4
+        return None  # raise Exception
+
+    @classmethod
+    def get_all_alternative_ids(cls, original_id: str, include_all_chambers=False):
+        original_format = cls.recognize_format(original_id)
+        if original_format == cls.FORMAT_1:
+            return cls._get_alternative_names_format_1(original_id)
+        elif original_format == cls.FORMAT_2:
+            return cls._get_alternative_names_format_2(original_id)
+        elif original_format == cls.FORMAT_3:
+            return cls._get_alternative_names_format_3(original_id)
+        elif original_format == cls.FORMAT_4:
+            return cls._get_alternative_names_format_4(original_id)
+
+    @classmethod
+    def _get_alternative_names_format_1(cls, original_id: str):
+        # original format is 70-S-21, 3042-D-21
+        id, chamber, year = original_id.split("-")
+        full_year = f"20{year}"
+        format_2 = f"{id}-{chamber}-{full_year}"
+        format_3 = f"{id.zfill(4)}-{chamber}-{full_year}"
+        format_4 = f"{id}-{year}"
+        result = [original_id, format_2, format_3, format_4]
+        if chamber == "D":
+            extra_format_2 = f"{id}-CD-{full_year}"
+            extra_format_3 = f"{id.zfill(4)}-CD-{full_year}"
+            result.extend([extra_format_2, extra_format_3])
+        elif chamber == "CD":
+            extra_format_2 = f"{id}-D-{full_year}"
+            extra_format_3 = f"{id.zfill(4)}-D-{full_year}"
+            result.extend([extra_format_2, extra_format_3])
+        return result
+
+    @classmethod
+    def _get_alternative_names_format_2(cls, original_id: str):
+        # original format is 70-S-2021, 3042-D-2021
+        id, chamber, year = original_id.split("-")
+        format_1 = f"{id}-{chamber}-{year[2:]}"
+        format_3 = f"{id.zfill(4)}-{chamber}-{year}"
+        format_4 = f"{id}-{year[2:]}"
+        result = [original_id, format_1, format_3, format_4]
+        if chamber == "D":
+            extra_format_1 = f"{id}-CD-{year[2:]}"
+            extra_format_3 = f"{id.zfill(4)}-CD-{year}"
+            result.extend([extra_format_1, extra_format_3])
+        elif chamber == "CD":
+            extra_format_1 = f"{id}-D-{year[2:]}"
+            extra_format_3 = f"{id.zfill(4)}-D-{year}"
+            result.extend([extra_format_1, extra_format_3])
+        return result
+
+    @classmethod
+    def _get_alternative_names_format_3(cls, original_id: str):
+        # original format is 0070-S-2021, 0070-D-2021, 070-S-2021
+        def extract_non_zero(id):
+            match = re.search(r"0*([1-9]\d*)", id)
+            if match:
+                return match.group(1)
+            return id
+
+        id, chamber, year = original_id.split("-")
+        non_zero_id = extract_non_zero(id)
+        format_1 = f"{non_zero_id}-{chamber}-{year[2:]}"
+        format_2 = f"{non_zero_id}-{chamber}-{year}"
+        format_4 = f"{non_zero_id}-{year[2:]}"
+        result = [original_id, format_1, format_2, format_4]
+        if chamber == "D":
+            extra_format_1 = f"{non_zero_id}-CD-{year[2:]}"
+            extra_format_2 = f"{non_zero_id}-CD-{year}"
+            result.extend([extra_format_1, extra_format_2])
+        elif chamber == "CD":
+            extra_format_1 = f"{non_zero_id}-D-{year[2:]}"
+            extra_format_2 = f"{non_zero_id}-D-{year}"
+            result.extend([extra_format_1, extra_format_2])
+        return result
+
+    @classmethod
+    def _get_alternative_names_format_4(cls, original_id: str):
+        # original format is 70-21, 3042-21
+        id, year = original_id.split("-")
+        possible_results = [original_id]
+        full_year = f"20{year}"
+        for chamber_id in cls.CHAMBER_IDS:
+            format_1 = f"{id}-{chamber_id}-{full_year}"
+            format_2 = f"{id.zfill(4)}-{chamber_id}-{full_year}"
+            format_3 = f"{id}-{chamber_id}-{year}"
+            possible_results.extend([format_1, format_2, format_3])
+        return possible_results

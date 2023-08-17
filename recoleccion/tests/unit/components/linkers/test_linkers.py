@@ -1,19 +1,13 @@
-from django.test import TestCase
 from django.core.management import call_command
-import numpy as np
 
-# Unitest
-from unittest.mock import patch, PropertyMock
-
-import pandas as pd
-
+# Project
 from recoleccion.components.linkers import PersonLinker
-from recoleccion.components.linkers.linker import Linker
+from recoleccion.tests.test_helpers.test_case import LinkingTestCase
 from recoleccion.tests.test_helpers.faker import create_fake_df
+import recoleccion.tests.test_helpers.mocks as mck
 
 
-class LinkingTestCase(TestCase):
-
+class LinkingTestCase(LinkingTestCase):
     def setUp(self):
         self.messy_columns = {
             "name": "str",
@@ -51,11 +45,9 @@ class LinkingTestCase(TestCase):
         canonical_data[len(canonical_data) + 1] = canonical_record
         updated_data = create_fake_df(self.messy_columns, n=8, as_dict=False, dates_as_str=False)
         updated_data.loc[len(updated_data)] = updated_record
-        with patch.object(PersonLinker, "get_canonical_data", return_value=canonical_data):
-            with patch.object(Linker, "TRAINING_DIR", new_callable=PropertyMock) as attr_mock:
-                attr_mock.return_value = "recoleccion/components/linkers/training/tests"
-                linker = PersonLinker()
-                linked_data = linker.link_persons(updated_data)
+        with mck.mock_method(PersonLinker, "get_canonical_data", return_value=canonical_data):
+            linker = PersonLinker()
+            linked_data = linker.link_persons(updated_data)
         row = linked_data[linked_data["name"] == "Juan C."]
         self.assertEqual(row["person_id"].values[0], EXPECTED_ID)
 
@@ -80,11 +72,9 @@ class LinkingTestCase(TestCase):
         canonical_data[len(canonical_data) + 1] = canonical_record
         updated_data = create_fake_df(self.messy_columns, n=8, as_dict=False, dates_as_str=False)
         updated_data.loc[len(updated_data)] = updated_record
-        with patch.object(PersonLinker, "get_canonical_data", return_value=canonical_data):
-            with patch.object(Linker, "TRAINING_DIR", new_callable=PropertyMock) as attr_mock:
-                attr_mock.return_value = "recoleccion/components/linkers/training/tests"
-                linker = PersonLinker()
-                linked_data = linker.link_persons(updated_data)
+        with mck.mock_method(PersonLinker, "get_canonical_data", return_value=canonical_data):
+            linker = PersonLinker()
+            linked_data = linker.link_persons(updated_data)
         row = linked_data[linked_data["name"] == "Eustaquio"]
         id_value = row["person_id"].values[0]
         self.assertIsNone(id_value)
@@ -110,11 +100,9 @@ class LinkingTestCase(TestCase):
         canonical_data[len(canonical_data) + 1] = canonical_record
         updated_data = create_fake_df(self.messy_columns, n=8, as_dict=False, dates_as_str=False)
         updated_data.loc[len(updated_data)] = updated_record
-        with patch.object(PersonLinker, "get_canonical_data", return_value=canonical_data):
-            with patch.object(Linker, "TRAINING_DIR", new_callable=PropertyMock) as attr_mock:
-                attr_mock.return_value = "recoleccion/components/linkers/training/tests"
-                linker = PersonLinker()
-                linked_data = linker.link_persons(updated_data)
+        with mck.mock_method(PersonLinker, "get_canonical_data", return_value=canonical_data):
+            linker = PersonLinker()
+            linked_data = linker.link_persons(updated_data)
         row = linked_data[linked_data["name"] == "Eustaquio"]
         id_value = row["person_id"].values[0]
         self.assertIsNone(id_value)
@@ -139,11 +127,9 @@ class LinkingTestCase(TestCase):
         canonical_data[len(canonical_data) + 1] = canonical_record
         updated_data = create_fake_df(self.messy_columns, n=8, as_dict=False, dates_as_str=False)
         updated_data.loc[len(updated_data)] = updated_record
-        with patch.object(PersonLinker, "get_canonical_data", return_value=canonical_data):
-            with patch.object(Linker, "TRAINING_DIR", new_callable=PropertyMock) as attr_mock:
-                attr_mock.return_value = "recoleccion/components/linkers/training/tests"
-                linker = PersonLinker()
-                linked_data = linker.link_persons(updated_data)
+        with mck.mock_method(PersonLinker, "get_canonical_data", return_value=canonical_data):
+            linker = PersonLinker()
+            linked_data = linker.link_persons(updated_data)
         row = linked_data[linked_data["name"] == "Juan Eustaquio"]
         id_value = row["person_id"].values[0]
         self.assertEqual(id_value, EXPECTED_ID)
@@ -169,11 +155,9 @@ class LinkingTestCase(TestCase):
         canonical_data[len(canonical_data) + 1] = canonical_record
         updated_data = create_fake_df(self.messy_columns, n=8, as_dict=False, dates_as_str=False)
         updated_data.loc[len(updated_data)] = updated_record
-        with patch.object(PersonLinker, "get_canonical_data", return_value=canonical_data):
-            with patch.object(Linker, "TRAINING_DIR", new_callable=PropertyMock) as attr_mock:
-                attr_mock.return_value = "recoleccion/components/linkers/training/tests"
-                linker = PersonLinker()
-                linked_data = linker.link_persons(updated_data)
+        with mck.mock_method(PersonLinker, "get_canonical_data", return_value=canonical_data):
+            linker = PersonLinker()
+            linked_data = linker.link_persons(updated_data)
         row = linked_data[linked_data["name"] == "Juan Eustaquio"]
         id_value = row["person_id"].values[0]
         self.assertEqual(id_value, EXPECTED_ID)
@@ -199,13 +183,9 @@ class LinkingTestCase(TestCase):
         canonical_data[len(canonical_data) + 1] = canonical_record
         updated_data = create_fake_df(self.messy_columns, n=8, as_dict=False, dates_as_str=False)
         updated_data.loc[len(updated_data)] = updated_record
-        with patch.object(PersonLinker, "get_canonical_data", return_value=canonical_data):
-            with patch.object(Linker, "TRAINING_DIR", new_callable=PropertyMock) as attr_mock:
-                attr_mock.return_value = "recoleccion/components/linkers/training/tests"
-                linker = PersonLinker()
-                linked_data = linker.link_persons(updated_data)
+        with mck.mock_method(PersonLinker, "get_canonical_data", return_value=canonical_data):
+            linker = PersonLinker()
+            linked_data = linker.link_persons(updated_data)
         row = linked_data[linked_data["name"] == "Roberto Juan"]
         id_value = row["person_id"].values[0]
         self.assertIsNone(id_value)
-
-

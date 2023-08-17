@@ -22,11 +22,11 @@ class FakeClass:
 def is_internal_mock_enabled():
     return getattr(settings, "INTERNAL_MOCK_ENABLED", True)
 
-def mock_method(mocked_class, method_name, return_value):
+def mock_method(mocked_class, method_name, return_value=None, new_callable=None):
     """Mocks a method of a class"""
     mocked_class_name = mocked_class.__name__
     if is_internal_mock_enabled():
-        patcher = patch.object(mocked_class, method_name, return_value=return_value)
+        patcher = patch.object(mocked_class, method_name, return_value=return_value, new_callable=new_callable)
         return patcher
     else:
         # This function needs to return a context manager, so this must be used

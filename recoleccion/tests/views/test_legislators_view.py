@@ -1,19 +1,16 @@
-from unittest.mock import PropertyMock, patch
-from rest_framework.test import APITestCase
 from django.core.management import call_command
-from recoleccion.components.linkers.linker import Linker
-from recoleccion.models.person import Person
 
+# Project
+from recoleccion.tests.test_helpers.test_case import LinkingAPITestCase
+from recoleccion.models.person import Person
 from recoleccion.models.senate_seat import SenateSeat
 from recoleccion.utils.enums.legislator_seats import LegislatorSeats
 
 
-class LegislatorViewTestCase(APITestCase):
+class LegislatorViewTestCase(LinkingAPITestCase):
     def test_legislators_list_without_repeated_seats_senators(self):
         # Each legislator has had at most 1 seat in total
-        with patch.object(Linker, "TRAINING_DIR", new_callable=PropertyMock) as attr_mock:
-            attr_mock.return_value = "recoleccion/components/linkers/training/tests"
-            call_command("load_current_senators")
+        call_command("load_current_senators")
         # Only senate_seats should be present
         url = "/legislators/"
         response = self.client.get(url)
@@ -24,9 +21,7 @@ class LegislatorViewTestCase(APITestCase):
 
     def test_legislators_list_without_repeated_seats_deputies(self):
         # Each legislator has had at most 1 seat in total
-        with patch.object(Linker, "TRAINING_DIR", new_callable=PropertyMock) as attr_mock:
-            attr_mock.return_value = "recoleccion/components/linkers/training/tests"
-            call_command("load_current_deputies")
+        call_command("load_current_deputies")
         # Only deputy_seats should be present
         url = "/legislators/"
         response = self.client.get(url)
@@ -36,9 +31,7 @@ class LegislatorViewTestCase(APITestCase):
             self.assertEquals(last_seat, LegislatorSeats.DEPUTY.label)
 
     def test_simple_legislators_retrieval(self):
-        with patch.object(Linker, "TRAINING_DIR", new_callable=PropertyMock) as attr_mock:
-            attr_mock.return_value = "recoleccion/components/linkers/training/tests"
-            call_command("load_current_deputies")
+        call_command("load_current_deputies")
         chosen_person = Person.objects.first()
         url = f"/legislators/{chosen_person.pk}/"
         response = self.client.get(url)
@@ -53,9 +46,7 @@ class LegislatorViewTestCase(APITestCase):
         self.assertEquals(len(legislator_seats), 1)
 
     def test_legislators_retrieval_with_repeated_seats(self):
-        with patch.object(Linker, "TRAINING_DIR", new_callable=PropertyMock) as attr_mock:
-            attr_mock.return_value = "recoleccion/components/linkers/training/tests"
-            call_command("load_current_deputies")
+        call_command("load_current_deputies")
         chosen_person = Person.objects.first()
         SenateSeat.objects.create(
             person_id=chosen_person.pk,

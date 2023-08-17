@@ -46,6 +46,8 @@ class Linker:
         gazetteer.training_pairs = new_training_pairs
 
     def _save_training(self, gazetteer: Gazetteer):
+        if "tests" not in self.TRAINING_DIR:
+            import pdb; pdb.set_trace()
         with open(f"{self.TRAINING_DIR}/{self.__class__.__name__}.json", "w") as f:
             self.clean_training_pairs(gazetteer)
             gazetteer.write_training(f)

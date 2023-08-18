@@ -27,7 +27,7 @@ class Migration(migrations.Migration):
                 ('senate_file', models.CharField(max_length=30, null=True)),
                 ('deputies_header_file', models.CharField(max_length=30, null=True)),
                 ('senate_header_file', models.CharField(max_length=30, null=True)),
-                ('status', models.CharField(choices=[('WITHDRAWN', 'Retirado'), ('HALF_SANCTION', 'Media sanción'), ('APPROVED', 'Aprobado'), ('REJECTED', 'Rechazado')], max_length=15)),
+                ('status', models.CharField(choices=[('WITHDRAWN', 'Retirado'), ('HALF_SANCTION', 'Media sanción'), ('APPROVED', 'Aprobado'), ('REJECTED', 'Rechazado')], max_length=15, null=True)),
             ],
             options={
                 'abstract': False,

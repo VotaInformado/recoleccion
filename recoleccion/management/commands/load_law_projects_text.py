@@ -2,7 +2,7 @@
 from django.core.management.base import BaseCommand
 
 # Django
-from django.db import transaction
+from django.db.models import Q
 
 # Components
 from recoleccion.components.data_sources.law_projects_text_source import (
@@ -16,7 +16,7 @@ from recoleccion.utils.enums.project_chambers import ProjectChambers
 from multiprocessing import Process, Queue, Event, current_process, active_children
 from queue import Empty
 from time import sleep
-
+import argparse
 
 DEFAULT_PROCESS_NUMBER = 5
 
@@ -38,28 +38,34 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("--processes", type=int, default=DEFAULT_PROCESS_NUMBER)
+        parser.add_argument("--only-missing", action=argparse.BooleanOptionalAction)
 
     @process
     def worker(self, projects_queue, data_queue, stop_event):
-        this_process = current_process()
-
-        while not projects_queue.empty() and not stop_event.is_set():
+        this_process = current_process().name
+        while not stop_event.is_set():
             try:
                 project = projects_queue.get(timeout=2)
-                if project.origin_chamber == "Diputados":  # ProjectChambers.DEPUTIES:
+                if project.origin_chamber == ProjectChambers.DEPUTIES:
                     num, source, year = project.deputies_project_id.split("-")
                     text, link = DeputiesLawProyectsText.get_text(num, source, year)
                     data_queue.put((project, text, link))
-                elif project.origin_chamber == "Senado":
-                    num, source, year = project.senate_project_id.split("-")
+                elif project.origin_chamber == ProjectChambers.SENATORS:
+                    parts = project.senate_project_id.split("-")
+                    # Ugly FIX: some projects have a wrong format TODO: fix
+                    if len(parts) == 3:
+                        num, source, year = parts
+                    elif len(parts) == 2:
+                        num, year = parts
+                        source = "S"
+                    else:
+                        continue
                     text, link = SenateLawProyectsText.get_text(num, source, year)
                     # TODO: if text is empty try to get text with deputies Projects source
                     data_queue.put((project, text, link))
             except Empty:
-                self.logger.info(f"Projects queue empty. Stopping {this_process.name}")
+                self.logger.info(f"{this_process} > Projects queue empty")
                 break
-            except Exception as e:
-                self.logger.error(f"Error in worker {this_process.name}: {repr(e)}")
 
     @process
     def writer(self, data_queue, stop_event):
@@ -67,18 +73,30 @@ class Command(BaseCommand):
             try:
                 data = data_queue.get(timeout=1)
                 project, text, link = data
+                self.logger.info(
+                    f"Writer > Updating Project [id:{project.id}, deputy_id:{project.deputies_project_id}, senate_id:{project.senate_project_id}] "
+                )
+                text = text.replace("\x00", "\uFFFD")
+                link = link.replace("\x00", "\uFFFD")
                 LawProject.update(id=project.id, text=text, link=link)
                 self.logger.info(
-                    f"Update on Project {project.deputies_project_id} | {project.senate_project_id} completed"
+                    f"Writer > Correctly updated Project [id:{project.id}, deputy_id:{project.deputies_project_id}, senate_id:{project.senate_project_id}]"
                 )
             except Empty:
                 pass
             except Exception as e:
-                self.logger.error(f"Error in writer: {repr(e)}")
+                self.logger.error(f"Writer > Error: {repr(e)}")
+        self.logger.info(f"Writer > Stopped")
 
     def handle(self, *args, **options):
         self.num_processes = options.get("processes", self.num_processes)
-        projects = LawProject.objects.all()
+        only_missing = options.get("only_missing", False)
+        projects = (
+            LawProject.objects.filter(Q(text=None) | Q(text="")).all()
+            if only_missing
+            else LawProject.objects.all()
+        )
+        projects = projects[:10]
         self.projects_queue = Queue()
         self.data_queue = Queue()
         for project in projects:
@@ -99,11 +117,15 @@ class Command(BaseCommand):
                 )
                 self.workers.append(t)
                 t.start()
-            while not self.projects_queue.empty():
+            alive_workers = True
+            while alive_workers:
                 self.logger.info(
-                    f"Working...\n\t- Projects queue size: {self.projects_queue.qsize()}\n\t- Data queue size: {self.data_queue.qsize()}"
+                    f"CURRENT STATE: \n\t- Projects queue size: {self.projects_queue.qsize()}\n\t- Data queue size: {self.data_queue.qsize()}"
                 )
+                alive_workers = [t.name for t in self.workers if t.is_alive()]
+                self.logger.info(f"Alive workers: {str(alive_workers)}")
                 sleep(1)
+            self.logger.warning("No workers alive, explicitly stopping them...")
             self.stop_workers.set()
             for t in self.workers:
                 t.join()

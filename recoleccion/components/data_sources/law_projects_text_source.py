@@ -7,7 +7,39 @@ from io import BytesIO
 import re
 
 
-class DeputiesLawProyectsText(DataSource):
+class LawProjectsText(DataSource):
+    # Base class for law projects text sources
+    # This class is not meant to be used directly
+    # Contains common methods used for both deputies and senators law projects text sources
+
+    @classmethod
+    def _get_pdf_text(cls, url):
+        # cls.logger.info(f"Getting text from pdf: {url}")
+        response = cls.session.get(url, stream=True)
+        stream = BytesIO(response.content)
+        pdf = Pdf(stream)
+        return pdf.get_text_and_close()
+
+    @classmethod
+    def get_text(cls, number, source, year):
+        from multiprocessing import current_process
+
+        this_process = current_process().name
+        cls.logger.info(
+            f"{this_process} > Getting text for project: {number}-{source}-{year}"
+        )
+        text, link = cls._get_text(number, source, year)
+        cls.logger.info(
+            f"{this_process} > GOT text for project: {number}-{source}-{year}"
+        )
+        return text, link
+
+    @classmethod
+    def _get_text(cls, number, source, year):
+        raise NotImplementedError
+
+
+class DeputiesLawProyectsText(LawProjectsText):
     session = requests.Session()
     base_url = "https://www.diputados.gov.ar/proyectos/resultados-buscador.html"
     infobase_url = "https://www.hcdn.gob.ar/folio-cgi-bin/om_isapi.dll?infobase=tp.nfo&softpage=Doc_Frame_Pg42&record=dochitfirst&advquery={exp}"
@@ -35,14 +67,6 @@ class DeputiesLawProyectsText(DataSource):
     }
 
     @classmethod
-    def _get_pdf_text(cls, url):
-        cls.logger.info(f"Getting text from pdf: {url}")
-        response = cls.session.get(url, stream=True)
-        stream = BytesIO(response.content)
-        pdf = Pdf(stream)
-        return pdf.get_text_and_close()
-
-    @classmethod
     def _get_infobase_url(cls, number, source, year):
         year = year[-2:] if len(year) > 2 else year
         exp = f"{number}-{source}-{year}"
@@ -58,7 +82,6 @@ class DeputiesLawProyectsText(DataSource):
         if not match:
             return ""
         record_name = match.group(1)
-        cls.logger.info(f"Record ID found: {record_name}. Getting text...")
         response = cls.session.get(cls.infobase_record_url.format(record=record_name))
         soup = BeautifulSoup(response.content, "html5lib")
         record = soup.find("a", attrs={"name": record_name})
@@ -70,7 +93,6 @@ class DeputiesLawProyectsText(DataSource):
 
     @classmethod
     def _get_html_text(cls, url):
-        cls.logger.info(f"Getting text from html: {url}")
         response = cls.session.get(url)
         soup = BeautifulSoup(response.content, "html.parser")
         text_container = soup.find("div", attrs={"class": "container interno"})
@@ -80,8 +102,7 @@ class DeputiesLawProyectsText(DataSource):
         return text
 
     @classmethod
-    def get_text(cls, number, source, year):
-        cls.logger.info(f"Getting text for project: {number}-{source}-{year}")
+    def _get_text(cls, number, source, year):
         cls.QUERY_DATA["strNumExp"] = number
         cls.QUERY_DATA["strNumExpOrig"] = source
         cls.QUERY_DATA["strNumExpAnio"] = year
@@ -110,25 +131,22 @@ class DeputiesLawProyectsText(DataSource):
         return text, link
 
 
-class SenateLawProyectsText(DataSource):
+class SenateLawProyectsText(LawProjectsText):
     session = requests.Session()
     domain = "https://www.senado.gob.ar"
     base_url = "https://www.senado.gob.ar/parlamentario/comisiones/verExp/{number}.{year}/{source}/PL"
 
     @classmethod
-    def _get_pdf_text(cls, url):  # TODO: remove duplicate
-        cls.logger.info(f"Getting text from pdf: {url}")
-        response = cls.session.get(url, stream=True)
-        stream = BytesIO(response.content)
-        pdf = Pdf(stream)
-        return pdf.get_text_and_close()
+    def full_path(cls, path):
+        return path if path.startswith("http") else cls.domain + path
 
     @classmethod
     def _get_final_text(cls, soup):
         final_text_container = soup.find("div", {"id": "textoDefinitivo"})
         link = final_text_container.find("a")
         if link and link["href"]:
-            return cls._get_pdf_text(link["href"])
+            link = cls.full_path(link["href"])
+            return cls._get_pdf_text(link)
         else:
             return final_text_container.get_text("\n", strip=True)
 
@@ -137,7 +155,7 @@ class SenateLawProyectsText(DataSource):
         final_text_container = soup.find("div", {"id": "textoDefinitivo"})
         link = final_text_container.find("a")
         if link and link["href"]:
-            return link["href"]
+            return cls.full_path(link["href"])
         return None
 
     @classmethod
@@ -145,11 +163,7 @@ class SenateLawProyectsText(DataSource):
         initial_text_container = page.find("div", {"id": "textoOriginal"})
         link = initial_text_container.find("a")
         if link and link["href"]:
-            link = (
-                link["href"]
-                if link["href"].startswith("http")
-                else cls.domain + link["href"]
-            )
+            link = cls.full_path(link["href"])
             return cls._get_pdf_text(link)
         else:
             return initial_text_container.get_text("\n", strip=True)
@@ -159,20 +173,20 @@ class SenateLawProyectsText(DataSource):
         initial_text_container = page.find("div", {"id": "textoOriginal"})
         link = initial_text_container.find("a")
         if link:
-            return (
-                link["href"]
-                if link["href"].startswith("http")
-                else cls.domain + link["href"]
-            )
+            return cls.full_path(link["href"])
         else:
             return None
 
     @classmethod
-    def get_text(cls, number, source, year):
-        cls.logger.info(f"Getting text for project: {number}-{source}-{year}")
+    def _parse_input(cls, number, source, year):
         number = str(int(number))  # remove leading zeros
         source = source.upper()
         year = year[-2:] if len(year) > 2 else year
+        return number, source, year
+
+    @classmethod
+    def _get_text(cls, number, source, year):
+        number, source, year = cls._parse_input(number, source, year)
         url = cls.base_url.format(number=number, source=source, year=year)
         response = cls.session.get(url)
         soup = BeautifulSoup(response.content, "html.parser")
@@ -182,5 +196,5 @@ class SenateLawProyectsText(DataSource):
             initial_text = cls._get_initial_text(soup)
             if initial_text and len_gt(initial_text, 10):
                 text = initial_text
-                link = cls._get_initial_text_link(soup)
+                link = cls._get_initial_text_link(soup) or link
         return text, link

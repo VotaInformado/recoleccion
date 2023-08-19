@@ -18,6 +18,11 @@ class FakeClass:
     def fake_method(self):
         pass
 
+class FakeResponse:
+    def __init__(self, status_code, content):
+        self.status_code = status_code
+        self.content = content
+        
 
 def is_internal_mock_enabled():
     return getattr(settings, "INTERNAL_MOCK_ENABLED", True)

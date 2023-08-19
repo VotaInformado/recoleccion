@@ -140,7 +140,7 @@ class Command(BaseCommand):
         self.logger.info(
             f"Projects remaining in writer queue: {self.data_queue.qsize()}"
         )
-        # To dont need to flush queues
+        # To avoid the need of flushing the queues
         self.projects_queue.cancel_join_thread()
         self.data_queue.cancel_join_thread()
         for p in self.workers:

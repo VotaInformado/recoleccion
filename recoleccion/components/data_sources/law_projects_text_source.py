@@ -110,7 +110,6 @@ class DeputiesLawProyectsText(LawProjectsText):
         response = cls.session.post(
             cls.base_url, data=cls.QUERY_DATA, headers=cls.POST_HEADERS
         )
-
         soup = BeautifulSoup(response.content, "html.parser")
         link_to_text = soup.find(
             "a", string=["Texto completo del proyecto", "Ver documento original"]
@@ -179,10 +178,15 @@ class SenateLawProyectsText(LawProjectsText):
             return None
 
     @classmethod
-    def _get_text(cls, number, source, year):
+    def _parse_input(cls, number, source, year):
         number = str(int(number))  # remove leading zeros
         source = source.upper()
         year = year[-2:] if len(year) > 2 else year
+        return number, source, year
+
+    @classmethod
+    def _get_text(cls, number, source, year):
+        number, source, year = cls._parse_input(number, source, year)
         url = cls.base_url.format(number=number, source=source, year=year)
         response = cls.session.get(url)
         soup = BeautifulSoup(response.content, "html.parser")

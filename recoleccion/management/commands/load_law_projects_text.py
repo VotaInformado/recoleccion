@@ -59,6 +59,7 @@ class Command(BaseCommand):
         except Empty:
             self.logger.info(f"{this_process} > Projects queue empty")
             return True
+        return False
 
     def writer_target(self, data_queue, workers_finished):
         this_process = current_process().name
@@ -110,7 +111,7 @@ class Command(BaseCommand):
                 self.logger.info(
                     f"CURRENT STATE: \n\t- Projects queue size: {self.projects_queue.qsize()}\n\t- Data queue size: {self.data_queue.qsize()}"
                 )
-                alive_workers = [t.name for t in self.workers if t.stopped()]
+                alive_workers = [t.name for t in self.workers if not t.stopped()]
                 self.logger.info(f"Alive workers: {str(alive_workers)}")
                 sleep(1)
             self.logger.warning("No workers alive, explicitly stopping them...")

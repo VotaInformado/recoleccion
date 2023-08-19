@@ -70,7 +70,7 @@ class DeputiesLawProyectsText(DataSource):
 
     @classmethod
     def _get_html_text(cls, url):
-        #cls.logger.info(f"Getting text from html: {url}")
+        # cls.logger.info(f"Getting text from html: {url}")
         response = cls.session.get(url)
         soup = BeautifulSoup(response.content, "html.parser")
         text_container = soup.find("div", attrs={"class": "container interno"})
@@ -113,7 +113,9 @@ class DeputiesLawProyectsText(DataSource):
             if infobase_text and len_gt(infobase_text, 10):
                 text = infobase_text
                 link = infobase_link
-        cls.logger.info(f"{this_process} > GOT text for project: {number}-{source}-{year}")
+        cls.logger.info(
+            f"{this_process} > GOT text for project: {number}-{source}-{year}"
+        )
         return text, link
 
 
@@ -128,7 +130,7 @@ class SenateLawProyectsText(DataSource):
 
     @classmethod
     def _get_pdf_text(cls, url):  # TODO: remove duplicate
-        cls.logger.info(f"Getting text from pdf: {url}")
+        # cls.logger.info(f"Getting text from pdf: {url}")
         response = cls.session.get(url, stream=True)
         stream = BytesIO(response.content)
         pdf = Pdf(stream)
@@ -174,8 +176,11 @@ class SenateLawProyectsText(DataSource):
     @classmethod
     def get_text(cls, number, source, year):
         from multiprocessing import current_process
+
         this_process = current_process().name
-        cls.logger.info(f"{this_process} > Getting text for project: {number}-{source}-{year}")
+        cls.logger.info(
+            f"{this_process} > Getting text for project: {number}-{source}-{year}"
+        )
         number = str(int(number))  # remove leading zeros
         source = source.upper()
         year = year[-2:] if len(year) > 2 else year
@@ -189,5 +194,7 @@ class SenateLawProyectsText(DataSource):
             if initial_text and len_gt(initial_text, 10):
                 text = initial_text
                 link = cls._get_initial_text_link(soup) or link
-        cls.logger.info(f"{this_process} > GOT text for project: {number}-{source}-{year}")
+        cls.logger.info(
+            f"{this_process} > GOT text for project: {number}-{source}-{year}"
+        )
         return text, link

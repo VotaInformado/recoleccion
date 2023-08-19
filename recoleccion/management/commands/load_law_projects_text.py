@@ -31,7 +31,7 @@ class Command(BaseCommand):
         parser.add_argument("--processes", type=int, default=DEFAULT_PROCESS_NUMBER)
         parser.add_argument("--only-missing", action=argparse.BooleanOptionalAction)
 
-    def worker(self, projects_queue, data_queue):
+    def worker_target(self, projects_queue, data_queue):
         this_process = current_process().name
         try:
             project = projects_queue.get(timeout=2)
@@ -60,7 +60,7 @@ class Command(BaseCommand):
             self.logger.info(f"{this_process} > Projects queue empty")
             return True
 
-    def writer(self, data_queue):
+    def writer_target(self, data_queue, workers_finished):
         this_process = current_process().name
         try:
             data = data_queue.get(timeout=1)
@@ -76,6 +76,7 @@ class Command(BaseCommand):
             )
         except Empty:
             pass  # To avoid locking into empty queue
+        return True if workers_finished.is_set() else False
 
     def handle(self, *args, **options):
         self.num_processes = options.get("processes", self.num_processes)
@@ -88,16 +89,19 @@ class Command(BaseCommand):
         projects = projects[:10]
         self.projects_queue = Queue()
         self.data_queue = Queue()
+        self.workers_finished = Event()
         for project in projects:
             self.projects_queue.put(project)
         self.workers = []
-        self.writer_thread = StoppableProcess(
-            target=self.writer, args=(self.data_queue,), name="Writer"
+        self.writer = StoppableProcess(
+            target=self.writer_target,
+            args=(self.data_queue, self.workers_finished),
+            name="Writer",
         )
         try:
             for i in range(self.num_processes):
                 p = StoppableProcess(
-                    target=self.worker,
+                    target=self.worker_target,
                     args=(self.projects_queue, self.data_queue),
                     name=f"Worker-{i}",
                 )
@@ -113,13 +117,14 @@ class Command(BaseCommand):
             self.logger.warning("No workers alive, explicitly stopping them...")
             for p in self.workers:
                 p.stop_and_join()
-            self.logger.info("All workers stopped")
-            while not self.data_queue.empty():  # TODO: unreliable
+            self.logger.info("All workers stopped. Finish writting data...")
+            self.workers_finished.set()
+            while not self.writer.stopped():
                 self.logger.info(
                     f"Working...\n\t- Projects queue size: {self.projects_queue.qsize()}\n\t- Data queue size: {self.data_queue.qsize()}"
                 )
                 sleep(1)
-            self.writer_thread.stop_and_join()
+            self.writer.stop_and_join()
             self.logger.info("All processes stopped")
         except KeyboardInterrupt:
             self.logger.warning("Keyboard interrupt received. Stopping threads...")
@@ -132,13 +137,15 @@ class Command(BaseCommand):
         self.logger.info(
             f"Projects remaining in workers queue: {self.projects_queue.qsize()}"
         )
-        self.logger.info(f"Data remaining in writer queue: {self.data_queue.qsize()}")
+        self.logger.info(
+            f"Projects remaining in writer queue: {self.data_queue.qsize()}"
+        )
         # To dont need to flush queues
         self.projects_queue.cancel_join_thread()
         self.data_queue.cancel_join_thread()
         for p in self.workers:
             p.stop_and_join()
         self.logger.info("Workers joined")
-        self.writer_thread.stop_and_join()
+        self.writer.stop_and_join()
         self.logger.info("Writer joined")
         self.logger.info("All processes stopped")

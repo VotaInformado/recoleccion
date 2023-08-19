@@ -86,7 +86,6 @@ class Command(BaseCommand):
             if only_missing
             else LawProject.objects.all()
         )
-        projects = projects[:10]
         self.projects_queue = Queue()
         self.data_queue = Queue()
         self.workers_finished = Event()

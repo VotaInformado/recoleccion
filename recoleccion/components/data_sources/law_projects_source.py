@@ -25,7 +25,6 @@ class HCDNLawProjects(DataSource):
         "proyecto_titulo": "title",
         "publicacion_fecha": "publication_date",
         "camara_origen": "origin_chamber",
-        "expediente_cabecera": "deputies_header_file",
         "resultado": "status",
     }
 

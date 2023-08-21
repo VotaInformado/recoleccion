@@ -32,7 +32,6 @@ class Command(BaseCommand):
         source = None
         if len(comps) == 3:
             num, source, year = comps
-            return
         if len(comps) == 2:
             num, year = comps
         project.senate_number = int(num)

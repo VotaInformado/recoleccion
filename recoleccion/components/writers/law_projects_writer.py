@@ -7,10 +7,25 @@ import numpy as np
 from recoleccion.models import LawProject
 from recoleccion.components.writers import Writer
 from recoleccion.models.law import Law
+from recoleccion.utils.enums.project_chambers import ProjectChambers
 
 
 class LawProjectsWriter(Writer):
     model = LawProject
+
+    @classmethod
+    def split_id(self, id):
+        if id is None:
+            return None, None, None
+        comps = id.split("-")
+        if len(comps) == 3:
+            num, source, year = comps
+        if len(comps) == 2:
+            num, year = comps
+        num = int(num)
+        source = source.upper() if source else None
+        year = int(year)
+        return num, source, year
 
     @classmethod
     def write(cls, data: pd.DataFrame):
@@ -47,8 +62,22 @@ class LawProjectsWriter(Writer):
         senate_project_id = row.get("senate_project_id", None)
         law = row.get("law", None)
         row = row.drop("law", errors="ignore")
+        deputies_number, deputies_source, deputies_year = cls.split_id(
+            deputies_project_id
+        )
+        senate_number, senate_source, senate_year = cls.split_id(senate_project_id)
+        row.update(
+            {
+                "deputies_number": deputies_number,
+                "deputies_source": deputies_source,
+                "deputies_year": deputies_year,
+                "senate_number": senate_number,
+                "senate_source": senate_source,
+                "senate_year": senate_year,
+            }
+        )
         try:
-            if row.get("origin_chamber", None) == "Diputados":
+            if row.get("origin_chamber", None) == ProjectChambers.DEPUTIES:
                 law_project, was_created = LawProject.objects.update_or_create(
                     deputies_project_id=deputies_project_id,
                     defaults=row.to_dict(),
@@ -62,7 +91,14 @@ class LawProjectsWriter(Writer):
                 cls.update_law(law, law_project)
         except Exception as e:
             project_id = deputies_project_id or senate_project_id
-            cls.logger.warning(f"An error occurred while updating or creating law project with id {project_id}: {e}")
+            cls.logger.warning(
+                f"An error occurred while updating or creating law project with id {project_id}: {e}"
+            )
+            # print stack trace
+            import traceback
+
+            traceback.print_exc()
+            raise e
             return None, False
         return law_project, was_created
 
@@ -81,7 +117,9 @@ class LawProjectsWriter(Writer):
                 cls.logger.info(f"Updated day order for project {project_id}")
                 updated.append(project)
             else:
-                cls.logger.warning(f"Project {project_id} not found, day order {day_order} not updated")
+                cls.logger.warning(
+                    f"Project {project_id} not found, day order {day_order} not updated"
+                )
                 not_found.append(project_id)
         cls.logger.info(f"Updated {len(updated)} day orders")
         cls.logger.info(f"{len(not_found)} day orders not found")

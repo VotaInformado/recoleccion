@@ -10,16 +10,23 @@ from recoleccion.utils.enums.project_status import ProjectStatus
 
 
 class LawProject(BaseModel):
-    deputies_project_id = models.CharField(max_length=30, unique=True, null=True)
-    senate_project_id = models.CharField(max_length=30, unique=True, null=True)
+    deputies_project_id = models.CharField(max_length=30, null=True)
+    senate_project_id = models.CharField(max_length=30, null=True)
+    deputies_number = models.IntegerField(null=True)
+    deputies_source = models.CharField(max_length=10, null=True)
+    deputies_year = models.IntegerField(null=True)
+    deputies_day_order = models.IntegerField(null=True)
+    senate_number = models.IntegerField(null=True)
+    senate_source = models.CharField(max_length=10, null=True)
+    senate_year = models.IntegerField(null=True)
+    senate_day_order = models.IntegerField(null=True)
+
     origin_chamber = models.CharField(choices=ProjectChambers.choices, max_length=10)
     title = models.TextField()
     # no tiene resumen en principio
     publication_date = models.DateField(null=True)
     status = models.CharField(choices=ProjectStatus.choices, max_length=30, null=True)
     source = models.CharField(max_length=100, null=True)
-    deputies_day_order = models.IntegerField(null=True)
-    senate_day_order = models.IntegerField(null=True)
     text = models.TextField(null=True)
     link = models.CharField(max_length=250, null=True)
 
@@ -34,6 +41,9 @@ class LawProject(BaseModel):
     FORMAT_3 = r"0*(\d{4})-[A-Z]{1,3}-\d{4}$"  # 0070-S-2021, 0070-D-2021, 070-S-2021
     FORMAT_4 = r"\d{1,4}-\d{2}$"  # 70-21, 3042-21
     CHAMBER_IDS = ["S", "D", "CD", "PE", "JMG", "OV"]
+
+    class Meta:
+        unique_together = ("deputies_project_id", "senate_project_id")
 
     @property
     def project_id(self):

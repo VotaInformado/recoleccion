@@ -55,7 +55,7 @@ class HCDNLawProjects(DataSource):
         data = response.json()["result"]["records"]
         df = pd.DataFrame(data)
         df = df[df["proyecto_tipo"] == "LEY"]
-        cls.logger.info(f"Base projects data size: {len(data)}")
+        cls.logger.info(f"Base LAW projects data size: {len(df.shape)}")
         return df
 
     @classmethod

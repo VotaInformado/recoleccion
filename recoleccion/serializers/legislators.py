@@ -33,4 +33,5 @@ class LegislatorDetailsSerializer(serializers.ModelSerializer):
     def get_legislator_seats(self, obj):
         senate_seats = ReducedSenateSeatSerializer(obj.senate_seats.all(), many=True).data
         deputy_seats = ReducedDeputySeatSerializer(obj.deputy_seats.all(), many=True).data
-        return senate_seats + deputy_seats
+        all_seats = senate_seats + deputy_seats
+        return sorted(all_seats, key=lambda seat: seat["start_of_term"], reverse=True)

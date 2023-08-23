@@ -6,6 +6,8 @@ from recoleccion.models import SenateSeat
 
 
 class ReducedSenateSeatSerializer(serializers.ModelSerializer):
+    chamber = serializers.ReadOnlyField(default="Senado")
+
     class Meta:
         model = SenateSeat
         exclude = ["person"]

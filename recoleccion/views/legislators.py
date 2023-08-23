@@ -7,11 +7,10 @@ from recoleccion.models.person import Person
 
 
 class LegislatorsViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
-    
     def get_serializer_class(self):
-        if self.action == 'list':
+        if self.action == "list":
             return LegislatorInfoSerializer
-        elif self.action == 'retrieve':
+        elif self.action == "retrieve":
             return LegislatorDetailsSerializer
 
     serializer_class = LegislatorInfoSerializer

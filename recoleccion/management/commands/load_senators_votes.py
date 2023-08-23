@@ -1,4 +1,5 @@
 import pandas as pd
+import threading
 
 # Base command
 from django.core.management.base import BaseCommand
@@ -10,14 +11,30 @@ from datetime import datetime as dt, timezone
 from recoleccion.components.data_sources.votes_source import SenateVotesSource
 from recoleccion.components.writers.votes_writer import VotesWriter
 from recoleccion.components.linkers import PersonLinker
+from recoleccion.utils.custom_logger import CustomLogger
 
 
 class Command(BaseCommand):
+    logger = CustomLogger(threading=True)
+
     def add_arguments(self, parser):
         parser.add_argument("--starting-year", type=int, default=2023)
 
     def handle(self, *args, **options):
+        THREAD_AMOUNT = 6
         year = options["starting_year"]
+        threads = []
+        for _ in range(THREAD_AMOUNT):
+            thread = threading.Thread(target=self.write_year_votes, args=(year, THREAD_AMOUNT))
+            threads.append(thread)
+            thread.start()
+            year -= 1
+
+        for thread in threads:
+            thread.join()
+
+    def write_year_votes(self, year: int, step_size: int):
+        self.logger.info(f"Writing votes for year {year}...")
         writer = VotesWriter()
         while year >= 1990:
             votes: pd.DataFrame = SenateVotesSource.get_data(year)
@@ -26,5 +43,5 @@ class Command(BaseCommand):
             linker = PersonLinker()
             linked_data = linker.link_persons(votes)
             writer.write(linked_data)
-            year -= 1
-            # TODO: ver lo de votación GENERAL / PARTICULAR
+            self.logger.info(f"Written votes for year {year}")
+            year -= step_size

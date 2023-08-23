@@ -1,7 +1,5 @@
-from django.db.models import Q
 import pandas as pd
-from datetime import datetime as dt
-import numpy as np
+
 
 # Project
 from recoleccion.models import LawProject
@@ -14,10 +12,10 @@ class LawProjectsWriter(Writer):
     model = LawProject
 
     @classmethod
-    def split_id(self, id):
-        if id is None:
+    def split_id(self, project_id: str):
+        if project_id is None:
             return None, None, None
-        comps = id.split("-")
+        comps = project_id.split("-")
         if len(comps) == 3:
             num, source, year = comps
         if len(comps) == 2:
@@ -28,12 +26,12 @@ class LawProjectsWriter(Writer):
         return num, source, year
 
     @classmethod
-    def write(cls, data: pd.DataFrame):
+    def write(cls, data: pd.DataFrame, update_existing=True):
         cls.logger.info(f"Received {len(data)} law projects to write...")
         written, updated = [], []
         for i in data.index:
             row = data.loc[i]
-            element, was_created = cls.update_or_create_element(row)
+            element, was_created = cls.update_or_create_element(row, update_existing)
             if was_created:
                 cls.logger.info(f"Created law project {element.project_id}")
                 written.append(element)
@@ -56,15 +54,15 @@ class LawProjectsWriter(Writer):
             )
 
     @classmethod
-    def update_or_create_element(cls, row: pd.Series):
+    def update_or_create_element(cls, row: pd.Series, update_existing: bool):
         row = row.dropna()
         deputies_project_id = row.get("deputies_project_id", None)
         senate_project_id = row.get("senate_project_id", None)
+        senate_project_id = senate_project_id.replace("/", "-") if senate_project_id else None
+        row["senate_project_id"] = senate_project_id  # fix for senate projects with wrong format
         law = row.get("law", None)
         row = row.drop("law", errors="ignore")
-        deputies_number, deputies_source, deputies_year = cls.split_id(
-            deputies_project_id
-        )
+        deputies_number, deputies_source, deputies_year = cls.split_id(deputies_project_id)
         senate_number, senate_source, senate_year = cls.split_id(senate_project_id)
         row.update(
             {
@@ -77,29 +75,39 @@ class LawProjectsWriter(Writer):
             }
         )
         try:
-            if row.get("origin_chamber", None) == ProjectChambers.DEPUTIES:
-                law_project, was_created = LawProject.objects.update_or_create(
-                    deputies_project_id=deputies_project_id,
-                    defaults=row.to_dict(),
-                )
+            source = row.get("source", "")
+            if "senado" in source.lower():
+                if not update_existing:
+                    law_project = LawProject.objects.filter(
+                        senate_number=senate_number, senate_year=senate_year
+                    ).first()
+                    if law_project:
+                        cls.logger.info(f"Law project {law_project.project_id} already exists, skipping...")
+                        return law_project, False
+                    else:
+                        law_project = LawProject.objects.create(**row.to_dict())
+                        return law_project, True
+                else:
+                    law_project, was_created = LawProject.objects.update_or_create(
+                        senate_year=senate_year,
+                        senate_number=senate_number,
+                        defaults=row.to_dict(),
+                    )
             else:
                 law_project, was_created = LawProject.objects.update_or_create(
-                    senate_project_id=senate_project_id,
+                    deputies_year=deputies_year,
+                    deputies_number=deputies_number,
                     defaults=row.to_dict(),
                 )
             if law:
                 cls.update_law(law, law_project)
         except Exception as e:
             project_id = deputies_project_id or senate_project_id
-            cls.logger.warning(
-                f"An error occurred while updating or creating law project with id {project_id}: {e}"
-            )
-            # print stack trace
+            cls.logger.warning(f"An error occurred while updating or creating law project with id {project_id}: {e}")
             import traceback
 
             traceback.print_exc()
             raise e
-            return None, False
         return law_project, was_created
 
     @classmethod
@@ -110,7 +118,8 @@ class LawProjectsWriter(Writer):
             row = data.loc[i]
             project_id = row.get("project_id")
             day_order = row.get("day_order")
-            project = LawProject.objects.filter(deputies_project_id=project_id).first()
+            deputies_number, deputies_source, deputies_year = cls.split_id(project_id)
+            project = LawProject.objects.filter(deputies_number=deputies_number, deputies_year=deputies_year).first()
             if project:
                 project.deputies_day_order = day_order
                 project.save()

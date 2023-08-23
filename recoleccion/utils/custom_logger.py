@@ -7,7 +7,7 @@ from django.conf import settings
 
 
 class CustomLogger:
-    def __init__(self, name=__name__, log_file_path=None, log_level=None):
+    def __init__(self, name=__name__, log_file_path=None, log_level=None, threading=False):
         self.logger = logging.getLogger(name)
         log_level = log_level or getattr(settings, "log_level", None) or "INFO"
         self.logger.setLevel(log_level)
@@ -18,8 +18,13 @@ class CustomLogger:
         if any(isinstance(h, logging.StreamHandler) for h in self.logger.handlers):
             return
 
+        if threading:
+            format = "\n%(log_color)s%(levelname)-8s%(white)s(%(threadName)s) %(message)s"
+        else:
+            format = "\n%(log_color)s%(levelname)-8s%(white)s(%(threadName)s) %(message)s"
+
         log_formatter = colorlog.ColoredFormatter(
-            "\n%(log_color)s%(levelname)-8s%(white)s%(message)s",
+            format,
             datefmt=None,
             reset=True,
             log_colors={
@@ -49,7 +54,7 @@ class CustomLogger:
 
             fh = logging.FileHandler(log_file_path)
             fh.setLevel(log_level)
-            fh.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+            fh.setFormatter(logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s"))
 
             self.logger.addHandler(fh)
 

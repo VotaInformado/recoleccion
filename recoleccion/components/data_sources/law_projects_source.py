@@ -10,6 +10,7 @@ from bs4 import BeautifulSoup
 # Project
 from recoleccion.components.utils import digitize_text
 from recoleccion.components.data_sources import DataSource
+from recoleccion.utils.custom_logger import CustomLogger
 from recoleccion.utils.enums.project_chambers import ProjectChambers
 from recoleccion.utils.enums.project_status import ProjectStatus
 
@@ -347,6 +348,134 @@ class DeputyLawProjectsSource(DataSource):
         data["source"] = "Diputados"
         cls.logger.info(f"Retrieved {len(data)} projects")
         return data, total_added
-    
 
 
+class SenateLawProjectsSource(DataSource):
+    def __init__(self, threading=True):
+        self.session = requests.Session()
+        self.threading = threading
+        self.logger = CustomLogger(threading=threading)
+
+    ROWS_PER_PAGE = 100
+    BASE_URL = "https://www.senado.gob.ar/parlamentario/parlamentaria/avanzada"
+    POST_HEADERS = {
+        "Referer": "https://www.senado.gob.ar/parlamentario/parlamentaria/avanzada",
+    }
+    GET_HEADERS = {
+        "Referer": "https://www.senado.gob.ar/parlamentario/parlamentaria/avanzada",
+    }
+
+    QUERY_DATA = {
+        "busqueda_proyectos[autor]": "",
+        "busqueda_proyectos[palabra]": "",
+        "busqueda_proyectos[opcion]": "Y",
+        "busqueda_proyectos[palabra2]": "",
+        "busqueda_proyectos[comision]": "",
+        "busqueda_proyectos[tipoDocumento]": "",
+        "busqueda_proyectos[expedienteLugar]": "",
+        "busqueda_proyectos[expedienteNumeroPre]": "",
+        "busqueda_proyectos[expedienteNumeroPos]": "",
+        "busqueda_proyectos[expedienteTipo]": "PL",
+    }
+    column_mappings = {
+        "expediente diputados:": "deputies_project_id",
+        "expediente senado:": "senate_project_id",
+        "fecha:": "publication_date",
+        "iniciado en:": "origin_chamber",
+        "title": "title",
+        "law": "law",
+    }
+
+    def get_payload(self, year: int):
+        payload = self.QUERY_DATA.copy()
+        payload["busqueda_proyectos[expedienteNumeroPos]"] = year
+        return payload
+
+    def get_origin_chamber(self, raw_chamber: str):
+        chambers_info = {
+            "S": ProjectChambers.SENATORS,
+            "D": ProjectChambers.DEPUTIES,
+            "CD": ProjectChambers.DEPUTIES,
+        }
+        return chambers_info.get(raw_chamber, None)
+
+    def get_project_info(self, project_id: str, origin_chamber: str, title: str):
+        origin_chamber = self.get_origin_chamber(origin_chamber)
+        project_info = {
+            "senate_project_id": project_id,
+            "origin_chamber": origin_chamber,
+            "title": title,
+        }
+        return project_info
+
+    def get_publication_date(self, raw_link: str):
+        link = raw_link.find("a")["href"]
+        url = f"https://www.senado.gob.ar{link}"
+        response = self.session.get(url)
+        raw_content = response.content.decode("utf-8")
+        date_pattern = r"\b\d{2}-\d{2}-\d{4}\b"
+        matches = re.finditer(date_pattern, raw_content)
+        if not matches:
+            return None
+        matched_dates = [match.group() for match in matches]
+        dates = [self.fix_date_format(date) for date in matched_dates]
+        min_date = min(dates)
+        return min_date
+
+    def send_base_request(self, year: int):
+        url = self.BASE_URL
+        self.logger.info(f"Sending base POST request to {url}...")
+        response = self.session.post(url, data=self.get_payload(year), headers=self.POST_HEADERS)
+        return response
+
+    def send_page_request(self, page_number):
+        url = f"{self.BASE_URL}?cantRegistros={self.ROWS_PER_PAGE}&page={page_number}"
+        self.logger.info(f"Sending GET request to {url}...")
+        response = self.session.get(url, headers=self.GET_HEADERS)
+        return response
+
+    def get_page_info(self, page: int):
+        page_info = []
+        response = self.send_page_request(page)
+        response_body = response.content
+        soup = BeautifulSoup(response_body, "html.parser")
+        table_data_element = soup.find("table", {"summary": "Listado de Proyectos"})
+        if not table_data_element:
+            return page_info  # no data
+        table_rows = table_data_element.find_all("tr")
+        for i, row in enumerate(table_rows[1:]):
+            cells = row.find_all("td")
+            cell_texts = [cell.text.strip() for cell in cells]
+            project_id, project_type, origin_chamber, title = cell_texts
+            self.logger.info(f"Extracting info from project: {project_id}")
+            publication_date = self.get_publication_date(cells[0])
+            project_info = self.get_project_info(project_id, origin_chamber, title)
+            project_info["publication_date"] = publication_date
+            page_info.append(project_info)
+        return page_info
+
+    def get_year_info(self, year: int):
+        # Make the HTTP request
+        year_info = []
+        self.logger.info(f"Requesting info for year {year}...")
+        self.send_base_request(year)
+        page = 1
+        while True:
+            page_info = self.get_page_info(page)
+            if not page_info:
+                break
+            year_info.extend(page_info)
+            page += 1
+        return year_info
+
+    def fix_date_format(self, date: str):
+        initial_format = "%d-%m-%Y"
+        final_format = "%Y-%m-%d"
+        return dt.datetime.strptime(date, initial_format).strftime(final_format)
+
+    def get_data(self, year: int):
+        projects_info = self.get_year_info(year)
+        data = pd.DataFrame(projects_info)
+        data["source"] = "Senadores (web)"
+        self.logger.info(f"Retrieved {len(data)} projects")
+        return data

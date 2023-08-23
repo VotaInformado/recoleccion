@@ -189,3 +189,31 @@ class LinkingTestCase(LinkingTestCase):
         row = linked_data[linked_data["name"] == "Roberto Juan"]
         id_value = row["person_id"].values[0]
         self.assertIsNone(id_value)
+
+    def test_senator_linking_special_case_3(self):
+        # Specific test for Julio César Cleto Cobos - Julio Cobos
+        EXPECTED_ID = 2
+
+        canonical_record = {
+            "name": "Julio César Cleto",
+            "last_name": "Cobos",
+            "id": EXPECTED_ID,
+        }
+        updated_record = {
+            "name": "Julio",
+            "last_name": "Cobos",
+            "province": "Córdoba",
+            "start_of_term": "2019-01-10",
+            "end_of_term": "2023-01-02",
+        }
+
+        canonical_data: dict = create_fake_df(self.canonical_columns, n=10)
+        canonical_data[len(canonical_data) + 1] = canonical_record
+        updated_data = create_fake_df(self.messy_columns, n=8, as_dict=False, dates_as_str=False)
+        updated_data.loc[len(updated_data)] = updated_record
+        with mck.mock_method(PersonLinker, "get_canonical_data", return_value=canonical_data):
+            linker = PersonLinker()
+            linked_data = linker.link_persons(updated_data)
+        row = linked_data[linked_data["name"] == "Julio"]
+        id_value = row["person_id"].values[0]
+        self.assertEqual(id_value, EXPECTED_ID)

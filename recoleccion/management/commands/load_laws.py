@@ -18,4 +18,3 @@ class Command(BaseCommand):
         laws_data = LawSource.get_data()
         writer = LawsWriter()
         written_laws = writer.write(laws_data)
-        

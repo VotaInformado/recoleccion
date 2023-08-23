@@ -1,7 +1,7 @@
-from decimal import InvalidOperation
-from unittest.mock import PropertyMock, patch
+from unittest.mock import PropertyMock
 
 # Project
+import recoleccion.tests.test_helpers.mocks as mck
 from recoleccion.components.linkers.linker import Linker
 
 

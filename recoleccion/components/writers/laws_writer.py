@@ -37,11 +37,11 @@ class LawsWriter(Writer):
         return initial_file and initial_file != "NULL" and not pd.isnull(initial_file)
 
     def associate_project(self, row: pd.Series):
-        project_id = row.get("project_id", None)
-        if not project_id:
+        initial_file = row.get("initial_file", None)
+        if not initial_file:
             row["project_id"] = None
             return row
-        project = LawProject.objects.filter(Q(deputies_project_id=project_id) | Q(senate_project_id=project_id)).first()
+        project = LawProject.objects.filter(deputies_project_id=initial_file).first()
         row["associated_project"] = project
         if project:
             self.associated_projects += 1

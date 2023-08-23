@@ -4,12 +4,11 @@ from rest_framework.utils.serializer_helpers import (
     ReturnDict,
 )
 
-# Models
+# Project
 from recoleccion.models.person import Person
 from recoleccion.serializers.deputies import ReducedDeputySeatSerializer
 from recoleccion.serializers.senate import ReducedSenateSeatSerializer
-
-# Serializers
+from recoleccion.serializers.votes import LegislatorVoteSerializer
 from recoleccion.utils.enums.legislator_seats import LegislatorSeatSerializer
 
 
@@ -24,6 +23,7 @@ class LegislatorInfoSerializer(serializers.ModelSerializer):
 class LegislatorDetailsSerializer(serializers.ModelSerializer):
     last_seat = LegislatorSeatSerializer()
     legislator_seats = serializers.SerializerMethodField()
+    votes = LegislatorVoteSerializer(many=True)  # TODO: solamente tiene que ir el resumen, el detalle va en legislators/x/votes
 
     class Meta:
         model = Person

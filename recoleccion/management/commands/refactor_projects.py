@@ -17,18 +17,29 @@ class Command(BaseCommand):
     def fix_deputies_id(self, project):
         if project.deputies_project_id is None:
             return
-        comps = project.deputies_project_id.split("-")
-        if len(comps) != 3:
+        if project.deputies_year or project.deputies_number or project.deputies_source:
             return
-        num, source, year = comps
+        comps = project.deputies_project_id.split("-")
+        source = None
+        if len(comps) == 3:
+            if project.deputies_project_id.startswith("D"):
+                source, num, year = comps
+                project.deputies_project_id = f"{num}-{source}-{year}"
+            else:
+                num, source, year = comps
+        if len(comps) == 2:
+            num, year = comps
         project.deputies_number = int(num)
-        project.deputies_source = source.upper()
+        project.deputies_source = source.upper() if source else None
         project.deputies_year = int(year)
 
     def fix_senate_id(self, project):
         if project.senate_project_id is None:
             return
-        comps = project.senate_project_id.split("-")
+        if project.senate_year or project.senate_number or project.senate_source:
+            return
+        project_id = project.senate_project_id.replace("/", "-")
+        comps = project_id.split("-")
         source = None
         if len(comps) == 3:
             num, source, year = comps
@@ -37,6 +48,7 @@ class Command(BaseCommand):
         project.senate_number = int(num)
         project.senate_source = source.upper() if source else None
         project.senate_year = int(year)
+        project.senate_project_id = project_id
 
     def handle(self, *args, **options):
         projects = LawProject.objects.all()

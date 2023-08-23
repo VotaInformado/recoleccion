@@ -12,7 +12,7 @@ class Law(BaseModel):
     publication_date = models.DateField(null=True)
     associated_decree = models.CharField(max_length=15, null=True)
     vetoed = models.BooleanField(default=False)
-    initial_file = models.FileField(upload_to="laws", null=True, help_text="Expediente inicial")
+    initial_file = models.CharField(max_length=30, null=True)
     associated_project = models.ForeignKey(
         "LawProject",
         on_delete=models.DO_NOTHING,

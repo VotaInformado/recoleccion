@@ -1,10 +1,15 @@
+import random
 from django.core.management import call_command
+from django.db import transaction
 
 # Project
+from recoleccion.models.law_project import LawProject
+from recoleccion.models.vote import Vote
 from recoleccion.tests.test_helpers.test_case import LinkingAPITestCase
 from recoleccion.models.person import Person
 from recoleccion.models.senate_seat import SenateSeat
 from recoleccion.utils.enums.legislator_seats import LegislatorSeats
+from recoleccion.utils.enums.vote_choices import VoteChoices
 
 
 class LegislatorViewTestCase(LinkingAPITestCase):
@@ -62,3 +67,30 @@ class LegislatorViewTestCase(LinkingAPITestCase):
         legislator_seats = data["legislator_seats"]
         self.assertEquals(data["id"], chosen_person.pk)
         self.assertEquals(len(legislator_seats), 2)
+
+    def create_votes(self, total_votes, person):
+        chamber = "SENATORS"
+        date = "2020-01-01"
+        projects = LawProject.objects.filter(senate_project_id__isnull=False).all()[:total_votes]
+        with transaction.atomic():
+            for i in range(total_votes):
+                Vote.objects.create(
+                    chamber=chamber,
+                    date=date,
+                    person=person,
+                    project=projects[i],
+                    vote=random.choice(VoteChoices.values),
+                )
+
+    def test_legislator_votes_retrieval(self):
+        EXPECTED_VOTES = 10
+        call_command("loaddata", "person.json")
+        call_command("loaddata", "law_project.json")
+        chosen_person = Person.objects.first()
+        self.create_votes(EXPECTED_VOTES, chosen_person)
+        url = f"/legislators/{chosen_person.pk}/"
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        votes = data["votes"]
+        self.assertEquals(len(votes), EXPECTED_VOTES)

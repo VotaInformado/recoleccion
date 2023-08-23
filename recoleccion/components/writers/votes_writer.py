@@ -124,15 +124,28 @@ class VotesWriter(Writer):
         row["law"] = law
         return row, law
 
+    def get_existing_vote(self, row, person, law_project, law, reference):
+        # If we have a person, we can use it to filter
+        # Else, we have to use the name and last name
+        if not person:
+            vote = Vote.objects.filter(
+                person_name=row.get("person_name"),
+                person_last_name=row.get("person_last_name"),
+                project=law_project,
+                law=law,
+                reference=reference,
+            ).first()
+        else:
+            vote = Vote.objects.filter(
+                person=person,
+                project=law_project,
+                law=law,
+                reference=reference,
+            ).first()
+        return vote
+
     def write_vote(self, row: pd.Series, person, law_project, law, reference):
-        existing_vote = Vote.objects.filter(
-            person=person,
-            person_name=row.get("person_name"),
-            person_last_name=row.get("person_last_name"),
-            project=law_project,
-            law=law,
-            reference=reference,
-        ).first()
+        existing_vote = self.get_existing_vote(row, person, law_project, law, reference)
         if existing_vote:
             this_vote_type = row.get("vote_type", None)
             if this_vote_type == VoteTypes.GENERAL:

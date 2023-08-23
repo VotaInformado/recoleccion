@@ -14,6 +14,7 @@ from recoleccion.views.deputies import DeputiesViewSet
 from recoleccion.views.legislators import LegislatorsViewSet
 from recoleccion.views.senate import SenateViewSet
 from recoleccion.views.laws import LawsViewSet
+from recoleccion.views.law_projects import LawProjectsViewSet
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -36,6 +37,7 @@ router.register(r"persons", PersonViewSet, basename="persons")
 router.register(r"deputies", DeputiesViewSet, basename="deputy_seats")
 router.register(r"senators", SenateViewSet, basename="senators")
 router.register(r"laws", LawsViewSet, basename="laws")
+router.register(r"law-projects", LawProjectsViewSet, basename="law-project")
 
 
 def redirect_to_health(request):

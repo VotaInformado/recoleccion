@@ -580,6 +580,8 @@ class SenateVotesSource(DataSource):
     def get_data(cls, year: int):
         votes_info = cls.get_year_info(year=year)
         data = pd.DataFrame(votes_info)
+        if data.empty:
+            return data
         data["date"] = data["date"].apply(cls.fix_date_format)
         data["chamber"] = ProjectChambers.SENATORS
         data["source"] = "Senado"

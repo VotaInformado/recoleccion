@@ -18,9 +18,10 @@ class Command(BaseCommand):
     DEPUTIES_CAPACITY = 257
 
     def remove_duplicates(self):
-        json_file_path = "recoleccion/components/linkers/training/PersonLinker.json"
+        json_file_path = "recoleccion/components/linkers/training/tests/PersonLinker.json"
         # Read the JSON file and parse its content
-        with open(json_file_path, "r") as file:
+        encoding = "utf-8-sig"  # You can change this to the desired encoding
+        with open(json_file_path, "r", encoding=encoding) as file:
             data = json.load(file)
 
         # Create a set to track unique tuples based on "name" and "last_name"
@@ -39,12 +40,9 @@ class Command(BaseCommand):
                 unique_tuples.add(item_tuple)
 
         # Write the unique data back to the JSON file
-        with open(json_file_path, "w") as file:
-            json.dump(unique_data, file, indent=4)
+
+        with open(json_file_path, "w", encoding=encoding) as file:
+            json.dump(unique_data, file, indent=4, ensure_ascii=False)
 
     def handle(self, *args, **options):
         self.remove_duplicates()
-
-    # Example usage
-    json_file_path = "path_to_your_json_file.json"
-    remove_duplicates(json_file_path)

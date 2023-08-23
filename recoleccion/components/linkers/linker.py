@@ -46,8 +46,6 @@ class Linker:
         gazetteer.training_pairs = new_training_pairs
 
     def _save_training(self, gazetteer: Gazetteer):
-        if "tests" not in self.TRAINING_DIR:
-            import pdb; pdb.set_trace()
         with open(f"{self.TRAINING_DIR}/{self.__class__.__name__}.json", "w") as f:
             self.clean_training_pairs(gazetteer)
             gazetteer.write_training(f)
@@ -136,10 +134,8 @@ class Linker:
         #         f"There are more messy records ({len(messy_data)}) than canonical record ({len(self.canonical_data)})"
         #     )
         file_dir = f"{self.TRAINING_DIR}/{self.__class__.__name__}.json"
-        if self.TRAINING_DIR != "recoleccion/components/linkers/training/tests":
-            import pdb; pdb.set_trace()
         if os.path.exists(file_dir):
-            with open(file_dir) as f:
+            with open(file_dir, encoding="utf-8-sig") as f:
                 self.gazetteer.prepare_training(messy_data, self.canonical_data, training_file=f)
         else:
             self.gazetteer.prepare_training(messy_data, self.canonical_data)

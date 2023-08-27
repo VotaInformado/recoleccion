@@ -154,3 +154,8 @@ STATIC_ROOT = "static"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 INTERNAL_MOCK_ENABLED = True
+
+# Rest framework
+REST_FRAMEWORK = {
+    "DEFAULT_PAGINATION_CLASS": "recoleccion.views.paginator.StandardResultsSetPagination",
+}

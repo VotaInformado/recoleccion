@@ -14,4 +14,4 @@ class LawProjectsViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.
         elif self.action == "retrieve":
             return LawProjectRetrieveSerializer
 
-    queryset = LawProject.objects.all()
+    queryset = LawProject.objects.order_by("id").all()

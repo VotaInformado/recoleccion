@@ -31,3 +31,9 @@ class Person(BaseModel):
         if self.is_active:
             return f"{base_str} (active)"
         return base_str
+
+    @property
+    def law_projects(self):
+        from recoleccion.models import LawProject
+
+        return LawProject.objects.filter(authorships__person=self)

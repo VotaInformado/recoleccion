@@ -56,6 +56,7 @@ DJANGO_APPS = [
     "django.contrib.staticfiles",
     "drf_yasg",
     "corsheaders",
+    "django_filters",
 ]
 
 LOCAL_APPS = [
@@ -158,4 +159,9 @@ INTERNAL_MOCK_ENABLED = True
 # Rest framework
 REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "recoleccion.views.paginator.StandardResultsSetPagination",
+    "DEFAULT_FILTER_BACKENDS": [
+        "django_filters.rest_framework.DjangoFilterBackend",
+        "rest_framework.filters.SearchFilter",
+        "rest_framework.filters.OrderingFilter",
+    ],
 }

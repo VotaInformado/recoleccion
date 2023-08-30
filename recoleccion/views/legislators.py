@@ -20,3 +20,6 @@ class LegislatorsViewSet(
 
     serializer_class = LegislatorInfoSerializer
     queryset = Person.objects.order_by("id").all()
+    search_fields = ["name", "last_name"]
+    filterset_fields = ["is_active", "last_seat"]
+    ordering_fields = ["name", "last_name", "last_seat", "is_active"]

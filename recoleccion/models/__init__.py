@@ -8,3 +8,4 @@ from .law_project import LawProject
 from .vote import Vote
 from .person_linking import PersonLinking, PersonLinkingDecisions
 from .vote_session import VoteSession
+from .authorship import Authorship

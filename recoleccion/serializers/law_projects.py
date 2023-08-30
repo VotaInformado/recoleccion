@@ -1,10 +1,10 @@
 # Django REST Framework
 from rest_framework import serializers
-from recoleccion.models import VoteSession
 
 # Project
-from recoleccion.models import LawProject, VoteSession
+from recoleccion.models import Authorship, LawProject, VoteSession
 from recoleccion.utils.enums.project_chambers import ProjectChambers
+from recoleccion.utils.enums.legislator_seats import LegislatorSeats
 from recoleccion.serializers.vote_sessions import VoteSessionSerializer
 
 
@@ -18,6 +18,7 @@ class LawProjectListSerializer(serializers.ModelSerializer):
 class LawProjectRetrieveSerializer(serializers.ModelSerializer):
     senate_vote_session = serializers.SerializerMethodField()
     deputies_vote_session = serializers.SerializerMethodField()
+    authors = serializers.SerializerMethodField()
 
     class Meta:
         model = LawProject
@@ -37,6 +38,15 @@ class LawProjectRetrieveSerializer(serializers.ModelSerializer):
             return None
         vote_session = VoteSession(deputies_votes)
         return VoteSessionSerializer(vote_session).data
+
+    def get_authors(self, obj: LawProject):
+        from recoleccion.serializers.authors import LawProjectAuthorsSerializer
+
+        if obj.origin_chamber == ProjectChambers.SENATORS:
+            authors = Authorship.objects.filter(law_project=obj, author_type=LegislatorSeats.SENATOR)
+        else:
+            authors = Authorship.objects.filter(law_project=obj, author_type=LegislatorSeats.DEPUTY)
+        return LawProjectAuthorsSerializer(authors, many=True).data
 
 
 class LawProjectBasicInfoSerializer(serializers.ModelSerializer):

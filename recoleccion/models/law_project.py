@@ -147,3 +147,32 @@ class LawProject(BaseModel):
             format_3 = f"{id}-{chamber_id}-{year}"
             possible_results.extend([format_1, format_2, format_3])
         return possible_results
+
+    @classmethod
+    def get_project_year_and_number(cls, project_id: str):
+        project_id = project_id.replace("/", "-")
+        splitted_id = project_id.split("-")
+        number = splitted_id[0]
+        year = splitted_id[-1]
+        return int(number), int(year)
+
+    @property
+    def authors(self):
+        from recoleccion.models import Person
+
+        return Person.objects.filter(authorships__law_project=self)
+
+    @classmethod
+    def get_project_origin_chamber(cls, project_id: str):
+        splitted_id = project_id.split("-")
+        if len(splitted_id) != 3:
+            # Lo más probable es que no se conozca (70-21)
+            return None
+        raw_chamber = splitted_id[1]
+
+        CHAMBER_MAPPING = {
+            "S": ProjectChambers.SENATORS,
+            "D": ProjectChambers.DEPUTIES,
+            "CD": ProjectChambers.DEPUTIES,
+        }
+        return CHAMBER_MAPPING.get(raw_chamber, None)

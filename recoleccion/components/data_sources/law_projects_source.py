@@ -477,5 +477,6 @@ class SenateLawProjectsSource(DataSource):
         projects_info = self.get_year_info(year)
         data = pd.DataFrame(projects_info)
         data["source"] = "Senadores (web)"
+        data["origin_chamber"] = ProjectChambers.SENATORS
         self.logger.info(f"Retrieved {len(data)} projects")
         return data

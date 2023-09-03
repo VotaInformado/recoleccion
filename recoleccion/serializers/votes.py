@@ -24,6 +24,8 @@ class LegislatorVoteSerializer(serializers.ModelSerializer):
         fields = ["project_id", "project", "vote", "date", "chamber"]
 
     def get_project_id(self, obj: Vote):
+        if not obj.project:
+            return None
         if obj.chamber == ProjectChambers.SENATORS:
             return obj.project.senate_project_id
         else:
@@ -31,5 +33,9 @@ class LegislatorVoteSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
-        data["project"]["project_id"] = data.pop("project_id")
+        project_id = data.pop("project_id")
+        if project_id:
+            data["project"]["project_id"] = project_id
+        else:
+            data["project"] = None
         return data

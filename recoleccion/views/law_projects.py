@@ -15,3 +15,10 @@ class LawProjectsViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.
             return LawProjectRetrieveSerializer
 
     queryset = LawProject.objects.order_by("id").all()
+    search_fields = ["title"]
+    filterset_fields = {
+        "origin_chamber": ["exact"],
+        "status": ["exact"],
+        "publication_date": ["gte", "lte"],
+    }
+    ordering_fields = ["title", "publication_date", "status"]

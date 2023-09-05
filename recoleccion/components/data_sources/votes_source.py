@@ -220,7 +220,7 @@ class DeputyVotesSource(DataSource):
             for project_id in project_ids:
                 project_info_copy = project_info.copy()
                 for vote_info in project_info_copy:
-                    vote_info["project_id"] = project_id
+                    vote_info["deputies_project_id"] = project_id
                 projects_info.append(project_info_copy)
             return projects_info  # si hay project_ids, mejor que no recorra los day_orders
         else:
@@ -494,7 +494,7 @@ class SenateVotesSource(DataSource):
         for project_id in project_ids:
             for vote_info in votes_info:
                 vote_info_copy = vote_info.copy()
-                vote_info_copy["project_id"] = project_id
+                vote_info_copy["senate_project_id"] = project_id
                 projects_info.append(vote_info_copy)
         if project_law:
             for vote_info in votes_info:

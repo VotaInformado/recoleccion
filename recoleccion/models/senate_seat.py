@@ -11,7 +11,8 @@ class SenateSeat(BaseModel):
 
     person = models.ForeignKey("Person", on_delete=models.CASCADE, related_name="senate_seats")
     province = models.CharField(max_length=100)
-    party = models.CharField(max_length=150)
+    party = models.ForeignKey("Party", on_delete=models.CASCADE, related_name="senate_seats", null=True)
+    party_name = models.CharField(max_length=150)
     start_of_term = models.DateField()
     end_of_term = models.DateField()
 

@@ -8,6 +8,8 @@ from recoleccion.components.linkers import Linker
 from recoleccion.components.utils import unidecode_text
 from recoleccion.models import Person
 from recoleccion.utils.custom_logger import CustomLogger
+from recoleccion.models import PersonLinking
+from recoleccion.utils.enums.linking_decisions import LinkingDecisions
 
 
 class PersonLinker(Linker):
@@ -86,3 +88,38 @@ class PersonLinker(Linker):
             if isinstance(value, date):
                 date_cols.append(col)
         return date_cols
+
+    def are_the_same_record(self, record_1, record_2):
+        return record_1["name"] == record_2["name"] and record_1["last_name"] == record_2["last_name"]
+
+    def load_linking(self, person_id, messy_name, canonical_name):
+        if person_id < 0:
+            decision = LinkingDecisions.DENIED
+        else:
+            decision = LinkingDecisions.APPROVED
+        PersonLinking.objects.create(
+            person_id=person_id, full_name=messy_name, compared_against=canonical_name, decision=decision
+        )
+
+    def get_record_id(self, messy_data, index_pair):
+        messy_data_index, canonical_data_index = index_pair
+        messy_name = messy_data[messy_data_index]["name"] + " " + messy_data[messy_data_index]["last_name"]
+        canonical_name = (
+            self.canonical_data[canonical_data_index]["name"]
+            + " "
+            + self.canonical_data[canonical_data_index]["last_name"]
+        )
+        # gets person_id from messy_name. If not found, returns 0, if it is found but not approved, returns -1
+        person_link = PersonLinking.objects.filter(full_name=messy_name, compared_against=canonical_name).first()
+        if not person_link:
+            return 0
+        return person_link.person.pk  # will return -1 if denied
+
+    def clean_record(self, record):
+        # for any record, returns name, last_name and id (only if it exists)
+        new_record = {}
+        new_record["name"] = record["name"]
+        new_record["last_name"] = record["last_name"]
+        if "id" in record:
+            new_record["id"] = record["id"]
+        return new_record

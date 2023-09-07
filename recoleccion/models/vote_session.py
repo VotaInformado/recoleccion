@@ -15,11 +15,23 @@ class VoteSession:
         date = vote_list[0].date
         self.date = date
         self.votes = vote_list
-        self.votes_summary = self.get_votes_summary(vote_list)
+        # self.votes_summary = self.get_votes_summary(vote_list)
 
-    def get_votes_summary(self, vote_list: List[Vote]):
-        vote_choices = VoteChoices.choices
-        summary = {}
-        for value, label in vote_choices:
-            summary[label] = len(list(filter(lambda vote: vote.vote == value, vote_list)))
-        return summary
+        self.afirmatives = self.votes.all().filter(vote=VoteChoices.POSITIVE.label).count()
+        self.negatives = self.votes.all().filter(vote=VoteChoices.NEGATIVE.label).count()
+        self.abstentions = self.votes.all().filter(vote=VoteChoices.ABSTENTION.label).count()
+        self.absents = self.votes.all().filter(vote=VoteChoices.ABSENT.label).count()
+
+    # def get_votes_summary(self, vote_list: List[Vote]):
+    #     vote_choices = VoteChoices.choices
+    #     summary = {}
+    #     for value, label in [
+    #         ("AFIRMATIVO", "afirmatives"),
+    #         ("NEGATIVO", "negatives"),
+    #         ("ABSTENCION", "abstentions"),
+    #         ("AUSENTE", "absents"),
+    #     ]:
+    #         summary[label] = len(
+    #             list(filter(lambda vote: vote.vote == value, vote_list))
+    #         )
+    #     return summary

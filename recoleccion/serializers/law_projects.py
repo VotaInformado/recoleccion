@@ -18,12 +18,24 @@ class LawProjectListSerializer(serializers.ModelSerializer):
 class LawProjectRetrieveSerializer(serializers.ModelSerializer):
     senate_vote_session = serializers.SerializerMethodField()
     deputies_vote_session = serializers.SerializerMethodField()
+    votings = serializers.SerializerMethodField()
     authors = serializers.SerializerMethodField()
 
     class Meta:
         model = LawProject
         fields = "__all__"
         read_only_fields = ["id"]
+
+    def get_votings(self, obj):
+        votings = []
+        for value, label in ProjectChambers.choices:
+            votes = obj.votes.filter(chamber=value)
+            if not votes:
+                continue
+            vote_session = VoteSession(votes)
+            serialized_session = VoteSessionSerializer(vote_session)
+            votings.append(serialized_session.data)
+        return votings
 
     def get_senate_vote_session(self, obj):
         senate_votes = obj.votes.filter(chamber=ProjectChambers.SENATORS)
@@ -43,9 +55,13 @@ class LawProjectRetrieveSerializer(serializers.ModelSerializer):
         from recoleccion.serializers.authors import LawProjectAuthorsSerializer
 
         if obj.origin_chamber == ProjectChambers.SENATORS:
-            authors = Authorship.objects.filter(law_project=obj, author_type=LegislatorSeats.SENATOR)
+            authors = Authorship.objects.filter(
+                law_project=obj, author_type=LegislatorSeats.SENATOR
+            )
         else:
-            authors = Authorship.objects.filter(law_project=obj, author_type=LegislatorSeats.DEPUTY)
+            authors = Authorship.objects.filter(
+                law_project=obj, author_type=LegislatorSeats.DEPUTY
+            )
         return LawProjectAuthorsSerializer(authors, many=True).data
 
 

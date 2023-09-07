@@ -48,7 +48,12 @@ class Linker:
     def get_canonical_data(self):
         return self.canonical_data
 
-    def get_record_id(self, messy_data, index_pair):
+    def get_saved_record_id(self, messy_data, index_pair):
+        """ Gets the record id from the previous linking decision saved in the DB if it exists, otherwise returns 0 """
+        raise NotImplementedError
+    
+    def get_record_id(self, record):
+        """ Gets the record id """
         raise NotImplementedError
 
     def load_linking(self, **kwargs):
@@ -73,12 +78,12 @@ class Linker:
             messy_data_index, canonical_data_index = index_pair
             messy_record, canonical_record = messy_data[messy_data_index], self.canonical_data[canonical_data_index]
             record_pair = (messy_record, canonical_record)
-            person_id = self.get_person_id(messy_data, index_pair)
-            if person_id > 0:  # approved
+            record_id = self.get_saved_record_id(messy_data, index_pair)
+            if record_id > 0:  # approved
                 match_records.append(record_pair)
                 match_records_ids.append(index_pair)
                 continue
-            elif person_id < 0:  # denied
+            elif record_id < 0:  # denied
                 distinct_records.append(record_pair)
                 distinct_records_ids.append(index_pair)
                 continue
@@ -93,8 +98,8 @@ class Linker:
                 response = input("yes (y) / no (n): ").lower()
 
             if response == "y":
-                person_id = self.canonical_data[canonical_data_index]["id"]
-                self.load_linking(person_id, messy_record, canonical_record)
+                record_id = self.get_record_id(canonical_record)
+                self.load_linking(record_id, messy_record, canonical_record)
                 match_records.append(record_pair)
                 match_records_ids.append(index_pair)
             elif response == "n":
@@ -120,6 +125,7 @@ class Linker:
             console_label(self.gazetteer)  # Run active learning because no training data exists
         self.gazetteer.train()
         self.gazetteer.index(self.canonical_data)
+
 
     def classify(self, messy_data):
         possible_mappings = self.gazetteer.search(messy_data, n_matches=1)

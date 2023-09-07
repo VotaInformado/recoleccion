@@ -76,11 +76,12 @@ class PartyLinker(Linker):
             decision = LinkingDecisions.DENIED
         else:
             decision = LinkingDecisions.APPROVED
+        party_id = party_id if party_id > 0 else None
         PartyLinking.objects.create(
             party_id=party_id, denomination=denomination, compared_against=canonical_name, decision=decision
         )
 
-    def get_record_id(self, messy_data, index_pair):
+    def get_saved_record_id(self, messy_data, index_pair):
         # gets person_id from messy_name. If not found, returns 0, if it is found but not approved, returns -1
         messy_data_index, canonical_data_index = index_pair
         messy_denomination = messy_data[messy_data_index]["denomination"]
@@ -99,3 +100,6 @@ class PartyLinker(Linker):
         if "id" in record:
             new_record["id"] = record["id"]
         return new_record
+
+    def get_record_id(self, record: dict):
+        return record["party_id"]

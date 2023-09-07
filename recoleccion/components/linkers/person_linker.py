@@ -97,11 +97,12 @@ class PersonLinker(Linker):
             decision = LinkingDecisions.DENIED
         else:
             decision = LinkingDecisions.APPROVED
+        person_id = person_id if person_id > 0 else None
         PersonLinking.objects.create(
             person_id=person_id, full_name=messy_name, compared_against=canonical_name, decision=decision
         )
 
-    def get_record_id(self, messy_data, index_pair):
+    def get_saved_record_id(self, messy_data, index_pair):
         messy_data_index, canonical_data_index = index_pair
         messy_name = messy_data[messy_data_index]["name"] + " " + messy_data[messy_data_index]["last_name"]
         canonical_name = (
@@ -123,3 +124,6 @@ class PersonLinker(Linker):
         if "id" in record:
             new_record["id"] = record["id"]
         return new_record
+
+    def get_record_id(self, record: dict):
+        return record["id"]

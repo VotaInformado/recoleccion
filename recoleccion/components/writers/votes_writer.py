@@ -204,7 +204,9 @@ class VotesWriter(Writer):
         """Receives a DF with cols: vote_id, party_id
         Updates only the party_id of the votes with the given vote_id
         """
-        for i in updated_votes.index:
+        votes_with_party = updated_votes[updated_votes["party_id"].notnull()]
+        # we keep only the votes that have a party_id
+        for i in votes_with_party.index:
             vote_info = updated_votes.loc[i]
             vote = Vote.objects.get(id=vote_info["vote_id"])
             party = Party.objects.get(id=vote_info["party_id"])

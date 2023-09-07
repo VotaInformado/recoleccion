@@ -11,6 +11,8 @@ from recoleccion.tests.test_helpers.test_case import LinkingTestCase
 
 
 class UpdateVotesParties(LinkingTestCase):
+    fixtures = ["party_linking.json"]
+
     def create_party_denominations(self, vote_amount: int, party: Party):
         for i in range(vote_amount):
             random_denomination = "".join(random.choices(string.ascii_uppercase, k=30))
@@ -56,7 +58,6 @@ class UpdateVotesParties(LinkingTestCase):
 
     def test_update_parties_votes_with_similar_party_names(self):
         # Expected not to be linked
-        import pdb; pdb.set_trace()
         PARTY_NAME = "PARTIDO JUSTICIALISTA"
         SIMILAR_NAME = "SOCIEDAD JUSTICIALISTA"
         party = Party.objects.create(main_denomination=PARTY_NAME)
@@ -64,6 +65,9 @@ class UpdateVotesParties(LinkingTestCase):
         original_vote = Vote.objects.create(
             person_name="Nombre", person_last_name="Apellido", party_name=SIMILAR_NAME, reference="Project"
         )
+        import pdb
+
+        pdb.set_trace()
         self.create_party_denominations(5, party)  # hay que hacer esto xq rompe con 1 canonical record
         queryset = Vote.objects.values("party_name", "id")
         messy_data = pd.DataFrame(list(queryset))

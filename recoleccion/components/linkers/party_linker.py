@@ -91,7 +91,7 @@ class PartyLinker(Linker):
         ).first()
         if not party_link:
             return 0
-        return party_link.party.pk  # will return -1 if denied
+        return party_link.party.pk if party_link.party else -1  # will return -1 if denied
 
     def clean_record(self, record):
         # for any record, returns name, last_name and id (only if it exists)

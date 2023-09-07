@@ -30,7 +30,7 @@ class SenatorsWriter(LegislatorsWriter):
         senator_seat = SenateSeat.objects.create(
             person_id=int(row.get("person_id")),
             province=row.get("province"),
-            party=row.get("party"),
+            party_name=row.get("party"),
             start_of_term=row.get("start_of_term"),
             end_of_term=row.get("end_of_term"),
         )
@@ -40,4 +40,5 @@ class SenatorsWriter(LegislatorsWriter):
     def update_element(self, row: pd.Series):
         row.pop("name")
         row.pop("last_name")
+        row = row.rename(index={"party": "party_name"})
         return SenateSeat.update_or_raise(**row)

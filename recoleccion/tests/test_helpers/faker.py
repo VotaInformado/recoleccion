@@ -6,21 +6,6 @@ fake = Faker()
 
 provinces = ["Buenos Aires", "CABA", "Córdoba", "Mendoza", "Santa Fe"]
 
-# Generate random data
-data = {
-    "Name": [fake.name() for _ in range(5)],
-    "Email": [fake.email() for _ in range(5)],
-    "Phone": [fake.phone_number() for _ in range(5)],
-    "Date of Birth": [fake.date_of_birth(minimum_age=18, maximum_age=80) for _ in range(5)],
-    "Salary": [fake.random_int(min=20000, max=80000) for _ in range(5)],
-}
-
-# Create DataFrame
-df = pd.DataFrame(data)
-
-print(df)
-
-
 def create_fake_df(df_columns: dict, n=100, as_dict: bool = True, **kwargs):
     column_names = list(df_columns.keys())
     column_types = list(df_columns.values())

@@ -56,7 +56,7 @@ class LegislatorViewTestCase(LinkingAPITestCase):
         SenateSeat.objects.create(
             person_id=chosen_person.pk,
             province="Province",
-            party="A party",
+            party_name="A party",
             start_of_term="2020-01-01",
             end_of_term="2024-01-01",
         )

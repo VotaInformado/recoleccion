@@ -5,7 +5,7 @@ import numpy as np
 
 # Project
 from recoleccion.utils.custom_logger import CustomLogger
-from recoleccion.models import Law, LawProject, Person, Vote
+from recoleccion.models import Law, LawProject, Party, Person, Vote
 from recoleccion.components.writers import Writer
 from recoleccion.utils.enums.project_chambers import ProjectChambers
 from recoleccion.utils.enums.vote_types import VoteTypes
@@ -69,13 +69,12 @@ class VotesWriter(Writer):
 
     def clean_person_data(self, row: pd.Series) -> pd.Series:
         if row.get("person_id"):
-            row = row.drop(["name", "last_name"])
             person = Person.objects.get(id=row.get("person_id"))
         else:
             row["person_name"] = row.get("name")
             row["person_last_name"] = row.get("last_name")
-            row = row.drop(["name", "last_name"])
             person = None
+        row = row.drop(["name", "last_name"], errors="ignore")
         return row, person
 
     def _get_vote_project(self, row: pd.Series, project_id: str, chamber: str) -> pd.Series:
@@ -200,3 +199,14 @@ class VotesWriter(Writer):
             reference,
         )
         return vote, was_created
+
+    def update_vote_parties(self, updated_votes: pd.DataFrame):
+        """Receives a DF with cols: vote_id, party_id
+        Updates only the party_id of the votes with the given vote_id
+        """
+        for i in updated_votes.index:
+            vote_info = updated_votes.loc[i]
+            vote = Vote.objects.get(id=vote_info["vote_id"])
+            party = Party.objects.get(id=vote_info["party_id"])
+            vote.party = party
+            vote.save()

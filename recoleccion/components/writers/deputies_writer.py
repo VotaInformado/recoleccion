@@ -29,7 +29,7 @@ class DeputiesWriter(LegislatorsWriter):
         senator_seat = DeputySeat.objects.create(
             person_id=int(row.get("person_id")),
             district=row.get("district"),
-            party=row.get("party"),
+            party_name=row.get("party"),
             start_of_term=row.get("start_of_term"),
             end_of_term=row.get("end_of_term"),
         )
@@ -39,4 +39,5 @@ class DeputiesWriter(LegislatorsWriter):
     def update_element(self, row: pd.Series):
         row.pop("name")
         row.pop("last_name")
+        row = row.rename(index={"party": "party_name"})
         return DeputySeat.update_or_raise(**row)

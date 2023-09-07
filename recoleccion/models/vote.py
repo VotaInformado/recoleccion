@@ -16,7 +16,8 @@ class Vote(BaseModel):
     person = models.ForeignKey("Person", on_delete=models.CASCADE, null=True, related_name="votes")
     person_name = models.CharField(max_length=100, null=True)  # only in case of not finding the person
     person_last_name = models.CharField(max_length=100, null=True)  # only in case of not finding the person
-    party = models.CharField(max_length=200, null=True)
+    party_name = models.CharField(max_length=200, null=True)
+    party = models.ForeignKey("Party", on_delete=models.CASCADE, null=True, related_name="votes")
     province = models.CharField(max_length=200, null=True)
     vote = models.CharField(choices=VoteChoices.choices, max_length=15)
     project = models.ForeignKey("LawProject", on_delete=models.CASCADE, null=True, related_name="votes")

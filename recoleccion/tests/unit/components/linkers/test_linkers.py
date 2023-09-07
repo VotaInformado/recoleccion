@@ -7,7 +7,7 @@ from recoleccion.tests.test_helpers.faker import create_fake_df
 import recoleccion.tests.test_helpers.mocks as mck
 
 
-class LinkingTestCase(LinkingTestCase):
+class LinkersTestCase(LinkingTestCase):
     def setUp(self):
         self.messy_columns = {
             "name": "str",

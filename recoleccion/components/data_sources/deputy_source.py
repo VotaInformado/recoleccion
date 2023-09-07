@@ -9,7 +9,14 @@ from recoleccion.components.utils import clean_text_formatting
 
 class DeputiesHistory(DataSource):
     url = "https://datos.hcdn.gob.ar:443/dataset/a80e0fa7-d73a-4ed1-9dec-80465e368951/resource/169de2eb-465f-4007-a4c2-39a5ba4c0df3/download/diputados2.1.csv"
-    column_mappings = {
+    column_mappings = {    # cambiaron de nombre las columnas se ve
+        "id": "deputy_id",
+        "nombre": "name",
+        "apellido": "last_name",
+        "distrito": "district",
+        "bloque": "party",
+        "inicio": "start_of_term",
+        "cese": "end_of_term",
         "diputado_id": "deputy_id",
         "diputado_nombre": "name",
         "diputado_apellido": "last_name",
@@ -23,7 +30,7 @@ class DeputiesHistory(DataSource):
     def get_raw_data(cls):
         response = requests.get(cls.url)
         csv_data = response.content
-        df = pd.read_csv(io.StringIO(csv_data.decode('utf-8')))
+        df = pd.read_csv(io.StringIO(csv_data.decode("utf-8")))
         return df
 
     @classmethod

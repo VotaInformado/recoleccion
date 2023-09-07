@@ -8,5 +8,9 @@ from recoleccion.serializers.votes import VoteModelSerializer
 class VoteSessionSerializer(serializers.Serializer):
     chamber = serializers.ChoiceField(choices=ProjectChambers.choices)
     date = serializers.DateField()
-    votes_summary = serializers.DictField()
-    votes = serializers.ListField(child=VoteModelSerializer())
+    # votes_summary = serializers.DictField()
+    afirmatives = serializers.IntegerField()
+    negatives = serializers.IntegerField()
+    abstentions = serializers.IntegerField()
+    absents = serializers.IntegerField()
+

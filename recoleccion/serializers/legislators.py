@@ -23,15 +23,31 @@ class LegislatorInfoSerializer(serializers.ModelSerializer):
 class LegislatorDetailsSerializer(serializers.ModelSerializer):
     last_seat = LegislatorSeatSerializer()
     legislator_seats = serializers.SerializerMethodField()
-    votes = LegislatorVoteSerializer(many=True)  # TODO: solamente tiene que ir el resumen, el detalle va en legislators/x/votes
+    votes = serializers.SerializerMethodField()
 
     class Meta:
         model = Person
         fields = "__all__"
         read_only_fields = ["id"]
 
+    def get_votes(self, obj):
+        from django.db.models import Count, Q
+        from recoleccion.utils.enums.vote_choices import VoteChoices
+        votes = obj.votes.all()
+        votes_summary = votes.aggregate(
+            afirmatives=Count("vote", filter=Q(vote=VoteChoices.POSITIVE.label)),
+            negatives=Count("vote", filter=Q(vote=VoteChoices.NEGATIVE.label)),
+            abstentions=Count("vote", filter=Q(vote=VoteChoices.ABSTENTION.label)),
+            absents=Count("vote", filter=Q(vote=VoteChoices.ABSENT.label)),
+        )
+        return votes_summary
+
     def get_legislator_seats(self, obj):
-        senate_seats = ReducedSenateSeatSerializer(obj.senate_seats.all(), many=True).data
-        deputy_seats = ReducedDeputySeatSerializer(obj.deputy_seats.all(), many=True).data
+        senate_seats = ReducedSenateSeatSerializer(
+            obj.senate_seats.all(), many=True
+        ).data
+        deputy_seats = ReducedDeputySeatSerializer(
+            obj.deputy_seats.all(), many=True
+        ).data
         all_seats = senate_seats + deputy_seats
         return sorted(all_seats, key=lambda seat: seat["start_of_term"], reverse=True)

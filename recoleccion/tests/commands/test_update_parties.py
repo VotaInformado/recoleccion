@@ -65,9 +65,6 @@ class UpdateVotesParties(LinkingTestCase):
         original_vote = Vote.objects.create(
             person_name="Nombre", person_last_name="Apellido", party_name=SIMILAR_NAME, reference="Project"
         )
-        import pdb
-
-        pdb.set_trace()
         self.create_party_denominations(5, party)  # hay que hacer esto xq rompe con 1 canonical record
         queryset = Vote.objects.values("party_name", "id")
         messy_data = pd.DataFrame(list(queryset))

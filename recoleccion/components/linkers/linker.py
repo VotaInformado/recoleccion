@@ -49,11 +49,11 @@ class Linker:
         return self.canonical_data
 
     def get_saved_record_id(self, messy_data, index_pair):
-        """ Gets the record id from the previous linking decision saved in the DB if it exists, otherwise returns 0 """
+        """Gets the record id from the previous linking decision saved in the DB if it exists, otherwise returns 0"""
         raise NotImplementedError
-    
+
     def get_record_id(self, record):
-        """ Gets the record id """
+        """Gets the record id"""
         raise NotImplementedError
 
     def load_linking(self, **kwargs):
@@ -125,7 +125,6 @@ class Linker:
             console_label(self.gazetteer)  # Run active learning because no training data exists
         self.gazetteer.train()
         self.gazetteer.index(self.canonical_data)
-
 
     def classify(self, messy_data):
         possible_mappings = self.gazetteer.search(messy_data, n_matches=1)

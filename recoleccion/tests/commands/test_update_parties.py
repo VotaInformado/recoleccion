@@ -14,8 +14,22 @@ class UpdateVotesParties(LinkingTestCase):
     fixtures = ["party_linking.json"]
 
     def create_party_denominations(self, vote_amount: int, party: Party):
+        POSSIBLE_DENOMINATIONS = [
+            "EL PARTIDO JUSTICIALISTA",
+            "PART. JUSTICIA",
+            "PARTIDO JUSTICIALISTA MENDOZA",
+            "PART. JUSTICIA SANTA FE",
+            "PARTIDO JUSTICIALISTA DE LA PROVINCIA DE BUENOS AIRES",
+            "PARTIDO JUSTICIALISTA DE LA PROVINCIA DE CORDOBA",
+            "PART. JUSTICIA DE SANTA FE",
+            "PARTIDO JUSTICIALISTA DE LA PROVINCIA DE ENTRE RIOS",
+            "PART. JUSTICIA DE ENTRE RIOS",
+            "PARTIDO JUSTICIALISTA DE LA PROVINCIA DE MISIONES",
+        ]
         for i in range(vote_amount):
-            random_denomination = "".join(random.choices(string.ascii_uppercase, k=30))
+            random_denomination = random.choice(POSSIBLE_DENOMINATIONS)
+            POSSIBLE_DENOMINATIONS.remove(random_denomination)
+            # random_denomination = "".join(random.choices(string.ascii_uppercase, k=30))
             # No hay chance de que sea alguna de las denominaciones existentes
             PartyDenomination.objects.create(party=party, denomination=random_denomination)
 
@@ -75,22 +89,21 @@ class UpdateVotesParties(LinkingTestCase):
         updated_vote = Vote.objects.get(id=original_vote.id)
         self.assertEqual(updated_vote.party_id, None)
 
-    # def test_update_parties_votes_with_different_names(self):
-    #     # Expected not to be linked
-    #     import pdb; pdb.set_trace()
-    #     PARTY_NAME = "FRENTE PARA LA VICTORIA"
-    #     SIMILAR_NAME = "PARTIDO JUSTICIALISTA"
-    #     party = Party.objects.create(main_denomination=PARTY_NAME)
-    #     PartyDenomination.objects.create(party=party, denomination=PARTY_NAME)
-    #     original_vote = Vote.objects.create(
-    #         person_name="Nombre", person_last_name="Apellido", party_name=SIMILAR_NAME, reference="Project"
-    #     )
-    #     self.create_party_denominations(5, party)  # hay que hacer esto xq rompe con 1 canonical record
-    #     queryset = Vote.objects.values("party_name", "id")
-    #     messy_data = pd.DataFrame(list(queryset))
-    #     linker = PartyLinker()
-    #     linked_data = linker.link_parties(messy_data)
-    #     writer = VotesWriter()
-    #     writer.update_vote_parties(linked_data)
-    #     updated_vote = Vote.objects.get(id=original_vote.id)
-    #     self.assertEqual(updated_vote.party_id, None)
+    def test_update_parties_votes_with_different_names(self):
+        # Expected not to be linked
+        PARTY_NAME = "PARTIDO JUSTICIALISTA"
+        SIMILAR_NAME = "FRENTE PARA LA VICTORIA"
+        party = Party.objects.create(main_denomination=PARTY_NAME)
+        PartyDenomination.objects.create(party=party, denomination=PARTY_NAME)
+        original_vote = Vote.objects.create(
+            person_name="Nombre", person_last_name="Apellido", party_name=SIMILAR_NAME, reference="Project"
+        )
+        self.create_party_denominations(10, party)  # hay que hacer esto xq rompe con 1 canonical record
+        queryset = Vote.objects.values("party_name", "id")
+        messy_data = pd.DataFrame(list(queryset))
+        linker = PartyLinker()
+        linked_data = linker.link_parties(messy_data)
+        writer = VotesWriter()
+        writer.update_vote_parties(linked_data)
+        updated_vote = Vote.objects.get(id=original_vote.id)
+        self.assertEqual(updated_vote.party_id, None)

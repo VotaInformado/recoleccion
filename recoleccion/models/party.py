@@ -19,6 +19,9 @@ class Party(BaseModel):
 
 
 class PartyDenomination(BaseModel):
+    class Meta:
+        unique_together = ("party", "denomination")
+
     party = models.ForeignKey(Party, on_delete=models.CASCADE, related_name="denominations")
     denomination = models.CharField(max_length=200)
     relation_type = models.CharField(

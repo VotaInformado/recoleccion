@@ -51,13 +51,16 @@ class PartyLinker(Linker):
         party_denominations = PartyDenomination.objects.all()
         denominations_info = {pd.denomination.lower(): pd.party_id for pd in party_denominations}
         matched_data, unmatched_data = {}, {}
+        md_index = ud_index = 0
         for id, messy_record in messy_data.items():
             messy_denomination = messy_record["denomination"].lower()
             if messy_denomination in denominations_info:
-                matched_data[id] = messy_record
-                matched_data[id]["party_id"] = denominations_info[messy_denomination]
+                matched_data[md_index] = messy_record
+                matched_data[md_index]["party_id"] = denominations_info[messy_denomination]
+                md_index += 1
             else:
-                unmatched_data[id] = messy_record
+                unmatched_data[ud_index] = messy_record
+                ud_index += 1
         matched_df = pd.DataFrame.from_dict(matched_data, orient="index")
         return matched_df, unmatched_data
 
@@ -77,7 +80,7 @@ class PartyLinker(Linker):
             self.logger.info(f"Manually decided on {manually_linked_data.shape[0]} parties")
             undefined_df = pd.DataFrame.from_dict(undefined_data, orient="index")
             try:
-                self.train(messy_data)
+                self.train(undefined_data)
             except IncompatibleLinkingDatasets as e:
                 undefined_df["party_id"] = None
                 return self.merge_dataframes(exactly_matched_data, manually_linked_data, undefined_df)
@@ -152,6 +155,7 @@ class PartyLinker(Linker):
         """
         approved_data, rejected_data = [], []
         undefined_data = {}
+        ud_index = 0
         canonical_data: dict = self.get_canonical_data()
 
         for messy_index, messy_record in messy_data.items():
@@ -175,6 +179,7 @@ class PartyLinker(Linker):
                     break
             if not decision_found:
                 messy_record = messy_data[messy_index]
-                undefined_data[messy_index] = messy_record
+                undefined_data[ud_index] = messy_record
+                ud_index += 1
         manually_linked_data: pd.DataFrame = self.assemble_manually_linked_data(approved_data, rejected_data)
         return manually_linked_data, undefined_data

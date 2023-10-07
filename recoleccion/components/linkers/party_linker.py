@@ -5,6 +5,7 @@ from datetime import date
 from pprint import pp
 
 # Project
+from recoleccion.models.linking import DENIED_INDICATOR
 from recoleccion.exceptions.custom import IncompatibleLinkingDatasets
 from recoleccion.components.linkers import Linker
 from recoleccion.components.utils import unidecode_text
@@ -40,6 +41,26 @@ class PartyLinker(Linker):
         messy_data = messy_data.to_dict(orient="index")
         return messy_data
 
+    def load_exact_matches(self, messy_data: dict) -> Tuple[pd.DataFrame, dict]:
+        """
+        First we make sure that exact matches are linked together
+        Returns:
+            - A DF with columns: denomination, record_id, party_id
+            - A dict with unmatched data (with the same format of messy_data)
+        """
+        party_denominations = PartyDenomination.objects.all()
+        denominations_info = {pd.denomination.lower(): pd.party_id for pd in party_denominations}
+        matched_data, unmatched_data = {}, {}
+        for id, messy_record in messy_data.items():
+            messy_denomination = messy_record["denomination"].lower()
+            if messy_denomination in denominations_info:
+                matched_data[id] = messy_record
+                matched_data[id]["party_id"] = denominations_info[messy_denomination]
+            else:
+                unmatched_data[id] = messy_record
+        matched_df = pd.DataFrame.from_dict(matched_data, orient="index")
+        return matched_df, unmatched_data
+
     def link_parties(self, data: pd.DataFrame) -> pd.DataFrame:
         """
         Receives a DF with columns: denomination, record_id
@@ -50,14 +71,16 @@ class PartyLinker(Linker):
         try:
             linked_parties = 0
             messy_data: dict = self.get_messy_data(data)
-            manually_linked_data, undefined_data = self.apply_manual_linking(messy_data)
+            exactly_matched_data, unmatched_data = self.load_exact_matches(messy_data)
+            self.logger.info(f"Exactly matched {exactly_matched_data.shape[0]} parties")
+            manually_linked_data, undefined_data = self.apply_manual_linking(unmatched_data)
             self.logger.info(f"Manually decided on {manually_linked_data.shape[0]} parties")
             undefined_df = pd.DataFrame.from_dict(undefined_data, orient="index")
             try:
                 self.train(messy_data)
             except IncompatibleLinkingDatasets as e:
                 undefined_df["party_id"] = None
-                return self.merge_dataframes(manually_linked_data, undefined_df)
+                return self.merge_dataframes(exactly_matched_data, manually_linked_data, undefined_df)
 
             certain, _ = self.classify(undefined_data)
             mapping = [None for x in range(undefined_df.shape[0])]
@@ -71,13 +94,13 @@ class PartyLinker(Linker):
             unlinked_parties = undefined_df["party_id"].isnull().sum()
             self.logger.info(f"{unlinked_parties} parties remain unlinked")
         except ValueError as e:
-            if "second dataset is empty" in str(e):
+            if "first dataset is empty" in str(e) or "second dataset is empty" in str(e):
                 # Shouldn't be an error, just means that there are no matches
                 undefined_df["party_id"] = None
                 self.logger.info("Linked 0 parties")
             else:
                 raise e
-        return self.merge_dataframes(manually_linked_data, undefined_df)
+        return self.merge_dataframes(exactly_matched_data, manually_linked_data, undefined_df)
 
     def are_the_same_record(self, record_1, record_2):
         return record_1["denomination"] == record_2["denomination"]
@@ -145,7 +168,8 @@ class PartyLinker(Linker):
                     break
                 elif self.rejected_linking(canonical_denomination, messy_denomination):
                     messy_record: dict = messy_data[messy_index]
-                    messy_record["party_id"] = None
+                    messy_record["party_id"] = DENIED_INDICATOR
+                    # we have to differentiate between rejected and undefined
                     rejected_data.append(messy_record)
                     decision_found = True
                     break

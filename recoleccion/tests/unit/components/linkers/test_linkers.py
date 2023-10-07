@@ -1,10 +1,11 @@
 from django.core.management import call_command
 
 # Project
+import recoleccion.tests.test_helpers.utils as ut
 from recoleccion.components.linkers import PartyLinker, PersonLinker
 from recoleccion.models.linking.party_linking import PartyLinking
 from recoleccion.models.linking.person_linking import PersonLinking
-from recoleccion.models.party import Party
+from recoleccion.models.party import Party, PartyDenomination
 from recoleccion.models.person import Person
 from recoleccion.tests.test_helpers.test_case import LinkingTestCase
 from recoleccion.tests.test_helpers.faker import create_fake_df
@@ -202,11 +203,17 @@ class PersonLinkerTestCase(LinkingTestCase):
         self.assertIsNone(id_value)
 
     def test_person_linking_with_repeated_records_but_previous_denied_linking(self):
-        # Even if the records are the same, if there is a previous denied linking, the records should not be merged       
-        EXPECTED_ID = 1
-        WRONG_ID = 2
-        MESSY_FULL_NAME = CANONICAL_FULL_NAME = "Juan Perez"
+        """
+        Hierarchy:
+        1. Exact matching (this case) X -> This should be the final decision (same record)
+        2. Previous decisions
+        3. Gazetteer
+        """
 
+        person = Person.objects.create(name="Juan", last_name="Perez")
+        EXPECTED_ID = person.pk
+        WRONG_ID = person.pk + 1
+        MESSY_FULL_NAME = CANONICAL_FULL_NAME = "Juan Perez"
         self.create_person_linking_decision(MESSY_FULL_NAME, CANONICAL_FULL_NAME, LinkingDecisions.DENIED)
 
         canonical_record = {
@@ -232,17 +239,19 @@ class PersonLinkerTestCase(LinkingTestCase):
             linked_data = linker.link_persons(updated_data)
         row = linked_data[linked_data["name"] == "Juan"]
         id_value = row["person_id"].values[0]
-        self.assertIsNone(id_value)
+        self.assertEqual(id_value, EXPECTED_ID)
 
     def test_person_linking_with_different_records_but_previous_approved_linking(self):
-        # Even if the records are different, if there is a previous approved linking, the records should be merged     
+        # Even if the records are different, if there is a previous approved linking, the records should be merged
         WRONG_ID = 2
         MESSY_FULL_NAME = "Roberto Clodomiro Paletta"
         CANONICAL_FULL_NAME = "Juan Perez"
         person = Person.objects.create(name="Juan", last_name="Perez")
         EXPECTED_ID = person.pk
 
-        self.create_person_linking_decision(MESSY_FULL_NAME, CANONICAL_FULL_NAME, LinkingDecisions.APPROVED, person_id=person.pk)
+        self.create_person_linking_decision(
+            MESSY_FULL_NAME, CANONICAL_FULL_NAME, LinkingDecisions.APPROVED, person_id=person.pk
+        )
 
         canonical_record = {
             "name": "Juan",
@@ -339,12 +348,19 @@ class PartyLinkerTestCase(LinkingTestCase):
         )
 
     def test_party_linking_with_similar_records_and_previous_approved_linking(self):
+        """
+        Hierarchy:
+        1. Exact matching (this case)
+        2. Previous decisions  X -> This should be the final decision (same record)
+        3. Gazetteer
+        """
+
         RECORD_ID = 2
         CANONICAL_DENOMINATION = "Partido Justicialista"
         MESSY_DENOMINATION = "Part. Justicialista"
         party = Party.objects.create(main_denomination=CANONICAL_DENOMINATION)
         EXPECTED_ID = party.pk
-        self.create_party_linking_decision(
+        ut.create_party_linking_decision(
             MESSY_DENOMINATION, CANONICAL_DENOMINATION, LinkingDecisions.APPROVED, party.pk
         )
 
@@ -369,15 +385,22 @@ class PartyLinkerTestCase(LinkingTestCase):
         self.assertEqual(row["party_id"].values[0], EXPECTED_ID)
 
     def test_party_linking_with_repeated_records_but_previous_denied_linking(self):
-        # Even if the records are the same, if there is a previous denied linking, the records should not be merged
-        CANONICAL_ID = 1
+        """
+        Hierarchy:
+        1. Exact matching (this case) X -> This should be the final decision (same record)
+        2. Previous decisions
+        3. Gazetteer
+        """
         RECORD_ID = 2
         DENOMINATION = "Partido Justicialista"
-        self.create_party_linking_decision(DENOMINATION, DENOMINATION, LinkingDecisions.DENIED)
+        ut.create_party_linking_decision(DENOMINATION, DENOMINATION, LinkingDecisions.DENIED)
+        party = Party.objects.create(main_denomination=DENOMINATION)
+        PartyDenomination.objects.create(party=party, denomination=DENOMINATION)
+        PARTY_ID = party.pk
 
         canonical_record = {
             "denomination": DENOMINATION,
-            "party_id": CANONICAL_ID,
+            "party_id": PARTY_ID,
         }
         updated_record = {
             "denomination": DENOMINATION,
@@ -393,16 +416,22 @@ class PartyLinkerTestCase(LinkingTestCase):
             linked_data = linker.link_parties(updated_data)
         row = linked_data[linked_data["denomination"] == DENOMINATION]
         self.assertEqual(row["record_id"].values[0], RECORD_ID)
-        self.assertEqual(row["party_id"].values[0], None)
+        self.assertEqual(row["party_id"].values[0], PARTY_ID)
 
     def test_party_linking_with_different_records_but_previous_approved_decision(self):
-        # Even if the records are very different, if there is a previous approved linking, the records should be merged
+        """
+        Hierarchy:
+        1. Exact matching (this case)
+        2. Previous decisions  X -> This should be the final decision (same record)
+        3. Gazetteer
+        """
+
         RECORD_ID = 2
         CANONICAL_DENOMINATION = "DIFFERENT_PARTY"
         MESSY_DENOMINATION = "Partido Justicialista"
         party = Party.objects.create(main_denomination=CANONICAL_DENOMINATION)
         EXPECTED_ID = party.pk
-        self.create_party_linking_decision(
+        ut.create_party_linking_decision(
             MESSY_DENOMINATION, CANONICAL_DENOMINATION, LinkingDecisions.APPROVED, party.pk
         )
 

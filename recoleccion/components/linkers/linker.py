@@ -184,7 +184,7 @@ class Linker:
         rejected_data = pd.DataFrame(rejected_data)
         return self.merge_dataframes(approved_data, rejected_data)
 
-    def merge_dataframes(self, df_1: pd.DataFrame, df_2: pd.DataFrame) -> pd.DataFrame:
-        merged_data = pd.concat([df_1, df_2])
+    def merge_dataframes(self, *dfs: pd.DataFrame) -> pd.DataFrame:
+        merged_data = pd.concat(dfs)
         merged_data = merged_data.reset_index(drop=True)
         return merged_data

@@ -4,6 +4,7 @@ import pandas as pd
 from datetime import date
 
 # Project
+from recoleccion.models.linking import DENIED_INDICATOR
 from recoleccion.exceptions.custom import IncompatibleLinkingDatasets
 from recoleccion.components.linkers import Linker
 from recoleccion.components.utils import unidecode_text
@@ -24,9 +25,7 @@ class PersonLinker(Linker):
         self.gazetteer = Gazetteer(self.fields)
         self.canonical_data = self.get_canonical_data()
 
-    def get_canonical_data(
-        self,
-    ):
+    def get_canonical_data(self) -> dict:
         canonical_data = pd.DataFrame(
             map(lambda x: (x.name, x.last_name, x.id), Person.objects.all()), columns=["name", "last_name", "id"]
         )
@@ -43,19 +42,48 @@ class PersonLinker(Linker):
         messy_data = messy_data.to_dict(orient="index")
         return messy_data
 
+    def get_record_full_name(self, record: dict, normalize=True) -> str:
+        raw_name = record["name"] + " " + record["last_name"]
+        if normalize:
+            raw_name = raw_name.lower()
+            raw_name = unidecode_text(raw_name)
+        return raw_name
+
+    def load_exact_matches(self, messy_data: dict) -> Tuple[pd.DataFrame, dict]:
+        """
+        First we make sure that exact matches are linked together
+        Returns:
+            - A DF with columns: denomination, record_id, party_id
+            - A dict with unmatched data (with the same format of messy_data)
+        """
+        canonical_data = self.get_canonical_data()
+        canonical_info = {self.get_record_full_name(record): record["id"] for record in canonical_data.values()}
+        matched_data, unmatched_data = {}, {}
+        for id, messy_record in messy_data.items():
+            messy_full_name = self.get_record_full_name(messy_record)
+            if messy_full_name in canonical_info:
+                matched_data[id] = messy_record
+                matched_data[id]["person_id"] = canonical_info[messy_full_name]
+            else:
+                unmatched_data[id] = messy_record
+        matched_df = pd.DataFrame.from_dict(matched_data, orient="index")
+        return matched_df, unmatched_data
+
     def link_persons(self, data: pd.DataFrame):
         self.logger.info(f"Linking {len(data)} persons...")
         try:
             linked_persons = 0
             messy_data: dict = self.get_messy_data(data)
-            manually_linked_data, undefined_data = self.apply_manual_linking(messy_data)
+            exactly_matched_data, unmatched_data = self.load_exact_matches(messy_data)
+            self.logger.info(f"Found {exactly_matched_data.shape[0]} exact matches")
+            manually_linked_data, undefined_data = self.apply_manual_linking(unmatched_data)
             self.logger.info(f"Manually decided on {manually_linked_data.shape[0]} parties")
             undefined_df = pd.DataFrame.from_dict(undefined_data, orient="index")
             try:
                 self.train(messy_data)
             except IncompatibleLinkingDatasets as e:
                 undefined_df["party_id"] = None
-                return self.merge_dataframes(manually_linked_data, undefined_df)
+                return self.merge_dataframes(exactly_matched_data, manually_linked_data, undefined_df)
             certain, _ = self.classify(undefined_data)
             mapping = [None for x in range(undefined_df.shape[0])]
             for messy_data_index, canonical_data_index in certain:  # Probably could be done in paralell
@@ -68,14 +96,12 @@ class PersonLinker(Linker):
             unlinked_persons = undefined_df["person_id"].isnull().sum()
             self.logger.info(f"{unlinked_persons} persons remain unlinked")
         except ValueError as e:  # TODO: creo que esto se puede sacar
-            if "second dataset is empty" in str(e):  # Shouldn't be an error, just means that there are no matches
+            if "first dataset is empty" in str(e) or "second dataset is empty" in str(e):
                 undefined_df["person_id"] = None
                 self.logger.info("Linked 0 persons")
             else:
                 raise e
-        total_data = pd.concat([manually_linked_data, undefined_df])
-        total_data = total_data.reset_index(drop=True)
-        return total_data
+        return self.merge_dataframes(exactly_matched_data, manually_linked_data, undefined_df)
 
     def _convert_dates_to_str(self, data: pd.DataFrame) -> pd.DataFrame:
         # Convert datetime
@@ -161,7 +187,7 @@ class PersonLinker(Linker):
                     break
                 elif self.rejected_linking(canonical_full_name, messy_full_name):
                     messy_record: dict = messy_data[messy_index]
-                    messy_record["person_id"] = None
+                    messy_record["party_id"] = DENIED_INDICATOR
                     rejected_data.append(messy_record)
                     decision_found = True
                     break

@@ -5,6 +5,7 @@ from django.core.management.base import BaseCommand
 import pandas as pd
 
 # Project
+from recoleccion.models.linking import DENIED_INDICATOR
 from recoleccion.utils.custom_logger import CustomLogger
 from recoleccion.components.linkers.party_linker import PartyLinker
 from recoleccion.models.party import Party, PartyDenomination
@@ -26,38 +27,13 @@ class Command(BaseCommand):
             party_name: Vote.objects.filter(Q(party_id__isnull=True) & Q(party_name=party_name)).count()
             for party_name in unique_party_names
         }
-        sorted_parties = sorted(parties_votes.items(), key=lambda x: x[1], reverse=True)
-        loaded_denominations = PartyDenomination.objects.all()
-        denominations_dict = {pd.denomination: pd.party for pd in loaded_denominations}
-        undefined_parties: List[str] = []
-        exact_matches = 0
         self.logger.info(f"Votes without party: {votes_without_party.count()}")
-        for party_name, _ in sorted_parties:
-            if party_name in denominations_dict:
-                party = denominations_dict[party_name]
-                loaded_votes = self.load_party_to_votes(party_name, party)
-                exact_matches += loaded_votes
-            else:
-                undefined_parties.append(party_name)
-        self.logger.info(f"{exact_matches} votes have been updated from exact matches")
-        case_difference_votes = self.load_case_difference_parties(undefined_parties)
-        self.logger.info(f"{case_difference_votes} votes have been updated from case difference")
-        linked_votes = self.link_parties(undefined_parties)
+        parties_to_link = sorted(parties_votes.items(), key=lambda x: x[1], reverse=True)
+        parties_to_link = [party_name for party_name, _ in parties_to_link]
+        linked_votes = self.link_parties(parties_to_link)
         self.logger.info(f"{linked_votes} votes have been updated from linking")
         self.check_actions_for_unlinked_parties()
         self.logger.info(f"{self.unlinked_votes} votes have been updated from linking")
-
-    def load_case_difference_parties(self, undefined_parties: List[str]):
-        votes_updated = 0
-        party_denominations = PartyDenomination.objects.all()
-        denominations_info = {pd.denomination.lower(): pd for pd in party_denominations}
-        for party_name in undefined_parties:
-            if party_name.lower() in denominations_info:
-                party_denomination = denominations_info[party_name.lower()]
-                party = party_denomination.party
-                party_votes_updated = self.load_party_to_votes(party_name, party)
-                votes_updated += party_votes_updated
-        return votes_updated
 
     def load_party_to_votes(self, party_name, party):
         votes = Vote.objects.filter(party_name=party_name)
@@ -65,22 +41,29 @@ class Command(BaseCommand):
         for vote in votes:
             vote.save()
         updated_votes = votes.count()
-        self.logger.info(f"{updated_votes} votes have been updated to party {party_name} with id {party.id}")
+        if party:
+            self.logger.info(f"{updated_votes} votes have been updated to party {party_name} with id {party.id}")
+        else:
+            self.logger.info(f"{updated_votes} votes from {party_name} have been updated to have NULL party")
         return votes.count()
 
     def load_party_to_linked_votes(self, party_row: pd.Series):
         party_id = party_row["party_id"]
-        party = Party.objects.get(id=party_id)
-        party_name = party_row["party_name"]  # linker changes the column name
+        party = Party.objects.get(id=party_id) if party_id != DENIED_INDICATOR else None
+        party_name = party_row["denomination"]
         linked_votes = self.load_party_to_votes(party_name, party)
         return linked_votes
 
-    def link_parties(self, undefined_parties: List[str]) -> pd.DataFrame:
-        # Tries to link the undefined parties, unlinked parties are returned
-        undefined_parties = pd.DataFrame(undefined_parties, columns=["party_name"])
-        undefined_parties["id"] = None  # the linker expects an id column
+    def link_parties(self, parties_to_link: List[str]) -> pd.DataFrame:
+        # Tries to link the parties, unlinked parties are returned
+        if not parties_to_link:
+            self.unlinked_parties = pd.DataFrame()  # empty dataframe
+            self.logger.info("No parties to link")
+            return 0
+        parties_to_link = pd.DataFrame(parties_to_link, columns=["party_name"])
+        parties_to_link["id"] = None  # the linker expects an id column
         linker = PartyLinker()
-        linked_data = linker.link_parties(undefined_parties)
+        linked_data = linker.link_parties(parties_to_link)
         linked_parties = linked_data[linked_data["party_id"].notnull()]
         self.unlinked_parties = linked_data[linked_data["party_id"].isnull()]
         total_votes_linked = 0
@@ -91,7 +74,10 @@ class Command(BaseCommand):
 
     def check_actions_for_unlinked_parties(self):
         self.unlinked_votes = 0
-        self.unlinked_parties: List[str] = self.unlinked_parties["party_name"].unique()
+        if self.unlinked_parties.empty:
+            self.logger.info("No unlinked parties to check")
+            return
+        self.unlinked_parties: List[str] = self.unlinked_parties["denomination"].unique()
         for party_name in self.unlinked_parties:
             party_created = self.check_for_party_creation(party_name)
             if party_created:
@@ -135,7 +121,3 @@ class Command(BaseCommand):
         party = Party.objects.get(id=party_id)
         self.load_party_to_votes(party_name, party)
         return True
-
-
-# TODO: Fix -> Buscar: SELECT * FROM recoleccion_vote WHERE party_id IS NULL AND party_name IN (SELECT denomination FROM recoleccion_partydenomination)
-# Actualizar a mano por el problema del comando que estaba mal hecho.

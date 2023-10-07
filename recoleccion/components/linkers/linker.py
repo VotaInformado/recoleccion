@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Tuple
 from dedupe import Gazetteer, console_label
 import os
 from uuid import uuid4
@@ -57,6 +57,18 @@ class Linker:
     def save_linking_decision(self, **kwargs):
         raise NotImplementedError
 
+    def user_approved_linking(self, record_pair: Tuple[dict, dict]) -> bool:
+        # Returns True if the user approves the linking, False otherwise
+        messy_record, canonical_record = record_pair
+        print("Are these the same records?: \n")
+        pp(messy_record, sort_dicts=True, width=35)
+        pp(canonical_record, sort_dicts=True, width=35)
+        response = input("yes (y) / no (n): ").lower()
+        while response not in ["y", "n"]:
+            print("Invalid response")
+            response = input("yes (y) / no (n): ").lower()
+        return response == "y"
+
     def label_pairs(self, pairs, messy_data):
         """
         Recieves:
@@ -77,22 +89,14 @@ class Linker:
             messy_data_index, canonical_data_index = index_pair
             messy_record, canonical_record = messy_data[messy_data_index], self.canonical_data[canonical_data_index]
             record_pair = (messy_record, canonical_record)
+            linking_approved = self.user_approved_linking(record_pair)
 
-            print("Are these the same records?: \n")
-            pp(messy_data[messy_data_index], sort_dicts=True, width=35)
-            pp(self.canonical_data[canonical_data_index], sort_dicts=True, width=35)
-
-            response = input("yes (y) / no (n): ").lower()
-            while response not in ["y", "n"]:
-                print("Invalid response")
-                response = input("yes (y) / no (n): ").lower()
-
-            if response == "y":
+            if linking_approved:
                 record_id = self.get_record_id(canonical_record)
                 self.save_linking_decision(record_id, messy_record, canonical_record)
                 match_records.append(record_pair)
                 match_records_ids.append(index_pair)
-            elif response == "n":
+            else:
                 self.save_linking_decision(-1, messy_record, canonical_record)
                 distinct_records.append(record_pair)
                 distinct_records_ids.append(index_pair)

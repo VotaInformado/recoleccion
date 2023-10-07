@@ -17,8 +17,9 @@ class ClassDecoratorMeta(type):
                 def patched_attr(attr):
                     def wrapper(*args, **kwargs):
                         with mck.mock_method(Linker, "TRAINING_DIR", new_callable=PropertyMock) as attr_mock:
-                            attr_mock.return_value = cls.TEST_LINKER_FILE_PATH
-                            return attr(*args, **kwargs)
+                            with mck.mock_method(Linker, "user_approved_linking", return_value=True):
+                                attr_mock.return_value = cls.TEST_LINKER_FILE_PATH
+                                return attr(*args, **kwargs)
 
                     return wrapper
 

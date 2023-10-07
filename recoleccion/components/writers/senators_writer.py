@@ -2,9 +2,11 @@ from django.db.models import Q
 import pandas as pd
 
 # Project
+from recoleccion.components.utils import date_to_str
 from recoleccion.models import SenateSeat, Person
 from .legislators_writer import LegislatorsWriter
 from recoleccion.utils.enums.legislator_seats import LegislatorSeats
+
 
 class SenatorsWriter(LegislatorsWriter):
     model = SenateSeat
@@ -22,7 +24,8 @@ class SenatorsWriter(LegislatorsWriter):
             params=[tuple(senators_info)],
         )
         return {
-            (senator.person_id, senator.start_of_term, senator.end_of_term): senator for senator in repeated_senators
+            (senator.person_id, date_to_str(senator.start_of_term), date_to_str(senator.end_of_term)): senator
+            for senator in repeated_senators
         }
 
     @classmethod

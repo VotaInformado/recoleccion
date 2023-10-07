@@ -2,6 +2,7 @@ from datetime import datetime as dt
 import pandas as pd
 
 # Project
+from recoleccion.components.utils import date_to_str
 from recoleccion.models.deputy_seat import DeputySeat
 from .legislators_writer import LegislatorsWriter
 from recoleccion.utils.enums.legislator_seats import LegislatorSeats
@@ -22,7 +23,10 @@ class DeputiesWriter(LegislatorsWriter):
             where=["(recoleccion_deputyseat.person_id,start_of_term,end_of_term) in %s"],
             params=[tuple(deputies_info)],
         )
-        return {(deputy.person_id, deputy.start_of_term, deputy.end_of_term): deputy for deputy in repeated_deputies}
+        return {
+            (deputy.person_id, date_to_str(deputy.start_of_term), date_to_str(deputy.end_of_term)): deputy
+            for deputy in repeated_deputies
+        }
 
     @classmethod
     def create_element(self, row):

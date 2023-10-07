@@ -33,6 +33,12 @@ class LinkingException(CustomException):
         super().__init__(self.CODE, self.STATUS_CODE, description or self.DESCRIPTION)
 
 
+class IncompatibleLinkingDatasets(LinkingException):
+    CODE = "INCOMPATIBLE_LINKING_DATASETS"
+    STATUS_CODE = 500
+    DESCRIPTION = "The datasets seem to be too different to be linked"
+
+
 class SenateLoadingException(CustomException):
     CODE = "SENATE_LOADING_EXCEPTION"
     STATUS_CODE = 500

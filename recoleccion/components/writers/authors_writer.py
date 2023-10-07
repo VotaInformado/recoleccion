@@ -3,10 +3,9 @@ import pandas as pd
 from datetime import datetime as dt
 
 # Project
-from recoleccion.models import Authorship
+from recoleccion.models import Authorship, LawProject, Party, Person
 from recoleccion.components.writers import Writer
-from recoleccion.models.law_project import LawProject
-from recoleccion.models.person import Person
+from recoleccion.models.linking import DENIED_INDICATOR
 
 
 class AuthorsWriter(Writer):
@@ -79,3 +78,18 @@ class AuthorsWriter(Writer):
                 person_last_name=row["person_last_name"],
                 defaults=row.to_dict(),
             )
+
+    def update_authors_parties(self, updated_authors: pd.DataFrame):
+        """Receives a DF with cols: record_id (author_id), party_id
+        Updates only the party_id of the authors with the given record_id
+        """
+        authors_with_party = updated_authors[updated_authors["party_id"].notnull()]
+        # we make sure to discard unlinked authors
+        authors_with_party = authors_with_party[authors_with_party["party_id"] != DENIED_INDICATOR]
+        # we must consider only approved linking decisions
+        for i in authors_with_party.index:
+            author_info = updated_authors.loc[i]
+            author = Authorship.objects.get(id=author_info["record_id"])
+            party = Party.objects.get(id=author_info["party_id"])
+            author.party = party
+            author.save()

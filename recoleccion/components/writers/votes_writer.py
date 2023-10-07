@@ -208,7 +208,7 @@ class VotesWriter(Writer):
         # we keep only the votes that have a party_id
         for i in votes_with_party.index:
             vote_info = updated_votes.loc[i]
-            vote = Vote.objects.get(id=vote_info["vote_id"])
+            vote = Vote.objects.get(id=vote_info["record_id"])
             party = Party.objects.get(id=vote_info["party_id"])
             vote.party = party
             vote.save()

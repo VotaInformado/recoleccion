@@ -35,10 +35,10 @@ class LegislatorDetailsSerializer(serializers.ModelSerializer):
         from recoleccion.utils.enums.vote_choices import VoteChoices
         votes = obj.votes.all()
         votes_summary = votes.aggregate(
-            afirmatives=Count("vote", filter=Q(vote=VoteChoices.POSITIVE.label)),
-            negatives=Count("vote", filter=Q(vote=VoteChoices.NEGATIVE.label)),
-            abstentions=Count("vote", filter=Q(vote=VoteChoices.ABSTENTION.label)),
-            absents=Count("vote", filter=Q(vote=VoteChoices.ABSENT.label)),
+            afirmatives=Count("vote", filter=Q(vote=VoteChoices.POSITIVE.value)),
+            negatives=Count("vote", filter=Q(vote=VoteChoices.NEGATIVE.value)),
+            abstentions=Count("vote", filter=Q(vote=VoteChoices.ABSTENTION.value)),
+            absents=Count("vote", filter=Q(vote=VoteChoices.ABSENT.value)),
         )
         return votes_summary
 

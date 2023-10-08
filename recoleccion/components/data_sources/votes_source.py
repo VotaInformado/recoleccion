@@ -13,6 +13,7 @@ from recoleccion.components.data_sources import DataSource
 from recoleccion.components.utils import capitalize_text, trim_extra_spaces
 from recoleccion.utils.enums.project_chambers import ProjectChambers
 from recoleccion.utils.enums.vote_types import VoteTypes
+from recoleccion.utils.enums.vote_choices import VoteChoices
 
 
 class DatasetVotesSource(DataSource):
@@ -63,11 +64,17 @@ class DatasetVotesSource(DataSource):
 
     @classmethod
     def add_reference_description(cls, reference_description: str):
-        return "" if pd.isnull(reference_description) or not reference_description else reference_description
+        return (
+            ""
+            if pd.isnull(reference_description) or not reference_description
+            else reference_description
+        )
 
     @classmethod
     def clean_legislator_name(cls, data: pd.DataFrame) -> pd.DataFrame:
-        new_columns: List[tuple] = data["diputado_nombre"].apply(cls.get_legislator_name_and_last_name)
+        new_columns: List[tuple] = data["diputado_nombre"].apply(
+            cls.get_legislator_name_and_last_name
+        )
         names, last_names = zip(*new_columns)
         data["name"] = names
         data["last_name"] = last_names  # must be named like this for the linker
@@ -80,9 +87,13 @@ class DatasetVotesSource(DataSource):
     @classmethod
     def clean_data(cls, data: pd.DataFrame) -> pd.DataFrame:
         data = cls.clean_legislator_name(data)
-        data = data.reset_index(drop=True)  # If not done, it can bring problems when linking
+        data = data.reset_index(
+            drop=True
+        )  # If not done, it can bring problems when linking
         cls.logger.info(f"Data size after dropping rows without name: {len(data)}")
-        data["reference_description"] = data["reference_description"].apply(cls.add_reference_description)
+        data["reference_description"] = data["reference_description"].apply(
+            cls.add_reference_description
+        )
         return data
 
     @classmethod
@@ -138,6 +149,22 @@ class DeputyVotesSource(DataSource):
         }
 
     @classmethod
+    def get_vote_info(cls, row_data):
+        name, last_name = cls.get_legislator_name(row_data[1].text.strip())
+        party = row_data[2].text.strip()
+        province = row_data[3].text.strip()
+        vote_text = row_data[4].text.strip()
+        vote = VoteChoices.get_choice(vote_text)
+        vote_info = {
+            "name": name,
+            "last_name": last_name,
+            "party": party,
+            "province": province,
+            "vote": vote,
+        }
+        return vote_info
+
+    @classmethod
     def get_project_votes_info(cls, link: str) -> List[dict]:
         response = requests.get(link)
         soup = BeautifulSoup(response.text, "html.parser")
@@ -157,17 +184,8 @@ class DeputyVotesSource(DataSource):
         for row in table_rows:
             row_data = row.find_all("td")
             if len(row_data) > 0:
-                name, last_name = cls.get_legislator_name(row_data[1].text.strip())
-                party = row_data[2].text.strip()
-                province = row_data[3].text.strip()
-                vote = row_data[4].text.strip()
-                vote_info = {
-                    "name": name,
-                    "last_name": last_name,
-                    "party": party,
-                    "province": province,
-                    "vote": vote,
-                }
+                import pdb; pdb.set_trace()
+                vote_info = cls.get_vote_info(row_data)
                 project_votes_info.append(vote_info)
         for vote_info in project_votes_info:
             vote_info.update(project_info)
@@ -206,7 +224,9 @@ class DeputyVotesSource(DataSource):
         return reference_info
 
     @classmethod
-    def build_projects_info(cls, project_info: List[dict], references_info: dict) -> List[List[dict]]:
+    def build_projects_info(
+        cls, project_info: List[dict], references_info: dict
+    ) -> List[List[dict]]:
         """
         Importante: una "única" votación puede estar asociada a varios proyectos (order_days o project_ids)
         Recibe info de un proyecto y de las referencias a ese proyecto.
@@ -222,7 +242,9 @@ class DeputyVotesSource(DataSource):
                 for vote_info in project_info_copy:
                     vote_info["deputies_project_id"] = project_id
                 projects_info.append(project_info_copy)
-            return projects_info  # si hay project_ids, mejor que no recorra los day_orders
+            return (
+                projects_info  # si hay project_ids, mejor que no recorra los day_orders
+            )
         else:
             for day_order in day_orders:
                 try:
@@ -264,7 +286,11 @@ class DeputyVotesSource(DataSource):
             detail_button = row.find("a", title="Ver detalle")
             detail_link = base_link_url + detail_button["href"]
             spans = row.find_all("span")
-            project_ids = [span.get_text().strip() for span in spans if project_id_pattern.match(span.get_text())]
+            project_ids = [
+                span.get_text().strip()
+                for span in spans
+                if project_id_pattern.match(span.get_text())
+            ]
             projects_ids.append(project_ids)
             if project_ids:
                 cls.logger.info(f"Found project IDs: {project_ids}")
@@ -388,7 +414,9 @@ class SenateVotesSource(DataSource):
         project_div = row.find("div", class_="expedientesOcultos")
         if not project_div:
             return []
-        links = project_div.find_all("a", href=lambda value: value and "verExp" in value)
+        links = project_div.find_all(
+            "a", href=lambda value: value and "verExp" in value
+        )
         link_pattern = re.compile(r"[A-Z0-9]+-\S+")
         link_texts = [link.text.strip() for link in links]
         project_ids = [link for link in link_texts if link_pattern.match(link)]
@@ -427,7 +455,9 @@ class SenateVotesSource(DataSource):
         links = project_div.find_all("a", href=lambda value: value and "orden" in value)
         od_pattern = re.compile(r"(?:O\.D\.|OD) \d+/\d+")
         link_texts = [link.text.strip() for link in links]
-        day_orders = [links[i] for i, link in enumerate(link_texts) if od_pattern.match(link)]
+        day_orders = [
+            links[i] for i, link in enumerate(link_texts) if od_pattern.match(link)
+        ]
         day_orders_links = [link["href"] for link in day_orders]
         project_ids = []
         for link in day_orders_links:
@@ -457,6 +487,7 @@ class SenateVotesSource(DataSource):
         province = cells[headers["Provincia"]].get_text()
         try:
             vote = cells[headers["¿Cómo votó?"]].find("span").get_text()
+            vote = VoteChoices.get_choice(vote)
         except Exception as e:
             return None
         info = {
@@ -489,7 +520,9 @@ class SenateVotesSource(DataSource):
         return votes_info
 
     @classmethod
-    def assemble_projects_info(cls, votes_info: List[dict], project_ids: List[str], project_law: str) -> List[dict]:
+    def assemble_projects_info(
+        cls, votes_info: List[dict], project_ids: List[str], project_law: str
+    ) -> List[dict]:
         projects_info = []
         for project_id in project_ids:
             for vote_info in votes_info:
@@ -513,7 +546,13 @@ class SenateVotesSource(DataSource):
         if not match:
             return None
         raw_law = match.group()
-        law = raw_law.replace("Ley ", "").replace("LEY ", "").replace(".", "").replace("'", "").strip()
+        law = (
+            raw_law.replace("Ley ", "")
+            .replace("LEY ", "")
+            .replace(".", "")
+            .replace("'", "")
+            .strip()
+        )
         law = int(law)
         return law
 
@@ -556,18 +595,26 @@ class SenateVotesSource(DataSource):
             else:
                 project_law = None
             detail_element = row.find("a", title="Detalle")
-            if not detail_element:  # algunas filas no tienen el botón de detalle de votación
+            if (
+                not detail_element
+            ):  # algunas filas no tienen el botón de detalle de votación
                 cls.logger.warning("No vote details link found, skipping...")
                 continue
             vote_details_link = detail_element.get("href")
             if not project_ids and not project_law:
-                cls.logger.warning(f"No projects nor law found, skipping row with link {vote_details_link}...")
+                cls.logger.warning(
+                    f"No projects nor law found, skipping row with link {vote_details_link}..."
+                )
                 continue
             votes_info = cls.get_votes_info(vote_details_link, vote_date, vote_type)
             if not votes_info:
-                cls.logger.warning(f"No votes found, skipping row with link {vote_details_link}...")
+                cls.logger.warning(
+                    f"No votes found, skipping row with link {vote_details_link}..."
+                )
                 continue
-            projects_votes_info = cls.assemble_projects_info(votes_info, project_ids, project_law)
+            projects_votes_info = cls.assemble_projects_info(
+                votes_info, project_ids, project_law
+            )
             year_info.extend(projects_votes_info)
         return year_info
 

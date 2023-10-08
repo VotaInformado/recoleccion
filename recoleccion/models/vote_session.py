@@ -17,10 +17,10 @@ class VoteSession:
         self.votes = vote_list
         # self.votes_summary = self.get_votes_summary(vote_list)
 
-        self.afirmatives = self.votes.all().filter(vote=VoteChoices.POSITIVE.label).count()
-        self.negatives = self.votes.all().filter(vote=VoteChoices.NEGATIVE.label).count()
-        self.abstentions = self.votes.all().filter(vote=VoteChoices.ABSTENTION.label).count()
-        self.absents = self.votes.all().filter(vote=VoteChoices.ABSENT.label).count()
+        self.afirmatives = self.votes.all().filter(vote=VoteChoices.POSITIVE.value).count()
+        self.negatives = self.votes.all().filter(vote=VoteChoices.NEGATIVE.value).count()
+        self.abstentions = self.votes.all().filter(vote=VoteChoices.ABSTENTION.value).count()
+        self.absents = self.votes.all().filter(vote=VoteChoices.ABSENT.value).count()
 
     # def get_votes_summary(self, vote_list: List[Vote]):
     #     vote_choices = VoteChoices.choices

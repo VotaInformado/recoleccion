@@ -18,7 +18,7 @@ class LawProjectsViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.
     search_fields = ["title"]
     filterset_fields = {
         "origin_chamber": ["exact"],
-        "status": ["exact"],
+        "status": ["in"],
         "publication_date": ["gte", "lte"],
     }
     ordering_fields = ["title", "publication_date", "status"]

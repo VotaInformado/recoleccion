@@ -40,10 +40,16 @@ class LegislatorViewTestCase(LinkingAPITestCase):
         deputies_vote_session = response.json()["deputies_vote_session"]
         self.assertEqual(senate_vote_session["chamber"], ProjectChambers.SENATORS)
         self.assertEqual(senate_vote_session["date"], SENATORS_VOTE_DATE)
-        self.assertEqual(len(senate_vote_session["votes"]), EXPECTED_SENATORS_VOTES)
+        self.assertIn("afirmatives", senate_vote_session)
+        self.assertIn("negatives", senate_vote_session)
+        self.assertIn("abstentions", senate_vote_session)
+        self.assertIn("absents", senate_vote_session)
         self.assertEqual(deputies_vote_session["chamber"], ProjectChambers.DEPUTIES)
         self.assertEqual(deputies_vote_session["date"], DEPUTIES_VOTE_DATE)
-        self.assertEqual(len(deputies_vote_session["votes"]), EXPECTED_DEPUTIES_VOTES)
+        self.assertIn("afirmatives", deputies_vote_session)
+        self.assertIn("negatives", deputies_vote_session)
+        self.assertIn("abstentions", deputies_vote_session)
+        self.assertIn("absents", deputies_vote_session)
 
     def test_law_project_list(self):
         url = "/law-projects/"

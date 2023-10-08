@@ -46,7 +46,9 @@ class LegislatorViewTestCase(LinkingAPITestCase):
         self.assertEqual(data["id"], chosen_person.pk)
         self.assertEqual(data["name"], chosen_person.name)
         self.assertEqual(data["last_name"], chosen_person.last_name)
-        self.assertEqual(data["last_seat"], LegislatorSeats(chosen_person.last_seat).label)
+        self.assertEqual(
+            data["last_seat"], LegislatorSeats(chosen_person.last_seat).label
+        )
         legislator_seats = data["legislator_seats"]
         self.assertEquals(len(legislator_seats), 1)
 
@@ -71,7 +73,9 @@ class LegislatorViewTestCase(LinkingAPITestCase):
     def create_votes(self, total_votes, person):
         chamber = "SENATORS"
         date = "2020-01-01"
-        projects = LawProject.objects.filter(senate_project_id__isnull=False).all()[:total_votes]
+        projects = LawProject.objects.filter(senate_project_id__isnull=False).all()[
+            :total_votes
+        ]
         with transaction.atomic():
             for i in range(total_votes):
                 Vote.objects.create(
@@ -93,4 +97,8 @@ class LegislatorViewTestCase(LinkingAPITestCase):
         self.assertEqual(response.status_code, 200)
         data = response.json()
         votes = data["votes"]
-        self.assertEquals(len(votes), EXPECTED_VOTES)
+
+        self.assertIn("afirmatives", votes)
+        self.assertIn("negatives", votes)
+        self.assertIn("abstentions", votes)
+        self.assertIn("absents", votes)

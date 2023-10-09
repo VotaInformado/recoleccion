@@ -395,7 +395,6 @@ class PartyLinkerTestCase(LinkingTestCase):
         DENOMINATION = "Partido Justicialista"
         ut.create_party_linking_decision(DENOMINATION, DENOMINATION, LinkingDecisions.DENIED)
         party = Party.objects.create(main_denomination=DENOMINATION)
-        PartyDenomination.objects.create(party=party, denomination=DENOMINATION)
         PARTY_ID = party.pk
 
         canonical_record = {

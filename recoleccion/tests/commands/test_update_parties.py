@@ -48,7 +48,6 @@ class UpdateVotesParties(LinkingTestCase):
         # Expected to be linked
         PARTY_NAME = "PARTIDO JUSTICIALISTA"
         party = Party.objects.create(main_denomination=PARTY_NAME)
-        PartyDenomination.objects.create(party=party, denomination=PARTY_NAME)
         original_vote = Vote.objects.create(
             person_name="Nombre", person_last_name="Apellido", party_name=PARTY_NAME, reference="Project"
         )
@@ -67,7 +66,6 @@ class UpdateVotesParties(LinkingTestCase):
         PARTY_NAME = "PARTIDO JUSTICIALISTA"
         SIMILAR_NAME = "PART. JUSTICIALISTA"
         party = Party.objects.create(main_denomination=PARTY_NAME)
-        PartyDenomination.objects.create(party=party, denomination=PARTY_NAME)
         original_vote = Vote.objects.create(
             person_name="Nombre", person_last_name="Apellido", party_name=SIMILAR_NAME, reference="Project"
         )
@@ -92,7 +90,6 @@ class UpdateVotesParties(LinkingTestCase):
         PARTY_NAME = "PARTIDO JUSTICIALISTA"
         SIMILAR_NAME = "SOCIEDAD JUSTICIALISTA"
         party = Party.objects.create(main_denomination=PARTY_NAME)
-        PartyDenomination.objects.create(party=party, denomination=PARTY_NAME)
         ut.create_party_linking_decision(SIMILAR_NAME, PARTY_NAME, LinkingDecisions.DENIED)
 
         original_vote = Vote.objects.create(
@@ -119,7 +116,6 @@ class UpdateVotesParties(LinkingTestCase):
         PARTY_NAME = "PARTIDO JUSTICIALISTA"
         SIMILAR_NAME = "FRENTE PARA LA VICTORIA"
         party = Party.objects.create(main_denomination=PARTY_NAME)
-        PartyDenomination.objects.create(party=party, denomination=PARTY_NAME)
         ut.create_party_linking_decision(SIMILAR_NAME, PARTY_NAME, LinkingDecisions.DENIED)
 
         original_vote = Vote.objects.create(
@@ -146,7 +142,6 @@ class UpdateVotesParties(LinkingTestCase):
         CANONICAL_NAME = "PARTIDO JUSTICIALISTA"
         MESSY_NAME = "PART. JUSTICIALISTA"
         party = Party.objects.create(main_denomination=CANONICAL_NAME)
-        PartyDenomination.objects.create(party=party, denomination=CANONICAL_NAME)
         ut.create_party_linking_decision(MESSY_NAME, CANONICAL_NAME, LinkingDecisions.APPROVED, party.pk)
 
         vote = Vote.objects.create(
@@ -169,7 +164,6 @@ class UpdateVotesParties(LinkingTestCase):
         MESSY_NAME = "Part. Justicialista"
         party = Party.objects.create(main_denomination=CANONICAL_NAME)
         ut.create_party_linking_decision(MESSY_NAME, CANONICAL_NAME, LinkingDecisions.DENIED)
-        PartyDenomination.objects.create(party=party, denomination=CANONICAL_NAME)
         vote = Vote.objects.create(
             person_name="Nombre", person_last_name="Apellido", party_name=MESSY_NAME, reference="Project"
         )
@@ -205,7 +199,6 @@ class UpdateAuthorsParties(LinkingTestCase):
     def test_update_authors_parties_with_exact_match(self):
         PARTY_NAME = "Partido Justicialista"
         party = Party.objects.create(main_denomination=PARTY_NAME)
-        PartyDenomination.objects.create(party=party, denomination=PARTY_NAME)
         person = Person.objects.first()
         project = LawProject.objects.first()
         author = Authorship.objects.create(
@@ -239,7 +232,6 @@ class UpdateAuthorsParties(LinkingTestCase):
         MESSY_NAME = "Part. Justicialista"
         party = Party.objects.create(main_denomination=CANONICAL_NAME)
         ut.create_party_linking_decision(MESSY_NAME, CANONICAL_NAME, LinkingDecisions.APPROVED, party.pk)
-        PartyDenomination.objects.create(party=party, denomination=CANONICAL_NAME)
         person = Person.objects.first()
         project = LawProject.objects.first()
         author = Authorship.objects.create(
@@ -261,7 +253,6 @@ class UpdateAuthorsParties(LinkingTestCase):
         CANONICAL_NAME = "Partido Justicialista"
         MESSY_NAME = "Part. Justicialista"
         party = Party.objects.create(main_denomination=CANONICAL_NAME)
-        PartyDenomination.objects.create(party=party, denomination=CANONICAL_NAME)
         ut.create_party_linking_decision(MESSY_NAME, CANONICAL_NAME, LinkingDecisions.DENIED)
         person = Person.objects.first()
         project = LawProject.objects.first()

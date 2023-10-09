@@ -91,7 +91,6 @@ class Command(BaseCommand):
 
     def create_new_party(self, party_name):
         party = Party.objects.create(main_denomination=party_name)
-        PartyDenomination.objects.create(party=party, denomination=party_name)
         self.logger.info(f"New party {party_name} created with id {party.id}")
         return party
 

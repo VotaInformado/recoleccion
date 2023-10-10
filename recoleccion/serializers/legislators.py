@@ -1,14 +1,10 @@
 # Django REST Framework
 from rest_framework import serializers
-from rest_framework.utils.serializer_helpers import (
-    ReturnDict,
-)
 
 # Project
 from recoleccion.models.person import Person
 from recoleccion.serializers.deputies import ReducedDeputySeatSerializer
 from recoleccion.serializers.senate import ReducedSenateSeatSerializer
-from recoleccion.serializers.votes import LegislatorVoteSerializer
 from recoleccion.utils.enums.legislator_seats import LegislatorSeatSerializer
 
 

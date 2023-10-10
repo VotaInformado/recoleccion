@@ -1,15 +1,10 @@
 # Django rest framework
-from rest_framework import viewsets, mixins, generics
-from rest_framework.decorators import action
-from rest_framework import status
-from rest_framework.response import Response
-from drf_yasg.utils import swagger_auto_schema
+from rest_framework import viewsets, mixins
 from recoleccion.serializers.law_projects import (
     LawProjectListSerializer,
     LawProjectRetrieveSerializer,
 )
 from recoleccion.serializers.votes import VoteModelSerializer
-from recoleccion.views.responses.law_projects import law_project_votings_responses
 
 # Models
 from recoleccion.models import LawProject

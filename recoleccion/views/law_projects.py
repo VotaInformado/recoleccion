@@ -37,8 +37,9 @@ class LawProyectVotesViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
         "chamber": ["exact"],
         "date": ["exact"],
         "vote": ["exact", "in"],
+        "party_name": ["icontains"],
     }
-    ordering_fields = ["vote"]
+    ordering_fields = ["vote", "person__name", "person__last_name", "party_name"]
     search_fields = ["person__name", "person__last_name", "vote"]
 
     def get_queryset(self):

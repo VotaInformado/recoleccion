@@ -2,7 +2,6 @@
 from rest_framework import serializers
 # Project
 from recoleccion.utils.enums.project_chambers import ProjectChambers
-from recoleccion.serializers.votes import VoteModelSerializer
 
 
 class VoteSessionSerializer(serializers.Serializer):

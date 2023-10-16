@@ -8,8 +8,13 @@ from rest_framework import viewsets, mixins
 # Project
 from recoleccion.views.responses.legislators import law_project_author_responses
 from recoleccion.models.authorship import Authorship
-from recoleccion.serializers.legislators import LegislatorDetailsSerializer, LegislatorInfoSerializer
+from recoleccion.serializers.legislators import (
+    LegislatorDetailsSerializer,
+    LegislatorInfoSerializer,
+)
 from recoleccion.models.person import Person
+from recoleccion.models.vote import Vote
+from recoleccion.serializers.votes import VoteModelSerializer
 
 
 class LegislatorsViewSet(
@@ -38,7 +43,30 @@ class LegislatorsViewSet(
 
         person = self.get_object()
         authorships = Authorship.objects.filter(person=person)
-        law_projects = [authorship.law_project for authorship in authorships if authorship.law_project]
+        law_projects = [
+            authorship.law_project
+            for authorship in authorships
+            if authorship.law_project
+        ]
         # TODO: ver esto, qué hacemos con las authorships con referencias en lugar de law_projects
         response = LawProjectBasicInfoSerializer(law_projects, many=True).data
         return Response(response, status=status.HTTP_200_OK)
+
+
+class LegislatorVotesViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
+    serializer_class = VoteModelSerializer
+
+    filterset_fields = {
+        "chamber": ["exact"],
+        "date": ["exact"],
+        "vote": ["exact", "in"],
+        "party_name": ["icontains"],
+        "project__title": ["icontains"],
+    }
+    ordering_fields = ["vote", "party_name", "project__title", "date"]
+    search_fields = ["project__title", "vote"]
+
+    def get_queryset(self):
+        legislator_id = self.kwargs["legislator_id"]
+        votes = Vote.objects.filter(person_id=legislator_id)
+        return votes

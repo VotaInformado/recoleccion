@@ -4,9 +4,14 @@ from rest_framework import serializers
 # Project
 from recoleccion.models import Vote
 from recoleccion.utils.enums.project_chambers import ProjectChambers
+from recoleccion.serializers.legislators import LegislatorInfoSerializer
+from recoleccion.serializers.law_projects import LawProjectBasicInfoSerializer
 
 
 class VoteModelSerializer(serializers.ModelSerializer):
+    person = LegislatorInfoSerializer(read_only=True)
+    project = LawProjectBasicInfoSerializer(read_only=True)
+
     class Meta:
         model = Vote
         fields = "__all__"
@@ -14,8 +19,6 @@ class VoteModelSerializer(serializers.ModelSerializer):
 
 
 class LegislatorVoteSerializer(serializers.ModelSerializer):
-    from recoleccion.serializers.law_projects import LawProjectBasicInfoSerializer
-
     project = LawProjectBasicInfoSerializer()
     project_id = serializers.SerializerMethodField()
 

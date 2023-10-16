@@ -3,10 +3,9 @@ import pandas as pd
 from datetime import datetime as dt
 
 # Project
-from recoleccion.models import Authorship
+from recoleccion.models import Authorship, LawProject, Party, Person
 from recoleccion.components.writers import Writer
-from recoleccion.models.law_project import LawProject
-from recoleccion.models.person import Person
+from recoleccion.models.linking import DENIED_INDICATOR
 
 
 class AuthorsWriter(Writer):

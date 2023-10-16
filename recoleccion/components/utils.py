@@ -2,9 +2,14 @@ import string
 from unidecode import unidecode
 from pandas import isna
 from itertools import islice
+from datetime import date
 
 LOWERCASE_ACCENTS = "áéíóúü"
 UPPERCASE_ACCENTS = "ÁÉÍÓÚÜ"
+
+
+def date_to_str(date: date):
+    return date.strftime("%Y-%m-%d")
 
 
 def clean_text_formatting(text, capitalize=True):

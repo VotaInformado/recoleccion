@@ -1,8 +1,10 @@
+from typing import List, Tuple
 from dedupe import Gazetteer, console_label
 import os
 from uuid import uuid4
 import pandas as pd
 from pprint import pp
+from recoleccion.exceptions.custom import IncompatibleLinkingDatasets
 
 # Project
 from recoleccion.utils.custom_logger import CustomLogger
@@ -41,18 +43,31 @@ class Linker:
         gazetteer.training_pairs = new_training_pairs
 
     def _save_training(self, gazetteer: Gazetteer):
-        with open(f"{self.TRAINING_DIR}/{self.__class__.__name__}.json", "w") as f:
+        with open(f"{self.TRAINING_DIR}/{self.__class__.__name__}.json", "w", encoding="utf-8-sig") as f:
             self.clean_training_pairs(gazetteer)
             gazetteer.write_training(f)
 
     def get_canonical_data(self):
         return self.canonical_data
 
-    def get_record_id(self, messy_data, index_pair):
+    def get_record_id(self, record):
+        """Gets the record id"""
         raise NotImplementedError
 
-    def load_linking(self, **kwargs):
+    def save_linking_decision(self, **kwargs):
         raise NotImplementedError
+
+    def user_approved_linking(self, record_pair: Tuple[dict, dict]) -> bool:
+        # Returns True if the user approves the linking, False otherwise
+        messy_record, canonical_record = record_pair
+        print("Are these the same records?: \n")
+        pp(messy_record, sort_dicts=True, width=35)
+        pp(canonical_record, sort_dicts=True, width=35)
+        response = input("yes (y) / no (n): ").lower()
+        while response not in ["y", "n"]:
+            print("Invalid response")
+            response = input("yes (y) / no (n): ").lower()
+        return response == "y"
 
     def label_pairs(self, pairs, messy_data):
         """
@@ -69,36 +84,20 @@ class Linker:
         match_records_ids = []
         distinct_records_ids = []
         self.logger.info(f"There are {len(pairs)} pairs to label: ")
+
         for index_pair in pairs:
             messy_data_index, canonical_data_index = index_pair
             messy_record, canonical_record = messy_data[messy_data_index], self.canonical_data[canonical_data_index]
             record_pair = (messy_record, canonical_record)
-            person_id = self.get_person_id(messy_data, index_pair)
-            if person_id > 0:  # approved
+            linking_approved = self.user_approved_linking(record_pair)
+
+            if linking_approved:
+                record_id = self.get_record_id(canonical_record)
+                self.save_linking_decision(record_id, messy_record, canonical_record)
                 match_records.append(record_pair)
                 match_records_ids.append(index_pair)
-                continue
-            elif person_id < 0:  # denied
-                distinct_records.append(record_pair)
-                distinct_records_ids.append(index_pair)
-                continue
-
-            print("Are these the same records?: \n")
-            pp(messy_data[messy_data_index], sort_dicts=True, width=35)
-            pp(self.canonical_data[canonical_data_index], sort_dicts=True, width=35)
-
-            response = input("yes (y) / no (n): ").lower()
-            while response not in ["y", "n"]:
-                print("Invalid response")
-                response = input("yes (y) / no (n): ").lower()
-
-            if response == "y":
-                person_id = self.canonical_data[canonical_data_index]["id"]
-                self.load_linking(person_id, messy_record, canonical_record)
-                match_records.append(record_pair)
-                match_records_ids.append(index_pair)
-            elif response == "n":
-                self.load_linking(-1, messy_record, canonical_record)
+            else:
+                self.save_linking_decision(-1, messy_record, canonical_record)
                 distinct_records.append(record_pair)
                 distinct_records_ids.append(index_pair)
 
@@ -118,12 +117,25 @@ class Linker:
         else:
             self.gazetteer.prepare_training(messy_data, self.canonical_data)
             console_label(self.gazetteer)  # Run active learning because no training data exists
-        self.gazetteer.train()
+        try:
+            self.gazetteer.train()
+        except ValueError as e:
+            if "Sample larger than population" in str(e):
+                self.logger.info("Not enough data to train the Gazetteer, skipping linking...")
+                raise IncompatibleLinkingDatasets()
+            raise e
         self.gazetteer.index(self.canonical_data)
 
-    def classify(self, messy_data):
-        possible_mappings = self.gazetteer.search(messy_data, n_matches=1)
+    def no_real_matches(self, possible_mappings: List[tuple]):
+        # If there is at least one match, then one of the tuples has, in its second element, a list with at least one
+        return not any([len(x[1]) > 0 for x in possible_mappings])
 
+    def classify(self, messy_data: dict):
+        if not messy_data:
+            return [], []  # this means no linking, see the usage of this function
+        possible_mappings = self.gazetteer.search(messy_data, n_matches=1)
+        if self.no_real_matches(possible_mappings):
+            return [], []  # this means no linking, see the usage of this function
         max_conf_pair = max(possible_mappings, key=lambda x: self.confidence(x))
         min_conf_pair = min(possible_mappings, key=lambda x: self.confidence(x))
         max_confidence = max_conf_pair[1][0][1]
@@ -166,3 +178,13 @@ class Linker:
 
     def are_the_same_record(self, record_1, record_2):
         raise NotImplementedError
+
+    def assemble_manually_linked_data(self, approved_data: List[dict], rejected_data: List[dict]) -> pd.DataFrame:
+        approved_data = pd.DataFrame(approved_data)
+        rejected_data = pd.DataFrame(rejected_data)
+        return self.merge_dataframes(approved_data, rejected_data)
+
+    def merge_dataframes(self, *dfs: pd.DataFrame) -> pd.DataFrame:
+        merged_data = pd.concat(dfs)
+        merged_data = merged_data.reset_index(drop=True)
+        return merged_data

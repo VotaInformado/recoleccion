@@ -3,77 +3,77 @@ from typing import List
 from django.db.models import Q
 from django.core.management.base import BaseCommand
 import pandas as pd
+from tqdm import tqdm
 
 # Project
 from recoleccion.models.linking import DENIED_INDICATOR
 from recoleccion.utils.custom_logger import CustomLogger
 from recoleccion.components.linkers.party_linker import PartyLinker
-from recoleccion.models.party import Party, PartyDenomination
-from recoleccion.models.vote import Vote
+from recoleccion.models import Authorship, Party, PartyDenomination
 
 
 class Command(BaseCommand):
     logger = CustomLogger(threading=True)
 
     def handle(self, *args, **options):
-        votes_without_party = Vote.objects.filter(party__isnull=True)
-        unique_party_names = votes_without_party.values_list("party_name", flat=True).distinct()
+        authors_without_party = Authorship.objects.filter(party__isnull=True)
+        unique_party_names = authors_without_party.values_list("party_name", flat=True).distinct()
         if not unique_party_names:
-            self.logger.info("All votes have a party, exiting...")
+            self.logger.info("All authors have a party, exiting...")
             return
         self.logger.info(f"{len(unique_party_names)} unique parties found")
         self.logger.info("Sorting parties...")
-        parties_votes = {
-            party_name: Vote.objects.filter(Q(party_id__isnull=True) & Q(party_name=party_name)).count()
+        parties_authors = {
+            party_name: Authorship.objects.filter(Q(party_id__isnull=True) & Q(party_name=party_name)).count()
             for party_name in unique_party_names
         }
-        self.logger.info(f"Votes without party: {votes_without_party.count()}")
-        parties_to_link = sorted(parties_votes.items(), key=lambda x: x[1], reverse=True)
+        self.logger.info(f"Authors without party: {authors_without_party.count()}")
+        parties_to_link = sorted(parties_authors.items(), key=lambda x: x[1], reverse=True)
         parties_to_link = [party_name for party_name, _ in parties_to_link]
-        linked_votes = self.link_parties(parties_to_link)
-        self.logger.info(f"{linked_votes} votes have been updated from linking")
+        linked_authors = self.link_parties(parties_to_link)
+        self.logger.info(f"{linked_authors} authors have been updated from linking")
         self.check_actions_for_unlinked_parties()
-        self.logger.info(f"{self.unlinked_votes} votes have been updated from linking")
+        self.logger.info(f"{self.unlinked_authors} authors have been updated from linking")
 
-    def load_party_to_votes(self, party_name, party):
-        votes = Vote.objects.filter(party_name=party_name)
-        votes.update(party=party)
-        for vote in votes:
-            vote.save()
-        updated_votes = votes.count()
+    def load_party_to_authors(self, party_name, party):
+        authors = Authorship.objects.filter(party_name=party_name)
+        authors.update(party=party)
+        for author in authors:
+            author.save()
+        updated_authors = authors.count()
         if party:
-            self.logger.info(f"{updated_votes} votes have been updated to party {party_name} with id {party.id}")
+            self.logger.info(f"{updated_authors} authors have been updated to party {party_name} with id {party.id}")
         else:
-            self.logger.info(f"{updated_votes} votes from {party_name} have been updated to have NULL party")
-        return votes.count()
+            self.logger.info(f"{updated_authors} authors from {party_name} have been updated to have NULL party")
+        return authors.count()
 
-    def load_party_to_linked_votes(self, party_row: pd.Series):
+    def load_party_to_linked_authors(self, party_row: pd.Series):
         party_id = party_row["party_id"]
         party = Party.objects.get(id=party_id) if party_id != DENIED_INDICATOR else None
         party_name = party_row["denomination"]
-        linked_votes = self.load_party_to_votes(party_name, party)
-        return linked_votes
+        linked_authors = self.load_party_to_authors(party_name, party)
+        return linked_authors
 
     def link_parties(self, parties_to_link: List[str]) -> pd.DataFrame:
         # Tries to link the parties, unlinked parties are returned
-        if not parties_to_link:
+        parties_to_link = pd.DataFrame(parties_to_link, columns=["party_name"])
+        if parties_to_link.empty:
             self.unlinked_parties = pd.DataFrame()  # empty dataframe
             self.logger.info("No parties to link")
             return 0
-        parties_to_link = pd.DataFrame(parties_to_link, columns=["party_name"])
         parties_to_link["id"] = None  # the linker expects an id column
         linker = PartyLinker()
         linked_data = linker.link_parties(parties_to_link)
         linked_parties = linked_data[linked_data["party_id"].notnull()]
         self.unlinked_parties = linked_data[linked_data["party_id"].isnull()]
-        total_votes_linked = 0
+        total_authors_linked = 0
         for _, row in linked_parties.iterrows():
-            votes_linked = self.load_party_to_linked_votes(row)
-            total_votes_linked += votes_linked
-        return total_votes_linked
+            authors_linked = self.load_party_to_linked_authors(row)
+            total_authors_linked += authors_linked
+        return total_authors_linked
 
     def check_actions_for_unlinked_parties(self):
-        self.unlinked_votes = 0
+        self.unlinked_authors = 0
         if self.unlinked_parties.empty:
             self.logger.info("No unlinked parties to check")
             return
@@ -85,9 +85,9 @@ class Command(BaseCommand):
             party_denomination_created = self.check_for_party_denomination_creation(party_name)
             if party_denomination_created:
                 continue
-            self.logger.info(f"Votes linked to {party_name} will remain without a party")
-            unlinked_votes = Vote.objects.filter(party_name=party_name).count()
-            self.unlinked_votes += unlinked_votes
+            self.logger.info(f"Authors linked to {party_name} will remain without a party")
+            unlinked_authors = Authorship.objects.filter(party_name=party_name).count()
+            self.unlinked_authors += unlinked_authors
 
     def create_new_party(self, party_name):
         party = Party.objects.create(main_denomination=party_name)
@@ -106,7 +106,7 @@ class Command(BaseCommand):
         user_input = input(f"Create NEW party {party_name}? (y/n): ")
         if user_input == "y":
             party = self.create_new_party(party_name)
-            self.load_party_to_votes(party_name, party)
+            self.load_party_to_authors(party_name, party)
             party_created = True
         return party_created
 
@@ -118,5 +118,5 @@ class Command(BaseCommand):
         party_id = int(party_id)
         self.create_new_party_denomination(party_id, party_name)
         party = Party.objects.get(id=party_id)
-        self.load_party_to_votes(party_name, party)
+        self.load_party_to_authors(party_name, party)
         return True

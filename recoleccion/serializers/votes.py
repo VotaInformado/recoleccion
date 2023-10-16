@@ -42,3 +42,13 @@ class LegislatorVoteSerializer(serializers.ModelSerializer):
         else:
             data["project"] = None
         return data
+
+
+class BasicVoteInfoSerializer(serializers.ModelSerializer):
+    from recoleccion.serializers.persons import PersonModelSerializer
+
+    person = PersonModelSerializer()
+
+    class Meta:
+        model = Vote
+        fields = ["person", "vote", "date", "chamber"]

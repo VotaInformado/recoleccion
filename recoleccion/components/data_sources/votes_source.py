@@ -184,7 +184,6 @@ class DeputyVotesSource(DataSource):
         for row in table_rows:
             row_data = row.find_all("td")
             if len(row_data) > 0:
-                import pdb; pdb.set_trace()
                 vote_info = cls.get_vote_info(row_data)
                 project_votes_info.append(vote_info)
         for vote_info in project_votes_info:

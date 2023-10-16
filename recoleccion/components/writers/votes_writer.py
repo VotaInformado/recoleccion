@@ -4,6 +4,7 @@ from datetime import datetime as dt
 import numpy as np
 
 # Project
+from recoleccion.models.linking import DENIED_INDICATOR
 from recoleccion.utils.custom_logger import CustomLogger
 from recoleccion.models import Law, LawProject, Party, Person, Vote
 from recoleccion.components.writers import Writer
@@ -236,9 +237,16 @@ class VotesWriter(Writer):
         """Receives a DF with cols: vote_id, party_id
         Updates only the party_id of the votes with the given vote_id
         """
-        for i in updated_votes.index:
-            vote_info = updated_votes.loc[i]
-            vote = Vote.objects.get(id=vote_info["vote_id"])
-            party = Party.objects.get(id=vote_info["party_id"])
+        votes_with_party = updated_votes[updated_votes["party_id"].notnull()]
+        # we keep only the votes that have a party_id
+        votes_with_party.loc[votes_with_party["party_id"] == DENIED_INDICATOR, "party_id"] = None
+        for i in votes_with_party.index:
+            party_id = votes_with_party.loc[i, "party_id"]
+            vote_info = votes_with_party.loc[i]
+            vote = Vote.objects.get(id=vote_info["record_id"])
+            if pd.isna(party_id):
+                party = None
+            else:
+                party = Party.objects.get(id=party_id)
             vote.party = party
             vote.save()

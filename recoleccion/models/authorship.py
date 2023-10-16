@@ -14,6 +14,7 @@ class Authorship(BaseModel):
     person = models.ForeignKey("Person", on_delete=models.CASCADE, related_name="authorships", null=True)
     person_name = models.CharField(max_length=150)
     person_last_name = models.CharField(max_length=150)
-    party = models.CharField(max_length=150)
+    party_name = models.CharField(max_length=150)
+    party = models.ForeignKey("Party", on_delete=models.CASCADE, related_name="authorships", null=True)
     author_type = models.CharField(choices=LegislatorSeats.choices, max_length=10)
     source = models.CharField(max_length=150)

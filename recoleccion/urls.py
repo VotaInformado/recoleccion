@@ -11,7 +11,7 @@ from rest_framework import permissions
 # Views
 from recoleccion.views import PersonViewSet
 from recoleccion.views.deputies import DeputiesViewSet
-from recoleccion.views.legislators import LegislatorsViewSet
+from recoleccion.views.legislators import LegislatorsViewSet, LegislatorVotesViewSet
 from recoleccion.views.senate import SenateViewSet
 from recoleccion.views.laws import LawsViewSet
 from recoleccion.views.law_projects import LawProjectsViewSet, LawProyectVotesViewSet
@@ -42,6 +42,11 @@ router.register(
     r"law-projects/(?P<law_project_id>[^/.]+)/votings",
     LawProyectVotesViewSet,
     basename="law-project-votings",
+)
+router.register(
+    r"legislators/(?P<legislator_id>[^/.]+)/votes",
+    LegislatorVotesViewSet,
+    basename="legislator-votes",
 )
 
 

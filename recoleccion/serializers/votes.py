@@ -10,6 +10,7 @@ from recoleccion.serializers.law_projects import LawProjectBasicInfoSerializer
 
 class VoteModelSerializer(serializers.ModelSerializer):
     person = LegislatorInfoSerializer(read_only=True)
+    project = LawProjectBasicInfoSerializer(read_only=True)
 
     class Meta:
         model = Vote

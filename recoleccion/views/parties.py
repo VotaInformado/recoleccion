@@ -8,8 +8,13 @@ from recoleccion.serializers.parties import PartyInfoSerializer, PartyDetailsSer
 from recoleccion.models import Party
 
 
-class PartiesViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
+class PartiesViewSet(
+    viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin
+):
     queryset = Party.objects.all()
+
+    ordering_fields = ["main_denomination"]
+    search_fields = ["main_denomination"]
 
     def get_serializer_class(self):
         if self.action == "list":

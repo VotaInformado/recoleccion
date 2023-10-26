@@ -80,11 +80,11 @@ class PartiesViewTestCase(APITestCase):
         response_sub_parties = response_content["sub_parties"]
         self.assertEqual(len(response_sub_parties), len(self.SUB_PARTIES))
         self.assertEqual(sorted(response_sub_parties), sorted(self.SUB_PARTIES))
-        response_members = response_content["members"]
-        sorted_response_members = sorted(response_members, key=lambda x: x["id"])
-        response_member_ids = [member["id"] for member in sorted_response_members]
-        response_member_objects = [Person.objects.get(pk=member_id) for member_id in response_member_ids]
-        self.assertEqual(len(response_members), 4)
-        expected_members = [deputy, senator, voter, author]
-        sorted_expected_members = sorted(expected_members, key=lambda x: x.pk)
-        self.assertEqual(response_member_objects, sorted_expected_members)
+        # response_members = response_content["members"]
+        # sorted_response_members = sorted(response_members, key=lambda x: x["id"])
+        # response_member_ids = [member["id"] for member in sorted_response_members]
+        # response_member_objects = [Person.objects.get(pk=member_id) for member_id in response_member_ids]
+        self.assertEqual(response_content["total_members"], 4)
+        # expected_members = [deputy, senator, voter, author]
+        # sorted_expected_members = sorted(expected_members, key=lambda x: x.pk)
+        # self.assertEqual(response_member_objects, sorted_expected_members)

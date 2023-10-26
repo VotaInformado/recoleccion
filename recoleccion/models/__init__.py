@@ -1,5 +1,5 @@
 from .base import BaseModel
-from .person import Person
+from .person import Person, PersonSex
 from .deputy_seat import DeputySeat
 from .senate_seat import SenateSeat
 from .social_data import SocialData

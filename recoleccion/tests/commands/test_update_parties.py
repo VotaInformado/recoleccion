@@ -202,7 +202,7 @@ class UpdateAuthorsParties(LinkingTestCase):
         person = Person.objects.first()
         project = LawProject.objects.first()
         author = Authorship.objects.create(
-            law_project=project, person=person, party_name=PARTY_NAME, author_type="Diputado", source="Test"
+            project=project, person=person, party_name=PARTY_NAME, author_type="Diputado", source="Test"
         )
         self.create_party_denominations(5, party)  # hay que hacer esto xq rompe con 1 canonical record
         call_command("add_parties_to_authors")
@@ -235,7 +235,7 @@ class UpdateAuthorsParties(LinkingTestCase):
         person = Person.objects.first()
         project = LawProject.objects.first()
         author = Authorship.objects.create(
-            law_project=project, person=person, party_name=MESSY_NAME, author_type="Diputado", source="Test"
+            project=project, person=person, party_name=MESSY_NAME, author_type="Diputado", source="Test"
         )
         self.create_party_denominations(5, party)  # hay que hacer esto xq rompe con 1 canonical record
         call_command("add_parties_to_authors")
@@ -257,7 +257,7 @@ class UpdateAuthorsParties(LinkingTestCase):
         person = Person.objects.first()
         project = LawProject.objects.first()
         author = Authorship.objects.create(
-            law_project=project, person=person, party_name=MESSY_NAME, author_type="Diputado", source="Test"
+            project=project, person=person, party_name=MESSY_NAME, author_type="Diputado", source="Test"
         )
         self.create_party_denominations(5, party)  # hay que hacer esto xq rompe con 1 canonical record
         call_command("add_parties_to_authors")

@@ -14,8 +14,10 @@ from recoleccion.views.deputies import DeputiesViewSet
 from recoleccion.views.legislators import LegislatorsViewSet, LegislatorVotesViewSet
 from recoleccion.views.senate import SenateViewSet
 from recoleccion.views.laws import LawsViewSet
-from recoleccion.views.law_projects import LawProjectsViewSet, LawProyectVotesViewSet
+from recoleccion.views.law_projects import LawProjectsViewSet, LawProjectVotesViewSet, NeuralNetworkProjectsViewSet
 from recoleccion.views.parties import PartiesViewSet
+from recoleccion.views.votes import NeuralNetworkVotesViewSet
+from recoleccion.views.authors import NeuralNetworkAuthorsViewSet
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -30,6 +32,7 @@ schema_view = get_schema_view(
     permission_classes=(permissions.AllowAny,),
 )
 
+# Front end endpoints
 
 router = SimpleRouter()
 
@@ -41,7 +44,7 @@ router.register(r"laws", LawsViewSet, basename="laws")
 router.register(r"law-projects", LawProjectsViewSet, basename="law-project")
 router.register(
     r"law-projects/(?P<law_project_id>[^/.]+)/votings",
-    LawProyectVotesViewSet,
+    LawProjectVotesViewSet,
     basename="law-project-votings",
 )
 router.register(
@@ -50,6 +53,14 @@ router.register(
     basename="legislator-votes",
 )
 router.register(r"parties", PartiesViewSet, basename="parties")
+
+# Neural network data endpoints
+
+network_router = SimpleRouter()
+
+network_router.register(r"votes", NeuralNetworkVotesViewSet, basename="votes")
+network_router.register(r"authors", NeuralNetworkAuthorsViewSet, basename="authors")
+network_router.register(r"law-projects", NeuralNetworkProjectsViewSet, basename="law-projects")
 
 
 def redirect_to_health(request):
@@ -65,12 +76,11 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("health/", health_check, name="health_check"),
     path("", include(router.urls)),
+    path("neural-network/", include(network_router.urls)),
     path(
         "swagger/",
         schema_view.with_ui("swagger", cache_timeout=0),
         name="schema-swagger-ui",
     ),
-    path(
-        "swagger.json", schema_view.without_ui(cache_timeout=0), name="schema-json"
-    ),  # To download the swagger.json
+    path("swagger.json", schema_view.without_ui(cache_timeout=0), name="schema-json"),  # To download the swagger.json
 ]

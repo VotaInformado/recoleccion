@@ -52,3 +52,9 @@ class BasicVoteInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Vote
         fields = ["person", "vote", "date", "chamber"]
+
+
+class NeuralNetworkVoteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Vote
+        fields = ["vote", "date", "person", "party", "project"]

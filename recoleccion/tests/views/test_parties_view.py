@@ -68,7 +68,7 @@ class PartiesViewTestCase(APITestCase):
             person=senator, party=party, start_of_term="2020-01-01", end_of_term="2024-01-01"
         )
         vote = Vote.objects.create(person=voter, party=party)
-        authorship = Authorship.objects.create(person=author, party=party, law_project=law_project)
+        authorship = Authorship.objects.create(person=author, party=party, project=law_project)
         URL = f"/parties/{party.pk}/"
         response = self.client.get(URL)
         self.assertEqual(response.status_code, 200)

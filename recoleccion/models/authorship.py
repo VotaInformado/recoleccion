@@ -7,9 +7,9 @@ from recoleccion.utils.enums.legislator_seats import LegislatorSeats
 
 class Authorship(BaseModel):
     class Meta:
-        unique_together = ("law_project", "person")
+        unique_together = ("project", "person")
 
-    law_project = models.ForeignKey("LawProject", on_delete=models.CASCADE, related_name="authorships", null=True)
+    project = models.ForeignKey("LawProject", on_delete=models.CASCADE, related_name="authorships", null=True)
     reference = models.CharField(max_length=150, help_text="In case the law project is not found", null=True)
     person = models.ForeignKey("Person", on_delete=models.CASCADE, related_name="authorships", null=True)
     person_name = models.CharField(max_length=150)

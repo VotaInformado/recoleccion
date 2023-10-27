@@ -5,7 +5,7 @@ import sys
 # La idea de este script es que se le pase como argumento el nombre del archivo de la fixture y lo arregle
 
 
-def fix_file(class_name):
+def fix_file(class_name: str):
     file_name = f"{class_name}.json"
     with open(file_name, "r") as file:
         data = json.load(file)
@@ -46,6 +46,6 @@ def fix_fields(class_name):
     with open(file_name, "w") as file:
         json.dump(new_data, file, indent=4)
 
-file_name = sys.argv[1]
-fix_file(file_name)
-fix_fields(file_name)
+class_name = sys.argv[1]
+fix_file(class_name)
+fix_fields(class_name)

@@ -1,0 +1,2452 @@
+[
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:04:32.948865 +00:00",
+            "modified_at": "2023-09-02 23:04:32.948905 +00:00",
+            "id": 10,
+            "uuid": "80e3fb28-b071-4ea0-ab98-3ecdf08af9d2",
+            "main_denomination": "Somos San Juan"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:05:47.533500 +00:00",
+            "modified_at": "2023-09-02 23:05:47.533547 +00:00",
+            "id": 12,
+            "uuid": "bbdd42e2-7afa-43b7-b928-1e520bb7cc17",
+            "main_denomination": "Ahora Patria"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:05:51.079528 +00:00",
+            "modified_at": "2023-09-02 23:05:51.079575 +00:00",
+            "id": 13,
+            "uuid": "0af6b793-e250-4e3f-a101-c1703674ddf2",
+            "main_denomination": "Identidad Bonaerense"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:05:53.520531 +00:00",
+            "modified_at": "2023-09-02 23:05:53.520577 +00:00",
+            "id": 14,
+            "uuid": "954ea95f-bee3-4361-97ef-40feedbc3a32",
+            "main_denomination": "Fe"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:05:57.787680 +00:00",
+            "modified_at": "2023-09-02 23:05:57.787725 +00:00",
+            "id": 15,
+            "uuid": "24fc7e2d-f150-4492-bec4-c5b6b06cd5a4",
+            "main_denomination": "Somos"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:05:58.956093 +00:00",
+            "modified_at": "2023-09-02 23:05:58.956132 +00:00",
+            "id": 16,
+            "uuid": "ffa8eea7-6229-4b0a-9682-2b7cab532117",
+            "main_denomination": "Udeso Salta"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:06:00.890252 +00:00",
+            "modified_at": "2023-09-02 23:06:00.890290 +00:00",
+            "id": 17,
+            "uuid": "3e5a89de-1b9d-4028-979e-f86bbe5d406c",
+            "main_denomination": "Movimiento Popular Neuquino"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:06:02.904689 +00:00",
+            "modified_at": "2023-09-02 23:06:02.904744 +00:00",
+            "id": 18,
+            "uuid": "ea570ca0-886a-4271-9661-12f8cb473fe1",
+            "main_denomination": "C\u00f3rdoba Federal"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:06:15.796962 +00:00",
+            "modified_at": "2023-09-02 23:06:15.797030 +00:00",
+            "id": 20,
+            "uuid": "0dd6522f-5ea0-4852-8a48-e3f94ae4a277",
+            "main_denomination": "Frente Renovador"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:06:17.831287 +00:00",
+            "modified_at": "2023-09-02 23:06:17.831337 +00:00",
+            "id": 21,
+            "uuid": "3105c76a-d0e7-41cb-91af-b875603aedd7",
+            "main_denomination": "Avanza Libertad"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:06:22.303337 +00:00",
+            "modified_at": "2023-09-02 23:06:22.303372 +00:00",
+            "id": 23,
+            "uuid": "0998343f-8549-4e55-bb1f-c386b440f15b",
+            "main_denomination": "Produccion Y Trabajo"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:06:25.487467 +00:00",
+            "modified_at": "2023-09-02 23:06:25.487514 +00:00",
+            "id": 24,
+            "uuid": "58e2b68c-74da-4b1a-b635-c29dc4b6b6d1",
+            "main_denomination": "Coalicion Civica Ari"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:06:34.833972 +00:00",
+            "modified_at": "2023-09-02 23:06:34.834010 +00:00",
+            "id": 26,
+            "uuid": "83e2d5f5-d003-4fef-b207-5b14b64c9e9b",
+            "main_denomination": "Dialogo Y Trabajo"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:06:53.164699 +00:00",
+            "modified_at": "2023-09-02 23:06:53.164756 +00:00",
+            "id": 27,
+            "uuid": "81c37ccb-e39b-4f49-a96e-b09fbd5107e8",
+            "main_denomination": "Juntos Por El Cambio Chubut"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:06:54.172465 +00:00",
+            "modified_at": "2023-09-02 23:06:54.172513 +00:00",
+            "id": 28,
+            "uuid": "b558aaf7-7385-4be8-8f7e-40b56efe2d1b",
+            "main_denomination": "Social Patagonico"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:06:54.836686 +00:00",
+            "modified_at": "2023-09-02 23:06:54.836720 +00:00",
+            "id": 29,
+            "uuid": "06d1c536-3528-43b8-8a29-bcf3a92c4de9",
+            "main_denomination": "Mov Pop Fueguino"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:06:56.264507 +00:00",
+            "modified_at": "2023-09-02 23:06:56.264549 +00:00",
+            "id": 30,
+            "uuid": "175aa411-5e6d-462c-b0ef-cb7c132e93be",
+            "main_denomination": "Partido Por La Justicia Social"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:09:52.804049 +00:00",
+            "modified_at": "2023-09-02 23:09:52.804102 +00:00",
+            "id": 32,
+            "uuid": "e04ab5d7-b787-4261-ad35-96db6ab7cf96",
+            "main_denomination": "Frente De Todos"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:11:38.286229 +00:00",
+            "modified_at": "2023-09-02 23:11:38.286291 +00:00",
+            "id": 33,
+            "uuid": "a0350905-b62f-4e57-b37a-6b8d891fe8c5",
+            "main_denomination": "Salta Somos Todos"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:11:39.595560 +00:00",
+            "modified_at": "2023-09-02 23:11:39.595596 +00:00",
+            "id": 34,
+            "uuid": "ae0ea0f7-c2a6-4f25-a64a-ba2f0c5e80f8",
+            "main_denomination": "Partido De La Concertacion Forja"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:11:41.065875 +00:00",
+            "modified_at": "2023-09-02 23:11:41.065923 +00:00",
+            "id": 35,
+            "uuid": "eb53054f-0732-4625-a1d3-98e13f5d35c2",
+            "main_denomination": "Del Bicentenario"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:12:45.125302 +00:00",
+            "modified_at": "2023-09-02 23:12:45.125360 +00:00",
+            "id": 36,
+            "uuid": "c0154045-cacf-4555-8379-3c61b78a77ff",
+            "main_denomination": "Suma Unen"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:13:25.685067 +00:00",
+            "modified_at": "2023-09-02 23:13:25.685099 +00:00",
+            "id": 37,
+            "uuid": "b92d48ec-6ff7-4edc-8314-341d276f2dae",
+            "main_denomination": "Proyecto Sur Unen"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:13:26.673734 +00:00",
+            "modified_at": "2023-09-02 23:13:26.673771 +00:00",
+            "id": 38,
+            "uuid": "be307602-640a-43ea-99ac-bcca44c57989",
+            "main_denomination": "Coalici\u00f3n C\u00edvica"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:13:27.660626 +00:00",
+            "modified_at": "2023-09-02 23:13:27.660689 +00:00",
+            "id": 39,
+            "uuid": "7b4d5679-1434-43ce-a0a1-e1b3391a8769",
+            "main_denomination": "Libres Del Sur"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:13:29.090453 +00:00",
+            "modified_at": "2023-09-02 23:13:29.090491 +00:00",
+            "id": 40,
+            "uuid": "df52bc04-02a7-47ca-b808-7748a2202b33",
+            "main_denomination": "Frente Civico Por Santiago"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:13:32.414749 +00:00",
+            "modified_at": "2023-09-02 23:13:32.414803 +00:00",
+            "id": 41,
+            "uuid": "c88563a0-a339-4ea4-8c34-6154866eaef4",
+            "main_denomination": "Unidad Y Equidad Federal"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:13:34.850838 +00:00",
+            "modified_at": "2023-09-02 23:13:34.850875 +00:00",
+            "id": 42,
+            "uuid": "e44008b3-0d4f-40e9-87ee-2545b04536bc",
+            "main_denomination": "Ser Somos Energia Para Renovar"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:13:36.160804 +00:00",
+            "modified_at": "2023-09-02 23:13:36.160845 +00:00",
+            "id": 43,
+            "uuid": "d5f048e3-ccc0-4b6e-8f30-d61b0d5974b6",
+            "main_denomination": "Frente De La Concordia Misionero"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:13:37.066731 +00:00",
+            "modified_at": "2023-09-02 23:13:37.066786 +00:00",
+            "id": 44,
+            "uuid": "0e8ab1aa-3350-4fb4-ab87-873146f95d01",
+            "main_denomination": "Compromiso Con San Juan"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:13:37.933496 +00:00",
+            "modified_at": "2023-09-02 23:13:37.933545 +00:00",
+            "id": 45,
+            "uuid": "eca3b3b4-1fcd-47ca-9435-41fb28c3275e",
+            "main_denomination": "Consenso Federal"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:13:39.000480 +00:00",
+            "modified_at": "2023-09-02 23:13:39.000531 +00:00",
+            "id": 46,
+            "uuid": "3d0c1235-6d43-4b88-9c42-726422a78ed4",
+            "main_denomination": "Movimiento Evita"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:13:40.026715 +00:00",
+            "modified_at": "2023-09-02 23:13:40.026737 +00:00",
+            "id": 47,
+            "uuid": "1934daa2-0194-4b6b-9f75-d2ffe41c6cf7",
+            "main_denomination": "Partido Obrero \u2013 Frente De Izquierda Y De Trabajadores Unidad"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:13:48.387361 +00:00",
+            "modified_at": "2023-09-02 23:13:48.387419 +00:00",
+            "id": 48,
+            "uuid": "3adb4aba-8a71-482c-885e-b9dd43888d5f",
+            "main_denomination": "Bloque De Los Trabajadores"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:13:49.395390 +00:00",
+            "modified_at": "2023-09-02 23:13:49.395456 +00:00",
+            "id": 49,
+            "uuid": "5d3732a9-9404-4889-b2ef-95f5cd909664",
+            "main_denomination": "Partido Federal Fueguino"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:13:50.201628 +00:00",
+            "modified_at": "2023-09-02 23:13:50.201691 +00:00",
+            "id": 50,
+            "uuid": "8324bd5b-780f-4fc3-87c7-467f55902d4c",
+            "main_denomination": "Union Celeste Y Blanco"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:13:51.067338 +00:00",
+            "modified_at": "2023-09-02 23:13:51.067375 +00:00",
+            "id": 51,
+            "uuid": "4c03f71a-18d9-4c74-b039-f6fcd351aade",
+            "main_denomination": "Unir"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:17:03.620764 +00:00",
+            "modified_at": "2023-09-02 23:17:03.620798 +00:00",
+            "id": 52,
+            "uuid": "216a8a07-1402-4e78-847a-8845f03247e5",
+            "main_denomination": "Encuentro Federal"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:17:07.045018 +00:00",
+            "modified_at": "2023-09-02 23:17:07.045056 +00:00",
+            "id": 54,
+            "uuid": "ba81fbe5-b0f3-438a-9046-4fa7241d29c0",
+            "main_denomination": "Creo"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:17:08.474194 +00:00",
+            "modified_at": "2023-09-02 23:17:08.474242 +00:00",
+            "id": 55,
+            "uuid": "1f8813cf-bbe0-46a4-8a29-b4a8043bdc8b",
+            "main_denomination": "Democrata Progresista"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:17:09.644246 +00:00",
+            "modified_at": "2023-09-02 23:17:09.644276 +00:00",
+            "id": 56,
+            "uuid": "9cdcaaaa-302e-492b-87f8-23508614e76b",
+            "main_denomination": "Valores Para Mi Pais"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:18:26.510376 +00:00",
+            "modified_at": "2023-09-02 23:18:26.510414 +00:00",
+            "id": 57,
+            "uuid": "8af33de8-3ed4-4904-8806-224cd5f487bb",
+            "main_denomination": "Juntos Somos Rio Negro"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:18:37.630948 +00:00",
+            "modified_at": "2023-09-02 23:18:37.630986 +00:00",
+            "id": 58,
+            "uuid": "f99bd46c-118e-4a9b-a830-8f9706b669f7",
+            "main_denomination": "Socialista"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:18:38.636278 +00:00",
+            "modified_at": "2023-09-02 23:18:38.636334 +00:00",
+            "id": 59,
+            "uuid": "10addcac-7c0b-4bd0-a9cd-68227154a6a6",
+            "main_denomination": "Buenos Aires Libre"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:18:39.966672 +00:00",
+            "modified_at": "2023-09-02 23:18:39.966708 +00:00",
+            "id": 60,
+            "uuid": "badf8348-04cf-4604-a088-571afd4af67a",
+            "main_denomination": "Corriente De Pensamiento Federal"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:18:41.236261 +00:00",
+            "modified_at": "2023-09-02 23:18:41.236295 +00:00",
+            "id": 61,
+            "uuid": "5ed59efe-7573-4cf2-a4f8-e412a326dde7",
+            "main_denomination": "Frente Por La Inclusion Social"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:18:49.030724 +00:00",
+            "modified_at": "2023-09-02 23:18:49.030791 +00:00",
+            "id": 62,
+            "uuid": "89d1fccc-f7f9-4c53-8b2a-37d88c1a69aa",
+            "main_denomination": "Movimiento Solidario Popular"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:19:14.936266 +00:00",
+            "modified_at": "2023-09-02 23:19:14.936319 +00:00",
+            "id": 63,
+            "uuid": "a566ae81-5bea-47cb-a0f5-a7e6b4e756c2",
+            "main_denomination": "Unidad Para El Desarrollo Social Y La Equidad"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:19:16.245117 +00:00",
+            "modified_at": "2023-09-02 23:19:16.245154 +00:00",
+            "id": 64,
+            "uuid": "798a2332-cdd2-4aa1-be27-46e28d9374c6",
+            "main_denomination": "Elijo Catamarca"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:19:17.877388 +00:00",
+            "modified_at": "2023-09-02 23:19:17.877427 +00:00",
+            "id": 65,
+            "uuid": "aae70c43-4bed-4d63-b5c2-fb8dcf15709a",
+            "main_denomination": "Frente Civico Y Social De Catamarca"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:21:02.643966 +00:00",
+            "modified_at": "2023-09-02 23:21:02.644010 +00:00",
+            "id": 67,
+            "uuid": "e72d11f7-883a-490b-9b10-9058d33f6090",
+            "main_denomination": "Trabajo Y Dignidad"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:21:03.428849 +00:00",
+            "modified_at": "2023-09-02 23:21:03.428887 +00:00",
+            "id": 68,
+            "uuid": "d88217bd-3c70-4e3a-8825-c435cdd6ec0d",
+            "main_denomination": "Red Por Argentina"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:21:53.786973 +00:00",
+            "modified_at": "2023-09-02 23:21:53.787034 +00:00",
+            "id": 69,
+            "uuid": "b1a2997e-35b2-4ef1-83c1-8012384356e0",
+            "main_denomination": "Frente Peronista"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:21:58.037898 +00:00",
+            "modified_at": "2023-09-02 23:21:58.037936 +00:00",
+            "id": 70,
+            "uuid": "51756e31-b496-49c2-99e6-fef2a3148dc9",
+            "main_denomination": "Movimiento Nacional Alfonsinista"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:21:59.993746 +00:00",
+            "modified_at": "2023-09-02 23:21:59.993806 +00:00",
+            "id": 71,
+            "uuid": "b79c1c86-24f2-42e3-9817-ed00166d15e0",
+            "main_denomination": "Izquierda Socialista Frente De Izquierda"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:22:06.257377 +00:00",
+            "modified_at": "2023-09-02 23:22:06.257433 +00:00",
+            "id": 72,
+            "uuid": "b11d7e68-387f-4035-af0b-804f9cce898b",
+            "main_denomination": "Democracia Igualitaria Y Participativa D I P"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:22:07.163761 +00:00",
+            "modified_at": "2023-09-02 23:22:07.163822 +00:00",
+            "id": 73,
+            "uuid": "a32fa969-6512-49d2-99e8-8b639fbffe92",
+            "main_denomination": "Republicanos Unidos"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:22:07.868755 +00:00",
+            "modified_at": "2023-09-02 23:22:07.868788 +00:00",
+            "id": 74,
+            "uuid": "8597b689-55ed-4e71-a0f2-e067fdda11bd",
+            "main_denomination": "Primero Argentina"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:22:09.319240 +00:00",
+            "modified_at": "2023-09-02 23:22:09.319277 +00:00",
+            "id": 75,
+            "uuid": "e73f8bc2-ff10-423f-8e96-bca0d4b3d360",
+            "main_denomination": "Cultura Educacion Y Trabajo"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:22:11.313520 +00:00",
+            "modified_at": "2023-09-02 23:22:11.313576 +00:00",
+            "id": 76,
+            "uuid": "df2a7819-1f3a-4dbd-a836-6110974d013c",
+            "main_denomination": "Union Pro"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:22:12.944930 +00:00",
+            "modified_at": "2023-09-02 23:22:12.944964 +00:00",
+            "id": 77,
+            "uuid": "500f1bcf-fa93-469c-b4ca-66981726cd34",
+            "main_denomination": "Frente Progresista Civico Y Social"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:22:14.520933 +00:00",
+            "modified_at": "2023-09-02 23:22:14.520968 +00:00",
+            "id": 78,
+            "uuid": "b5a412a2-8691-4480-aa27-5e531e60add9",
+            "main_denomination": "Union Por San Juan"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:24:45.316497 +00:00",
+            "modified_at": "2023-09-02 23:24:45.316535 +00:00",
+            "id": 80,
+            "uuid": "5a5c9445-26a7-481b-b333-9eb09c8568a1",
+            "main_denomination": "Brigadier General Juan Bautista Bustos"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:24:47.814999 +00:00",
+            "modified_at": "2023-09-02 23:24:47.815037 +00:00",
+            "id": 81,
+            "uuid": "fd35d2ca-7c74-49d1-98e0-c15e86df56db",
+            "main_denomination": "Gen"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:25:29.862812 +00:00",
+            "modified_at": "2023-09-02 23:25:29.862851 +00:00",
+            "id": 82,
+            "uuid": "ceadf924-370e-43bf-9a14-fe1f1fad3e04",
+            "main_denomination": "Pts Frente De Izquierda"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:25:32.981299 +00:00",
+            "modified_at": "2023-09-02 23:25:32.981355 +00:00",
+            "id": 83,
+            "uuid": "94a169ff-9e81-4b33-913f-a98f3eb22363",
+            "main_denomination": "El Chacho"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:26:17.979542 +00:00",
+            "modified_at": "2023-09-02 23:26:17.979591 +00:00",
+            "id": 84,
+            "uuid": "d098ab40-7d76-4b10-b6db-5f2cc064ae12",
+            "main_denomination": "Misiones"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:26:19.872089 +00:00",
+            "modified_at": "2023-09-02 23:26:19.872124 +00:00",
+            "id": 85,
+            "uuid": "cb611484-08ce-4fc7-842c-aa1bd2cb0122",
+            "main_denomination": "Accion Federal"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:27:41.068191 +00:00",
+            "modified_at": "2023-09-02 23:27:41.068230 +00:00",
+            "id": 86,
+            "uuid": "408a818a-39fe-41ce-9a93-c2aaf5a3c97d",
+            "main_denomination": "Democrata De Mendoza"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:28:15.432935 +00:00",
+            "modified_at": "2023-09-02 23:28:15.432973 +00:00",
+            "id": 88,
+            "uuid": "316d5667-8348-4e4a-bf54-e225139a2efe",
+            "main_denomination": "Juntos Por Argentina"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:28:16.358041 +00:00",
+            "modified_at": "2023-09-02 23:28:16.358076 +00:00",
+            "id": 89,
+            "uuid": "e3902196-2cb8-46c8-88b6-ec56627bddb6",
+            "main_denomination": "Avanzar San Luis"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:28:17.426484 +00:00",
+            "modified_at": "2023-09-02 23:28:17.426528 +00:00",
+            "id": 90,
+            "uuid": "8230615c-d35c-4993-a363-abda5256da4c",
+            "main_denomination": "Evolucion Radical"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:28:46.575083 +00:00",
+            "modified_at": "2023-09-02 23:28:46.575120 +00:00",
+            "id": 91,
+            "uuid": "ab74f023-b49d-4d48-b71a-52ce84eb63ce",
+            "main_denomination": "Federal Unidos Por Una Nueva Argentina"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:28:58.176775 +00:00",
+            "modified_at": "2023-09-02 23:28:58.176814 +00:00",
+            "id": 92,
+            "uuid": "69c61bcf-66a8-4e4f-a5ee-306582ddcebd",
+            "main_denomination": "Valores Republicanos"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:29:10.806803 +00:00",
+            "modified_at": "2023-09-02 23:29:10.806848 +00:00",
+            "id": 94,
+            "uuid": "8c0df8e6-f671-4c5c-8f6d-17887d3470d1",
+            "main_denomination": "Unidos Por Una Nueva Argentina"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:29:11.814254 +00:00",
+            "modified_at": "2023-09-02 23:29:11.814286 +00:00",
+            "id": 95,
+            "uuid": "71887dbb-1237-4b2a-9466-63d6fd878d07",
+            "main_denomination": "De La Concertacion"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:29:28.413665 +00:00",
+            "modified_at": "2023-09-02 23:29:28.413726 +00:00",
+            "id": 96,
+            "uuid": "ee81fa00-57ff-4bfb-bb89-837c192ef6b0",
+            "main_denomination": "Frente Civico Cordoba"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:29:44.729416 +00:00",
+            "modified_at": "2023-09-02 23:29:44.729466 +00:00",
+            "id": 97,
+            "uuid": "111d3ab3-8bd3-4e9d-bfe1-8566b776af1a",
+            "main_denomination": "Compromiso Federal"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:29:47.569181 +00:00",
+            "modified_at": "2023-09-02 23:29:47.569234 +00:00",
+            "id": 98,
+            "uuid": "ac31f855-79d6-4f61-bcba-a46a38edbe08",
+            "main_denomination": "Frente Nuevo Encuentro"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:30:11.779077 +00:00",
+            "modified_at": "2023-09-02 23:30:11.779099 +00:00",
+            "id": 99,
+            "uuid": "84702423-46a2-4d41-9b6e-ebba9c2c686a",
+            "main_denomination": "Concertacion Forja"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:30:14.721338 +00:00",
+            "modified_at": "2023-09-02 23:30:14.721374 +00:00",
+            "id": 100,
+            "uuid": "5a3062f0-8397-4dda-9462-cf185f8c17b9",
+            "main_denomination": "Renovador De Salta"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:31:20.127508 +00:00",
+            "modified_at": "2023-09-02 23:31:20.127572 +00:00",
+            "id": 101,
+            "uuid": "d235af27-e6f4-4633-a993-f9eb0db23400",
+            "main_denomination": "Libertad Valores Y Cambio"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:31:21.075719 +00:00",
+            "modified_at": "2023-09-02 23:31:21.075756 +00:00",
+            "id": 102,
+            "uuid": "3304d7ba-542a-4f71-bede-60ce96cdbdb5",
+            "main_denomination": "Solidario Si"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:31:22.262433 +00:00",
+            "modified_at": "2023-09-02 23:31:22.262478 +00:00",
+            "id": 103,
+            "uuid": "98a1743c-8d67-4e5c-a05d-35c7aa5d6c77",
+            "main_denomination": "Dialogo Por Buenos Aires"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:31:23.851351 +00:00",
+            "modified_at": "2023-09-02 23:31:23.851379 +00:00",
+            "id": 104,
+            "uuid": "00ed38ce-8cf5-4a5a-8434-5e776b40ae1d",
+            "main_denomination": "Unidad Popular"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:31:27.137745 +00:00",
+            "modified_at": "2023-09-02 23:31:27.137802 +00:00",
+            "id": 105,
+            "uuid": "63d620a8-abcd-457a-a516-7f6261dfedc7",
+            "main_denomination": "No Integra Bloque"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:31:30.883677 +00:00",
+            "modified_at": "2023-09-02 23:31:30.883714 +00:00",
+            "id": 106,
+            "uuid": "59700206-393f-4030-b4af-5e4ca6e0e5cc",
+            "main_denomination": "Union Por Entre Rios"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:31:31.769665 +00:00",
+            "modified_at": "2023-09-02 23:31:31.769683 +00:00",
+            "id": 107,
+            "uuid": "c040ddac-abe0-45e6-840e-beab89add1f0",
+            "main_denomination": "Partido Liberal De Corrientes"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:32:19.684445 +00:00",
+            "modified_at": "2023-09-02 23:32:19.684496 +00:00",
+            "id": 108,
+            "uuid": "0b14bde5-1d66-49db-86b0-738f489c43a4",
+            "main_denomination": "Union Por Cordoba"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:32:22.117940 +00:00",
+            "modified_at": "2023-09-02 23:32:22.117991 +00:00",
+            "id": 109,
+            "uuid": "45cefe54-b020-455d-8b7a-8672332d88d7",
+            "main_denomination": "Partido Bloquista De San Juan"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:32:23.241897 +00:00",
+            "modified_at": "2023-09-02 23:32:23.241921 +00:00",
+            "id": 110,
+            "uuid": "035abb52-b5d9-4cd2-b295-553df601382b",
+            "main_denomination": "Frente Norte"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:32:24.998775 +00:00",
+            "modified_at": "2023-09-02 23:32:24.998816 +00:00",
+            "id": 111,
+            "uuid": "58585afe-a226-45bb-a7fc-58230813ba6b",
+            "main_denomination": "Nuevo Encuentro Popular Y Solidario"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-03 21:46:14.901203 +00:00",
+            "modified_at": "2023-09-03 21:46:14.901259 +00:00",
+            "id": 112,
+            "uuid": "7ed9d51b-b00a-4f33-8ba2-1cad0ca95ddd",
+            "main_denomination": "Alianza Encuentro Corrientes"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-03 21:52:29.929929 +00:00",
+            "modified_at": "2023-09-03 21:52:29.929964 +00:00",
+            "id": 116,
+            "uuid": "277461b2-840c-44d1-b445-d7a300ef9985",
+            "main_denomination": "Movim Popular Salte\u00f1o"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-03 21:53:38.154581 +00:00",
+            "modified_at": "2023-09-03 21:53:38.154617 +00:00",
+            "id": 117,
+            "uuid": "62cea0f1-8bd9-4b92-9d7c-2e852d422357",
+            "main_denomination": "Frente Popular"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-03 21:53:46.171734 +00:00",
+            "modified_at": "2023-09-03 21:53:46.171794 +00:00",
+            "id": 118,
+            "uuid": "918478ad-4b40-4f4a-8cd6-643f6f69109f",
+            "main_denomination": "Alianza Republicana Federal"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-03 21:55:21.764306 +00:00",
+            "modified_at": "2023-09-03 21:55:21.764346 +00:00",
+            "id": 119,
+            "uuid": "84651bef-5f91-4108-bcfa-34595fafde81",
+            "main_denomination": "Frente Renovador De La Concordia"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-03 22:02:33.431721 +00:00",
+            "modified_at": "2023-09-03 22:02:33.431749 +00:00",
+            "id": 121,
+            "uuid": "944b72f3-99c5-4916-a5c0-3ec95fe7ea4d",
+            "main_denomination": "Hacemos Por C\u00f3rdoba"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-03 22:03:41.123369 +00:00",
+            "modified_at": "2023-09-03 22:03:41.123409 +00:00",
+            "id": 122,
+            "uuid": "38fcffca-babe-4d8f-aee5-406805b1be8b",
+            "main_denomination": "Partido Justicialista"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-03 22:05:22.098843 +00:00",
+            "modified_at": "2023-09-03 22:05:22.098882 +00:00",
+            "id": 123,
+            "uuid": "826ef052-57cf-4f02-ae79-8a8a1d99f013",
+            "main_denomination": "Frepaso"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-03 22:07:45.715937 +00:00",
+            "modified_at": "2023-09-03 22:07:45.715994 +00:00",
+            "id": 124,
+            "uuid": "57f383e4-b640-46db-a3cd-41a27aa42bf3",
+            "main_denomination": "Cambiemos Fuerza C\u00edvica Riojana"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-03 22:08:01.893824 +00:00",
+            "modified_at": "2023-09-03 22:08:01.893884 +00:00",
+            "id": 125,
+            "uuid": "34b4c1bf-6a5b-4b5c-a6c1-9201ebf7a909",
+            "main_denomination": "Movimiento Santiago Viable"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-03 22:08:52.638578 +00:00",
+            "modified_at": "2023-09-03 22:08:52.638616 +00:00",
+            "id": 128,
+            "uuid": "99223bfa-fa39-44ba-884c-28b82bc5e1a9",
+            "main_denomination": "U D E L P A"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-03 22:09:00.597043 +00:00",
+            "modified_at": "2023-09-03 22:09:00.597106 +00:00",
+            "id": 129,
+            "uuid": "c566080f-8930-4d14-ab42-ab86e1b960f0",
+            "main_denomination": "Liberal"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-03 22:15:18.360933 +00:00",
+            "modified_at": "2023-09-03 22:15:18.360981 +00:00",
+            "id": 130,
+            "uuid": "aabd6bce-32f9-4efa-a4ba-9e5f6beffdf7",
+            "main_denomination": "Defensa Provincial De Tucuman"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-03 22:15:22.308979 +00:00",
+            "modified_at": "2023-09-03 22:15:22.309025 +00:00",
+            "id": 131,
+            "uuid": "bbe9746f-73cc-42e4-be65-a77ce3dae99a",
+            "main_denomination": "Cambiemos Buenos Aires"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-03 22:17:04.470258 +00:00",
+            "modified_at": "2023-09-03 22:17:04.470297 +00:00",
+            "id": 132,
+            "uuid": "709a65dc-6c69-494c-b889-0b1d20984e7a",
+            "main_denomination": "Popular De Jujuy"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-03 22:20:38.935914 +00:00",
+            "modified_at": "2023-09-03 22:20:38.935952 +00:00",
+            "id": 133,
+            "uuid": "e3640db1-fc07-445a-8d59-fcde3e6fa557",
+            "main_denomination": "Partido De La Victoria"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-03 22:21:06.959520 +00:00",
+            "modified_at": "2023-09-03 22:21:06.959570 +00:00",
+            "id": 134,
+            "uuid": "b67a69b3-2811-4ab0-8f09-b4e9b5c4f956",
+            "main_denomination": "Frejuli"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-03 22:24:39.706509 +00:00",
+            "modified_at": "2023-09-03 22:24:39.706558 +00:00",
+            "id": 135,
+            "uuid": "0f4ac657-f2e7-416e-9ad6-917aae506aa9",
+            "main_denomination": "Fuerza Republicana"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:09:51.414949 +00:00",
+            "modified_at": "2023-09-02 23:09:51.414990 +00:00",
+            "id": 31,
+            "uuid": "4023c1a3-8d00-46f5-9fda-e96ce154e4e2",
+            "main_denomination": "Uni\u00f3n C\u00edvica Radical"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-03 22:27:04.932277 +00:00",
+            "modified_at": "2023-09-03 22:27:04.932330 +00:00",
+            "id": 137,
+            "uuid": "de05d634-ebdc-4d94-9018-2fab7b85b2a7",
+            "main_denomination": "Frente Cambia Mendoza"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-03 22:35:23.441472 +00:00",
+            "modified_at": "2023-09-03 22:35:23.441532 +00:00",
+            "id": 138,
+            "uuid": "353e3045-abb8-4d82-b938-1951fab24989",
+            "main_denomination": "Frente Acuerdo C\u00edvico Y Social"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-03 22:36:27.956520 +00:00",
+            "modified_at": "2023-09-03 22:36:27.956568 +00:00",
+            "id": 139,
+            "uuid": "d1cac6f5-4d89-4a0a-b0a3-f80af21ca65d",
+            "main_denomination": "Alianza Frente Para La Victoria Riojano"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-03 22:37:45.778744 +00:00",
+            "modified_at": "2023-09-03 22:37:45.778777 +00:00",
+            "id": 141,
+            "uuid": "a3fa09b2-0b14-4bc6-b6f8-a9345f9419da",
+            "main_denomination": "Laborista"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-03 22:41:31.460563 +00:00",
+            "modified_at": "2023-09-03 22:41:31.460619 +00:00",
+            "id": 143,
+            "uuid": "12fd85ce-2777-4279-943a-57509b75ee70",
+            "main_denomination": "Alianza Frente Popular Riojano"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-03 22:41:39.961064 +00:00",
+            "modified_at": "2023-09-03 22:41:39.961106 +00:00",
+            "id": 144,
+            "uuid": "17525a8d-34d0-4ae8-97b5-66e76f79812d",
+            "main_denomination": "Frente Por La Integraci\u00f3n"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-02 23:06:28.951688 +00:00",
+            "modified_at": "2023-09-02 23:06:28.951743 +00:00",
+            "id": 25,
+            "uuid": "be926be1-b089-46d0-9739-2b5431f298ce",
+            "main_denomination": "Frente Para La Victoria"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-03 22:47:49.653227 +00:00",
+            "modified_at": "2023-09-03 22:47:49.653266 +00:00",
+            "id": 146,
+            "uuid": "b21850f6-c4f4-44be-b49c-c108705df31a",
+            "main_denomination": "Unidad Federalista"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-03 22:47:51.261374 +00:00",
+            "modified_at": "2023-09-03 22:47:51.261402 +00:00",
+            "id": 147,
+            "uuid": "e6d55e9c-5f57-4a12-88ee-2e483243d627",
+            "main_denomination": "Autonomista"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-03 22:49:34.941283 +00:00",
+            "modified_at": "2023-09-03 22:49:34.941341 +00:00",
+            "id": 150,
+            "uuid": "52e637ba-d172-4930-a60b-8c73d6dec9be",
+            "main_denomination": "Autonomista Corrientes"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-03 22:55:36.467834 +00:00",
+            "modified_at": "2023-09-03 22:55:36.467873 +00:00",
+            "id": 151,
+            "uuid": "521b81e3-7d68-478b-b72c-59aeef3ffaf8",
+            "main_denomination": "U C R Bloquista San Juan"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-03 22:55:45.733807 +00:00",
+            "modified_at": "2023-09-03 22:55:45.733859 +00:00",
+            "id": 152,
+            "uuid": "dc258e13-0809-445c-9b09-bda7ee78583c",
+            "main_denomination": "Chubut Somos Todos"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-03 22:56:10.245913 +00:00",
+            "modified_at": "2023-09-03 22:56:10.245964 +00:00",
+            "id": 153,
+            "uuid": "40412711-381d-4288-a026-7c951c248fc3",
+            "main_denomination": "U C R Antipersonalista"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-03 23:00:36.149264 +00:00",
+            "modified_at": "2023-09-03 23:00:36.149304 +00:00",
+            "id": 154,
+            "uuid": "6c54d46b-eb62-4fc3-80a2-a062eac41a51",
+            "main_denomination": "Unidad Ciudadana"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-03 23:01:20.803629 +00:00",
+            "modified_at": "2023-09-03 23:01:20.803677 +00:00",
+            "id": 155,
+            "uuid": "453c1fb7-c576-45f6-a712-d94c301e8d6f",
+            "main_denomination": "Juntos Por El Cambio"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-03 23:03:19.515533 +00:00",
+            "modified_at": "2023-09-03 23:03:19.515570 +00:00",
+            "id": 156,
+            "uuid": "d1a6f47b-4c30-4af9-b731-459721f9ad9b",
+            "main_denomination": "Frente Amplio Progresista"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-03 23:04:29.331992 +00:00",
+            "modified_at": "2023-09-03 23:04:29.332062 +00:00",
+            "id": 157,
+            "uuid": "87ff2971-cf5c-40f8-8fd2-c82ed55fa84d",
+            "main_denomination": "Uni\u00f3n Popular Federal"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-03 23:07:59.299630 +00:00",
+            "modified_at": "2023-09-03 23:07:59.299670 +00:00",
+            "id": 158,
+            "uuid": "c488f62e-d9ae-4eb9-b999-b21718b29430",
+            "main_denomination": "Frente Juje\u00f1o"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-03 23:09:11.471018 +00:00",
+            "modified_at": "2023-09-03 23:09:11.471057 +00:00",
+            "id": 159,
+            "uuid": "a39ac40c-968f-4a8a-bf12-d9fa67114fa2",
+            "main_denomination": "Alianza Unen"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-03 23:09:15.701011 +00:00",
+            "modified_at": "2023-09-03 23:09:15.701067 +00:00",
+            "id": 160,
+            "uuid": "b60654fe-9f30-4899-a971-744b463540f6",
+            "main_denomination": "Partido Blanco De Los Trabajadores Jujuy"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-03 23:10:47.199011 +00:00",
+            "modified_at": "2023-09-03 23:10:47.199051 +00:00",
+            "id": 161,
+            "uuid": "85398e93-d9ee-4b15-a7ba-75313ebb9f9f",
+            "main_denomination": "Partido Nuevo"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-03 23:13:57.444323 +00:00",
+            "modified_at": "2023-09-03 23:13:57.444396 +00:00",
+            "id": 162,
+            "uuid": "589c5613-5b99-47ec-b571-ef5fc10f189e",
+            "main_denomination": "Uni\u00f3n Por Chaco"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-03 23:14:04.056388 +00:00",
+            "modified_at": "2023-09-03 23:14:04.056425 +00:00",
+            "id": 163,
+            "uuid": "fd80c503-4683-42b3-a57a-1d5b5522f019",
+            "main_denomination": "Laborista Nacionalista Salta"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-03 23:14:09.349870 +00:00",
+            "modified_at": "2023-09-03 23:14:09.349922 +00:00",
+            "id": 164,
+            "uuid": "647ddebf-383f-4fdc-b1bc-21dc3acea509",
+            "main_denomination": "Autonomista De Buenos Aires"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-03 23:14:22.664583 +00:00",
+            "modified_at": "2023-09-03 23:14:22.664640 +00:00",
+            "id": 165,
+            "uuid": "32c2259a-2670-45fd-a132-60135d4e30c6",
+            "main_denomination": "Sin Especificar"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-03 23:15:18.339372 +00:00",
+            "modified_at": "2023-09-03 23:15:18.339436 +00:00",
+            "id": 166,
+            "uuid": "a359e283-1bc0-4b3c-89b0-fe7a5d5e3644",
+            "main_denomination": "Vanguardia Federal Tucuman"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-03 23:15:57.999940 +00:00",
+            "modified_at": "2023-09-03 23:15:57.999979 +00:00",
+            "id": 167,
+            "uuid": "2d5f179e-4c19-4cdf-8658-72f69a6e6a18",
+            "main_denomination": "De La Justicia Social Tucum\u00e1n"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-03 23:17:21.224613 +00:00",
+            "modified_at": "2023-09-03 23:17:21.224648 +00:00",
+            "id": 169,
+            "uuid": "38fcd857-f64e-4575-93a1-30950c363f75",
+            "main_denomination": "U C R Intransigente"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-03 23:17:32.947866 +00:00",
+            "modified_at": "2023-09-03 23:17:32.947905 +00:00",
+            "id": 170,
+            "uuid": "3d0e8479-8376-40a1-ac3f-078bcf8dfd37",
+            "main_denomination": "Alianza Cambiemos San Juan"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-03 23:17:40.299709 +00:00",
+            "modified_at": "2023-09-03 23:17:40.299749 +00:00",
+            "id": 171,
+            "uuid": "eb3a808f-bbdf-4285-b1c9-e3af21e58842",
+            "main_denomination": "Juntos Por El Cambio Tierra Del Fuego"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-03 23:18:18.604435 +00:00",
+            "modified_at": "2023-09-03 23:18:18.604475 +00:00",
+            "id": 172,
+            "uuid": "1a9d2988-560e-4465-ad77-c22eacf5431d",
+            "main_denomination": "Democrata Cristiano"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-03 22:48:29.858831 +00:00",
+            "modified_at": "2023-09-03 22:48:29.858885 +00:00",
+            "id": 148,
+            "uuid": "3793a702-784b-483c-81f1-9bd12ff3cd85",
+            "main_denomination": "Alianza Popular y Federal Santa Fe"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-03 23:20:14.204153 +00:00",
+            "modified_at": "2023-09-03 23:20:14.204193 +00:00",
+            "id": 173,
+            "uuid": "33a2d9db-e0c6-465a-851f-3ffd988223b3",
+            "main_denomination": "Frente Amplio Formose\u00f1o Cambiemos"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-03 23:20:43.712851 +00:00",
+            "modified_at": "2023-09-03 23:20:43.712890 +00:00",
+            "id": 174,
+            "uuid": "0590e273-d9e4-45b8-abf6-00f9af427b96",
+            "main_denomination": "Alianza Concertaci\u00f3n Para El Desarrollo"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-03 23:20:51.708744 +00:00",
+            "modified_at": "2023-09-03 23:20:51.708780 +00:00",
+            "id": 175,
+            "uuid": "7c8171e4-db10-4dbe-b2cd-46f36cb0f419",
+            "main_denomination": "Accion Popular San Luis"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-03 23:22:47.922509 +00:00",
+            "modified_at": "2023-09-03 23:22:47.922547 +00:00",
+            "id": 176,
+            "uuid": "a132d674-d3ca-46f0-b1c4-5e844627e2b7",
+            "main_denomination": "Alianza Frente Nuevo"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-03 23:22:49.796228 +00:00",
+            "modified_at": "2023-09-03 23:22:49.796286 +00:00",
+            "id": 177,
+            "uuid": "37d3be0c-f77f-4ede-9850-033f9c97514a",
+            "main_denomination": "Eco Vamos Corrientes"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-03 23:23:26.917233 +00:00",
+            "modified_at": "2023-09-03 23:23:26.917275 +00:00",
+            "id": 178,
+            "uuid": "44849579-7ea6-4bde-9086-8819b06b7892",
+            "main_denomination": "Alianza Frente Just Chaco Merece M\u00e1s"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-03 23:24:14.449663 +00:00",
+            "modified_at": "2023-09-03 23:24:14.449680 +00:00",
+            "id": 180,
+            "uuid": "f3f5ea02-f579-4f7c-ac06-b98b80864ddf",
+            "main_denomination": "Afirmaci\u00f3n Para Una Rep\u00fablica Igualitaria"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-03 21:52:20.724966 +00:00",
+            "modified_at": "2023-09-03 21:52:20.725017 +00:00",
+            "id": 115,
+            "uuid": "455f2b34-5d3d-4c9a-aebd-02a8e10cfd3e",
+            "main_denomination": "Cambiemos"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-03 22:37:40.699077 +00:00",
+            "modified_at": "2023-09-03 22:37:40.699119 +00:00",
+            "id": 140,
+            "uuid": "44a9b6f0-c9ec-41ab-aa33-dc0aeb1a6ad2",
+            "main_denomination": "Alianza Popular Renovadora Mendoza"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-03 22:24:51.714866 +00:00",
+            "modified_at": "2023-09-03 22:24:51.714903 +00:00",
+            "id": 136,
+            "uuid": "dba03877-2654-48cd-8d94-48fac6f50d4f",
+            "main_denomination": "Alianza Popular Federalista Catamarca"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-21 02:15:46.481621 +00:00",
+            "modified_at": "2023-09-21 02:15:46.481656 +00:00",
+            "id": 184,
+            "uuid": "f87b8f1c-d156-4789-9d4d-f591d3419a76",
+            "main_denomination": "Participaci\u00f3n Ciudadana"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-21 02:31:16.311453 +00:00",
+            "modified_at": "2023-09-21 02:31:16.311481 +00:00",
+            "id": 186,
+            "uuid": "61097101-1471-46f2-b119-e7b3e466696a",
+            "main_denomination": "Frente Popular Bonaerense"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-21 02:34:54.325091 +00:00",
+            "modified_at": "2023-09-21 02:34:54.325129 +00:00",
+            "id": 187,
+            "uuid": "67a6b14d-56eb-4d54-88d6-c12b6dea67ac",
+            "main_denomination": "F.F.J. Azul y Blanco"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-21 02:36:12.324770 +00:00",
+            "modified_at": "2023-09-21 02:36:12.324807 +00:00",
+            "id": 188,
+            "uuid": "c0c2e24f-a843-4826-80c1-e655693a74d7",
+            "main_denomination": "Partido Socialista Popular"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-21 02:40:47.541447 +00:00",
+            "modified_at": "2023-09-21 02:40:47.541496 +00:00",
+            "id": 189,
+            "uuid": "79e7a79d-aa9e-4ea5-b8c5-c75560f9efb3",
+            "main_denomination": "Todos Juntos por San Juan"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-21 02:41:45.459365 +00:00",
+            "modified_at": "2023-09-21 02:41:45.459401 +00:00",
+            "id": 191,
+            "uuid": "f69f050c-b6fb-413c-a84a-4d69f20ec10f",
+            "main_denomination": "Santa Fe Federal"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-21 02:49:30.568321 +00:00",
+            "modified_at": "2023-09-21 02:49:30.568353 +00:00",
+            "id": 193,
+            "uuid": "1b80b925-0c86-4bd6-94f8-720fa2c7ca91",
+            "main_denomination": "PROYECTO BUENOS AIRES FEDERAL"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-21 02:51:58.062158 +00:00",
+            "modified_at": "2023-09-21 02:51:58.062200 +00:00",
+            "id": 194,
+            "uuid": "52f378ec-4dda-4f5a-a43f-53cd4cd399f7",
+            "main_denomination": "CONCERTACI\u00d3N PLURAL"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-21 02:52:42.262046 +00:00",
+            "modified_at": "2023-09-21 02:52:42.262078 +00:00",
+            "id": 195,
+            "uuid": "7bf71b78-3bf6-4daf-81da-e6b59851abf3",
+            "main_denomination": "Solidaridad e Igualdad (SI) - ARI (T.D.F"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-03 22:48:51.331140 +00:00",
+            "modified_at": "2023-09-03 22:48:51.331201 +00:00",
+            "id": 149,
+            "uuid": "bfb9ad2d-fb86-4c71-9a9b-cc2162f9ad0b",
+            "main_denomination": "Movimiento de Integraci\u00f3n y Desarrollo"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-21 02:53:39.844219 +00:00",
+            "modified_at": "2023-09-21 02:53:39.844255 +00:00",
+            "id": 196,
+            "uuid": "d17c5024-a281-4a2d-8ceb-be2796dfafd2",
+            "main_denomination": "Socialista del MIJD"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-21 02:53:46.791668 +00:00",
+            "modified_at": "2023-09-21 02:53:46.791710 +00:00",
+            "id": 197,
+            "uuid": "6ae42d52-bb13-426d-9d13-195c8e53b4ec",
+            "main_denomination": "LEALTAD Y DIGNIDAD JUSTICIALISTA"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-21 02:54:54.286162 +00:00",
+            "modified_at": "2023-09-21 02:54:54.286198 +00:00",
+            "id": 198,
+            "uuid": "e7fa4817-7b1c-418a-a80b-2607f0e1d69f",
+            "main_denomination": "Convergencia"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-21 02:55:15.314443 +00:00",
+            "modified_at": "2023-09-21 02:55:15.314484 +00:00",
+            "id": 199,
+            "uuid": "7de2362b-35cb-4762-a1a6-0297f53d7f71",
+            "main_denomination": "Nuevo Espacio Santafesino"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-21 02:56:09.717450 +00:00",
+            "modified_at": "2023-09-21 02:56:09.717483 +00:00",
+            "id": 200,
+            "uuid": "f6011ab2-35ca-4ef8-bfd9-aa05d59cb4c8",
+            "main_denomination": "Memoria y Democracia"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-21 02:57:35.671557 +00:00",
+            "modified_at": "2023-09-21 02:57:35.671608 +00:00",
+            "id": 201,
+            "uuid": "039c32bb-f415-45e6-a352-91afb3ff4370",
+            "main_denomination": "M.M.T.A."
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-21 02:58:25.611141 +00:00",
+            "modified_at": "2023-09-21 02:58:25.611180 +00:00",
+            "id": 203,
+            "uuid": "3b4bf43c-024e-4fec-ba65-03186d3186ad",
+            "main_denomination": "Partido Blanco"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-21 02:58:47.704271 +00:00",
+            "modified_at": "2023-09-21 02:58:47.704304 +00:00",
+            "id": 204,
+            "uuid": "428de046-973e-4e65-b1d0-3718f0a3e835",
+            "main_denomination": "RADICAL RIONEGRINO"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-03 21:50:38.459311 +00:00",
+            "modified_at": "2023-10-03 21:50:38.459340 +00:00",
+            "id": 205,
+            "uuid": "1df5474b-2a48-4aaf-b2c9-3a996144dd32",
+            "main_denomination": "HAY FUTURO ARGENTINA"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-03 22:01:04.582080 +00:00",
+            "modified_at": "2023-10-03 22:01:04.582123 +00:00",
+            "id": 206,
+            "uuid": "b7c76d66-4937-4d11-b7c5-2921df3a4035",
+            "main_denomination": "Recrear"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-03 22:06:11.166259 +00:00",
+            "modified_at": "2023-10-03 22:06:11.166291 +00:00",
+            "id": 208,
+            "uuid": "c2f0e8c2-5913-4543-8d75-b1b9a834b0f9",
+            "main_denomination": "Part. Prov. San Luis"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-03 22:06:44.338398 +00:00",
+            "modified_at": "2023-10-03 22:06:44.338435 +00:00",
+            "id": 209,
+            "uuid": "ae15baba-ee7c-4871-a332-c7e6bc2d1fc9",
+            "main_denomination": "Izquierda Unida"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-03 22:59:34.151424 +00:00",
+            "modified_at": "2023-10-03 22:59:34.151466 +00:00",
+            "id": 210,
+            "uuid": "31415742-1046-42f0-8fd4-e923951a9fad",
+            "main_denomination": "Propuesta Republicana"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-03 23:10:47.685143 +00:00",
+            "modified_at": "2023-10-03 23:10:47.685176 +00:00",
+            "id": 211,
+            "uuid": "c3e4cc61-02fc-4dd8-a1db-64eec6620cf3",
+            "main_denomination": "FEDERALISMO Y LIBERACI\u00d3N"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-03 23:15:16.748486 +00:00",
+            "modified_at": "2023-10-03 23:15:16.748522 +00:00",
+            "id": 212,
+            "uuid": "64e05e6f-4dd4-4350-8b7e-22fd1bde7127",
+            "main_denomination": "Partido Nuevo Contra la Corrupci\u00f3n"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-03 23:17:37.152623 +00:00",
+            "modified_at": "2023-10-03 23:17:37.152657 +00:00",
+            "id": 213,
+            "uuid": "df746ec5-9941-4df9-91d2-f29bc306f3c2",
+            "main_denomination": "CAMBIO FEDERAL"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-03 23:19:16.182876 +00:00",
+            "modified_at": "2023-10-03 23:19:16.182907 +00:00",
+            "id": 214,
+            "uuid": "0aea63b0-54b9-4306-bc29-b61bb6723321",
+            "main_denomination": "PARES"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-03 23:24:45.488513 +00:00",
+            "modified_at": "2023-10-03 23:24:45.488547 +00:00",
+            "id": 215,
+            "uuid": "d22562f7-e1ae-4bfa-a709-33d6d3605b8f",
+            "main_denomination": "ESPERANZA FEDERAL"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-03 23:25:24.629898 +00:00",
+            "modified_at": "2023-10-03 23:25:24.629953 +00:00",
+            "id": 216,
+            "uuid": "c46144dc-4544-401d-8f24-9183ab16375d",
+            "main_denomination": "VECINALISTA - PARTIDO NUEVO"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-03 23:25:37.966972 +00:00",
+            "modified_at": "2023-10-03 23:25:37.967012 +00:00",
+            "id": 217,
+            "uuid": "377edd49-017e-431c-92d4-d983b4f851a0",
+            "main_denomination": "TUCUMAN"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-03 23:28:28.108614 +00:00",
+            "modified_at": "2023-10-03 23:28:28.108686 +00:00",
+            "id": 218,
+            "uuid": "fa4dc34d-d3ba-4aba-afe9-bb9e591ffcb3",
+            "main_denomination": "Frente Justicia Uni\u00f3n y Libertad"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-21 02:57:50.979669 +00:00",
+            "modified_at": "2023-09-21 02:57:50.979705 +00:00",
+            "id": 202,
+            "uuid": "2f8f3f2a-e123-485c-889c-df358485bfdf",
+            "main_denomination": "Radical Independiente"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-03 23:35:00.914106 +00:00",
+            "modified_at": "2023-10-03 23:35:00.914143 +00:00",
+            "id": 219,
+            "uuid": "1384fd22-6901-46c1-86ec-e5f5599eda94",
+            "main_denomination": "Acci\u00f3n por la Rep\u00fablica"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-03 23:39:59.331215 +00:00",
+            "modified_at": "2023-10-03 23:39:59.331258 +00:00",
+            "id": 221,
+            "uuid": "da84770f-e7f1-4fab-b812-11af91b21f4a",
+            "main_denomination": "Movimiento Independiente"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-03 23:43:16.671599 +00:00",
+            "modified_at": "2023-10-03 23:43:16.671628 +00:00",
+            "id": 222,
+            "uuid": "a7093982-69e3-4570-8841-453b8bc80e02",
+            "main_denomination": "Frente de Unidad Provincial"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-03 23:44:52.454633 +00:00",
+            "modified_at": "2023-10-03 23:44:52.454682 +00:00",
+            "id": 223,
+            "uuid": "d62d0a35-4d67-45ba-ab46-1f3f90de4ba2",
+            "main_denomination": "Nacional Sindical"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-03 23:45:04.193192 +00:00",
+            "modified_at": "2023-10-03 23:45:04.193212 +00:00",
+            "id": 224,
+            "uuid": "f2c427bc-3af6-4c8b-81ad-ad435560510a",
+            "main_denomination": "Vida y Compromiso"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-03 23:45:17.873226 +00:00",
+            "modified_at": "2023-10-03 23:45:17.873260 +00:00",
+            "id": 225,
+            "uuid": "6b340261-00b0-43f6-a8fe-9167d38892bd",
+            "main_denomination": "Movimiento Pampa Sur"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-03 23:45:32.195206 +00:00",
+            "modified_at": "2023-10-03 23:45:32.195234 +00:00",
+            "id": 226,
+            "uuid": "d092f62b-c19a-4681-8cbb-bae9e733babe",
+            "main_denomination": "Proyecto Corrientes"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-03 23:45:43.980972 +00:00",
+            "modified_at": "2023-10-03 23:45:43.981013 +00:00",
+            "id": 227,
+            "uuid": "cb987041-c0fd-4bc0-a7dc-d50bbc4ce3d8",
+            "main_denomination": "Bloque por la Verdad"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-03 23:48:31.285939 +00:00",
+            "modified_at": "2023-10-03 23:48:31.285976 +00:00",
+            "id": 228,
+            "uuid": "318787f1-bfa1-469b-89a1-c356e29ade9c",
+            "main_denomination": "PUNTANO INDEPENDIENTE"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-03 23:48:45.225988 +00:00",
+            "modified_at": "2023-10-03 23:48:45.226036 +00:00",
+            "id": 229,
+            "uuid": "1cea79ac-427d-42c8-85a3-59dbf4b5405e",
+            "main_denomination": "FRENTE C\u00cdVICO JUJE\u00d1O"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-09-04 19:03:10.740000 +00:00",
+            "modified_at": "2023-09-04 19:03:18.247000 +00:00",
+            "id": 183,
+            "uuid": "6a1f5e35-eee5-4558-a472-e1ea2e5b72ae",
+            "main_denomination": "Partido Conservador Popular"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-03 23:54:19.440206 +00:00",
+            "modified_at": "2023-10-03 23:54:19.440236 +00:00",
+            "id": 230,
+            "uuid": "1abf29c4-a1b4-49cb-9e23-02bc3e88df9d",
+            "main_denomination": "Frente Grande"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-03 23:56:27.667024 +00:00",
+            "modified_at": "2023-10-03 23:56:27.667067 +00:00",
+            "id": 231,
+            "uuid": "fe5715ec-585f-4841-9f7a-e67f62955481",
+            "main_denomination": "Primero Tucum\u00e1n"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-03 23:56:55.653817 +00:00",
+            "modified_at": "2023-10-03 23:56:55.653869 +00:00",
+            "id": 232,
+            "uuid": "9d4cfc0c-dc23-42f0-97f1-613eccc88037",
+            "main_denomination": "Frente por los Derechos Ciudadanos"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-03 23:58:31.027138 +00:00",
+            "modified_at": "2023-10-03 23:58:31.027169 +00:00",
+            "id": 233,
+            "uuid": "7bc6fcbb-acaa-4dea-8792-409b5679fa5d",
+            "main_denomination": "Uni\u00f3n por Todos"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-04 00:00:54.183382 +00:00",
+            "modified_at": "2023-10-04 00:00:54.183415 +00:00",
+            "id": 235,
+            "uuid": "da677792-9e45-4c38-8edc-fc3ee92646f6",
+            "main_denomination": "Uni\u00f3n Centro Democr\u00e1tico"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-04 00:01:37.447288 +00:00",
+            "modified_at": "2023-10-04 00:01:37.447315 +00:00",
+            "id": 236,
+            "uuid": "cf37a68c-d8e7-41ce-b2d5-15a855426d1b",
+            "main_denomination": "C\u00f3rdoba Trabajo y Producci\u00f3n"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-04 00:02:05.043826 +00:00",
+            "modified_at": "2023-10-04 00:02:05.043862 +00:00",
+            "id": 237,
+            "uuid": "ef0902fe-5fd2-457b-b5fb-9ed02013ec23",
+            "main_denomination": "Mov. de Bases Independientes"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-04 00:02:47.163641 +00:00",
+            "modified_at": "2023-10-04 00:02:47.163676 +00:00",
+            "id": 238,
+            "uuid": "39001512-4e24-4e11-a5ef-13dae008936c",
+            "main_denomination": "Movimiento por la Dignidad y la Independencia"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-04 00:05:51.515195 +00:00",
+            "modified_at": "2023-10-04 00:05:51.515228 +00:00",
+            "id": 239,
+            "uuid": "bbf6fad1-bd04-4fb1-a736-6fdf3b0b0c46",
+            "main_denomination": "Autodeterminaci\u00f3n y Libertad"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-04 00:06:02.009556 +00:00",
+            "modified_at": "2023-10-04 00:06:02.009591 +00:00",
+            "id": 240,
+            "uuid": "0feb590a-b631-4b53-b498-9364774c9004",
+            "main_denomination": "Santa Fe en Movimiento"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-04 00:07:00.043753 +00:00",
+            "modified_at": "2023-10-04 00:07:00.043800 +00:00",
+            "id": 241,
+            "uuid": "fa89deba-3ce5-47d0-87c6-db53db41d3c0",
+            "main_denomination": "U. Ce. De."
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-04 00:07:42.323712 +00:00",
+            "modified_at": "2023-10-04 00:07:42.323739 +00:00",
+            "id": 242,
+            "uuid": "23762c71-c849-4a87-b692-e32a0830613e",
+            "main_denomination": "Dignidad y Justicia"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-04 00:08:46.264049 +00:00",
+            "modified_at": "2023-10-04 00:08:46.264090 +00:00",
+            "id": 243,
+            "uuid": "23048895-1c2d-4feb-ad0a-a03982cd4e51",
+            "main_denomination": "P.A.I.S."
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-04 00:10:20.201488 +00:00",
+            "modified_at": "2023-10-04 00:10:20.201545 +00:00",
+            "id": 244,
+            "uuid": "5a9221ec-ac2d-47f5-a6a8-34b47d4bf701",
+            "main_denomination": "Compromiso para el Cambio"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-04 00:10:47.799822 +00:00",
+            "modified_at": "2023-10-04 00:10:47.799868 +00:00",
+            "id": 245,
+            "uuid": "21851a7c-1c03-4c1c-b40d-27eb35f68223",
+            "main_denomination": "Polo Social"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-04 00:10:54.907193 +00:00",
+            "modified_at": "2023-10-04 00:10:54.907232 +00:00",
+            "id": 246,
+            "uuid": "3a9f87a5-1291-4e69-a793-1627b4a1489c",
+            "main_denomination": "AL. H. T. E. (Socialista)"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-04 00:12:08.937907 +00:00",
+            "modified_at": "2023-10-04 00:12:08.937939 +00:00",
+            "id": 247,
+            "uuid": "b2c2978a-3b33-48c5-9804-c1deb9bc9e78",
+            "main_denomination": "Uni\u00f3n por Argentina"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-04 00:12:20.821748 +00:00",
+            "modified_at": "2023-10-04 00:12:20.821777 +00:00",
+            "id": 248,
+            "uuid": "833d46db-38d5-4331-ad8a-28fafbdd09b2",
+            "main_denomination": "Buenos Aires"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-04 00:13:27.154530 +00:00",
+            "modified_at": "2023-10-04 00:13:27.154560 +00:00",
+            "id": 249,
+            "uuid": "f21037fc-183b-4dfa-a676-336fb440489a",
+            "main_denomination": "Cruzada Renovadora"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-04 00:18:18.078837 +00:00",
+            "modified_at": "2023-10-04 00:18:18.078869 +00:00",
+            "id": 251,
+            "uuid": "0639ea00-6362-4611-a9a9-bc69aa04242e",
+            "main_denomination": "Nuevo Espacio Entrerriano"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-04 00:19:13.795261 +00:00",
+            "modified_at": "2023-10-04 00:19:13.795295 +00:00",
+            "id": 252,
+            "uuid": "546d936b-9978-4bd4-ab5c-af4bfac64d20",
+            "main_denomination": "Libertad y Democracia"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-04 00:19:26.807330 +00:00",
+            "modified_at": "2023-10-04 00:19:26.807361 +00:00",
+            "id": 253,
+            "uuid": "d602fd52-4706-482a-8c6c-2019956b82f0",
+            "main_denomination": "Participaci\u00f3n y Justicia"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-04 00:19:36.073366 +00:00",
+            "modified_at": "2023-10-04 00:19:36.073395 +00:00",
+            "id": 254,
+            "uuid": "6d21488b-e0ad-4198-baa1-1d80acbd169a",
+            "main_denomination": "Eva Per\u00f3n"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-04 00:19:45.990815 +00:00",
+            "modified_at": "2023-10-04 00:19:45.990851 +00:00",
+            "id": 255,
+            "uuid": "7d5586f9-1558-4c60-abb2-61fb54a01cf7",
+            "main_denomination": "Soberania Popular"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-04 00:20:28.309550 +00:00",
+            "modified_at": "2023-10-04 00:20:28.309582 +00:00",
+            "id": 256,
+            "uuid": "bd5a8812-14b3-46c0-8525-93a715bc35cb",
+            "main_denomination": "Republicano Democr\u00e1tico"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-04 00:20:31.427683 +00:00",
+            "modified_at": "2023-10-04 00:20:31.427713 +00:00",
+            "id": 257,
+            "uuid": "54b179f9-8724-478a-be8f-7e59f0b5b4a9",
+            "main_denomination": "Linea Abierta"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-04 00:21:17.817164 +00:00",
+            "modified_at": "2023-10-04 00:21:17.817186 +00:00",
+            "id": 258,
+            "uuid": "34d2df81-71da-41f5-bdab-7e432770f574",
+            "main_denomination": "Ricardo Balbin"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-04 00:21:19.450009 +00:00",
+            "modified_at": "2023-10-04 00:21:19.450038 +00:00",
+            "id": 259,
+            "uuid": "facde315-69cd-48de-842a-66a28976cb0d",
+            "main_denomination": "F.I.S.CA.L"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-04 00:21:22.976885 +00:00",
+            "modified_at": "2023-10-04 00:21:22.976917 +00:00",
+            "id": 260,
+            "uuid": "ba290263-facd-402f-8d32-bd0dae60e447",
+            "main_denomination": "Movimiento de Renovacion Civica"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-04 00:24:25.097821 +00:00",
+            "modified_at": "2023-10-04 00:24:25.097872 +00:00",
+            "id": 261,
+            "uuid": "fbdec3c5-6807-4ccd-9ea5-989263cb899c",
+            "main_denomination": "Partido Comunista"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-04 00:24:35.391531 +00:00",
+            "modified_at": "2023-10-04 00:24:35.391567 +00:00",
+            "id": 262,
+            "uuid": "014ffd39-b6c5-44fc-912d-4e2e01fa9afd",
+            "main_denomination": "Corriente Grande"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-04 00:24:57.086322 +00:00",
+            "modified_at": "2023-10-04 00:24:57.086363 +00:00",
+            "id": 263,
+            "uuid": "b049df11-9820-4642-b489-0d7ae19cc5aa",
+            "main_denomination": "Desarrollo y Justicia"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-04 00:24:59.160295 +00:00",
+            "modified_at": "2023-10-04 00:24:59.160334 +00:00",
+            "id": 264,
+            "uuid": "82d47da5-9627-45ad-9705-5fecbb1db976",
+            "main_denomination": "MO.RE.CI"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-04 00:25:41.442109 +00:00",
+            "modified_at": "2023-10-04 00:25:41.442139 +00:00",
+            "id": 265,
+            "uuid": "14752ab4-6bd9-4096-b897-6be8db841cad",
+            "main_denomination": "Dem\u00f3crata"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-04 00:31:05.525521 +00:00",
+            "modified_at": "2023-10-04 00:31:05.525553 +00:00",
+            "id": 266,
+            "uuid": "364c3e61-bed5-4a9e-95ae-50f27a772742",
+            "main_denomination": "Partido Federal"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-04 00:31:32.955680 +00:00",
+            "modified_at": "2023-10-04 00:31:32.955772 +00:00",
+            "id": 267,
+            "uuid": "5ed0ff12-dc3c-4307-a4ae-f16604485612",
+            "main_denomination": "Partido Propuesta Salte\u00f1a"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-04 00:31:35.714159 +00:00",
+            "modified_at": "2023-10-04 00:31:35.714182 +00:00",
+            "id": 268,
+            "uuid": "860e8896-9257-4332-a1e7-8b0892df8c91",
+            "main_denomination": "La Argentina de los Valores"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-04 00:31:42.703593 +00:00",
+            "modified_at": "2023-10-04 00:31:42.703617 +00:00",
+            "id": 269,
+            "uuid": "a66ddc32-2163-4d00-a059-cdf1c256e358",
+            "main_denomination": "Bloque Unipersonal"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-04 00:32:49.265154 +00:00",
+            "modified_at": "2023-10-04 00:32:49.265191 +00:00",
+            "id": 271,
+            "uuid": "23430df4-ca90-47c7-b9be-48b893863b83",
+            "main_denomination": "Unidad Bonaerense"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-04 00:33:18.013046 +00:00",
+            "modified_at": "2023-10-04 00:33:18.013121 +00:00",
+            "id": 272,
+            "uuid": "485809f6-ad22-4e73-9fd3-1a383571272b",
+            "main_denomination": "Mov. Social Entrerriano"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-04 00:33:51.739713 +00:00",
+            "modified_at": "2023-10-04 00:33:51.739743 +00:00",
+            "id": 273,
+            "uuid": "a4a261de-110a-483d-92bd-dcaa7bbaa886",
+            "main_denomination": "U.B."
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-04 00:34:07.829266 +00:00",
+            "modified_at": "2023-10-04 00:34:07.829309 +00:00",
+            "id": 274,
+            "uuid": "6bbd1a9c-ac9f-42e4-8299-0276e3cfbc1f",
+            "main_denomination": "Desarrollista"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-04 00:34:37.925394 +00:00",
+            "modified_at": "2023-10-04 00:34:37.925428 +00:00",
+            "id": 275,
+            "uuid": "d0a93210-7aa2-4dde-9db1-4aa9a543725a",
+            "main_denomination": "Movimiento Socialista de los Trabajadores"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-04 00:36:47.739696 +00:00",
+            "modified_at": "2023-10-04 00:36:47.739781 +00:00",
+            "id": 278,
+            "uuid": "0adb4d79-bd9d-43a7-9362-49fbcfffb77f",
+            "main_denomination": "Politica Abierta"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-04 00:36:49.185734 +00:00",
+            "modified_at": "2023-10-04 00:36:49.185776 +00:00",
+            "id": 279,
+            "uuid": "7a48c728-b5c5-4115-8dd3-a22993db1ee1",
+            "main_denomination": "Emancipaci\u00f3n y Justicia"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-04 00:36:50.535589 +00:00",
+            "modified_at": "2023-10-04 00:36:50.535633 +00:00",
+            "id": 280,
+            "uuid": "5d374415-8020-460a-b887-de350a397b29",
+            "main_denomination": "Frente Nueva Dirigencia"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-07 20:16:10.330689 +00:00",
+            "modified_at": "2023-10-07 20:16:10.330719 +00:00",
+            "id": 282,
+            "uuid": "f7c95491-e239-4bc3-b77e-3ae6b33590aa",
+            "main_denomination": "Mediar Argentina"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-07 20:11:23.841217 +00:00",
+            "modified_at": "2023-10-07 20:11:23.841259 +00:00",
+            "id": 281,
+            "uuid": "f0d546bf-3518-4bc4-b70f-880924fd6adb",
+            "main_denomination": "Poder Ejecutivo"
+        },
+        "model": "recoleccion.party"
+    },
+    {
+        "fields": {
+            "created_at": "2023-10-07 20:25:31.237797 +00:00",
+            "modified_at": "2023-10-07 20:25:31.237834 +00:00",
+            "id": 283,
+            "uuid": "89b4824f-3104-4e25-b0d6-d4cf0e669c41",
+            "main_denomination": "Bloque protectora"
+        },
+        "model": "recoleccion.party"
+    }
+]

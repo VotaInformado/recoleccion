@@ -3,6 +3,7 @@ from rest_framework import viewsets, mixins
 from recoleccion.serializers.law_projects import (
     LawProjectListSerializer,
     LawProjectRetrieveSerializer,
+    NeuralNetworkProjectSerializer,
 )
 from recoleccion.serializers.votes import VoteModelSerializer
 
@@ -11,9 +12,7 @@ from recoleccion.models import LawProject
 from recoleccion.utils.enums.project_chambers import ProjectChambers
 
 
-class LawProjectsViewSet(
-    viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin
-):
+class LawProjectsViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
     def get_serializer_class(self):
         if self.action == "list":
             return LawProjectListSerializer
@@ -30,7 +29,7 @@ class LawProjectsViewSet(
     ordering_fields = ["title", "publication_date", "status"]
 
 
-class LawProyectVotesViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
+class LawProjectVotesViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
     serializer_class = VoteModelSerializer
 
     filterset_fields = {
@@ -46,3 +45,11 @@ class LawProyectVotesViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
         law_project_id = self.kwargs["law_project_id"]
         law_project = LawProject.objects.get(id=law_project_id)
         return law_project.votes.all()
+
+
+class NeuralNetworkProjectsViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
+    serializer_class = NeuralNetworkProjectSerializer
+    queryset = LawProject.objects.all().order_by("-id")
+    filterset_fields = {
+        "created_at": ["gte", "lte"],
+    }

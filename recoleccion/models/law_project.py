@@ -160,7 +160,7 @@ class LawProject(BaseModel):
     def authors(self):
         from recoleccion.models import Person
 
-        return Person.objects.filter(authorships__law_project=self)
+        return Person.objects.filter(authorships__project=self)
 
     @classmethod
     def get_project_origin_chamber(cls, project_id: str):

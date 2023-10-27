@@ -52,7 +52,7 @@ class Party(BaseModel):
 
     @property
     def law_projects(self) -> List[LawProject]:
-        project_ids = Authorship.objects.filter(party=self).values_list("law_project", flat=True)
+        project_ids = Authorship.objects.filter(party=self).values_list("project", flat=True)
         project_ids = set(project_ids)
         return [LawProject.objects.get(pk=project_id) for project_id in project_ids if project_id]
 

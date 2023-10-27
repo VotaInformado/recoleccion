@@ -6,8 +6,8 @@ from django.db.models import Q
 
 # Components
 from recoleccion.components.data_sources.law_projects_text_source import (
-    DeputiesLawProyectsText,
-    SenateLawProyectsText,
+    DeputiesLawProjectsText,
+    SenateLawProjectsText,
 )
 from recoleccion.components.writers.law_projects_writer import LawProjectsWriter
 from recoleccion.utils.custom_logger import CustomLogger
@@ -37,7 +37,7 @@ class Command(BaseCommand):
             project = projects_queue.get(timeout=2)
             if project.origin_chamber == ProjectChambers.DEPUTIES:
                 num, source, year = project.deputies_project_id.split("-")
-                text, link = DeputiesLawProyectsText.get_text(num, source, year)
+                text, link = DeputiesLawProjectsText.get_text(num, source, year)
                 data_queue.put((project, text, link))
             elif project.origin_chamber == ProjectChambers.SENATORS:
                 parts = project.senate_project_id.split("-")
@@ -49,11 +49,9 @@ class Command(BaseCommand):
                     year = parts[-1]
                     source = "S"
                 else:
-                    self.logger.error(
-                        f"{this_process} > Invalid project id: {project.senate_project_id}"
-                    )
+                    self.logger.error(f"{this_process} > Invalid project id: {project.senate_project_id}")
                     return False
-                text, link = SenateLawProyectsText.get_text(num, source, year)
+                text, link = SenateLawProjectsText.get_text(num, source, year)
                 # TODO: if text is empty try to get text with deputies Projects source
                 data_queue.put((project, text, link))
         except Empty:
@@ -83,9 +81,7 @@ class Command(BaseCommand):
         self.num_processes = options.get("processes", self.num_processes)
         only_missing = options.get("only_missing", False)
         projects = (
-            LawProject.objects.filter(Q(text=None) | Q(text="")).all()
-            if only_missing
-            else LawProject.objects.all()
+            LawProject.objects.filter(Q(text=None) | Q(text="")).all() if only_missing else LawProject.objects.all()
         )
         self.projects_queue = Queue()
         self.data_queue = Queue()
@@ -134,12 +130,8 @@ class Command(BaseCommand):
             self._stop_threads()
 
     def _stop_threads(self):
-        self.logger.info(
-            f"Projects remaining in workers queue: {self.projects_queue.qsize()}"
-        )
-        self.logger.info(
-            f"Projects remaining in writer queue: {self.data_queue.qsize()}"
-        )
+        self.logger.info(f"Projects remaining in workers queue: {self.projects_queue.qsize()}")
+        self.logger.info(f"Projects remaining in writer queue: {self.data_queue.qsize()}")
         # To avoid the need of flushing the queues
         self.projects_queue.cancel_join_thread()
         self.data_queue.cancel_join_thread()

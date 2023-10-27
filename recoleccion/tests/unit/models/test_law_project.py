@@ -71,7 +71,7 @@ class LawProjectAuthorsTestCase(TestCase):
         for author in authors:
             Authorship.objects.create(
                 person=author,
-                law_project=law_project,
+                project=law_project,
             )
         retrieved_project: LawProject = LawProject.objects.get(pk=law_project.id)
         self.assertEqual(retrieved_project.authors.count(), AUTHORS_AMOUNT)
@@ -95,7 +95,7 @@ class LawProjectAuthorsTestCase(TestCase):
         for project in person_projects:
             Authorship.objects.create(
                 person=person,
-                law_project=project,
+                project=project,
             )
         retrieved_person = Person.objects.get(pk=person.id)
         self.assertEqual(retrieved_person.law_projects.count(), PROJECTS_AMOUNT)

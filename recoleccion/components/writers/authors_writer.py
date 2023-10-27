@@ -65,14 +65,14 @@ class AuthorsWriter(Writer):
 
         if person:
             return Authorship.objects.update_or_create(
-                law_project=project,
+                project=project,
                 person=person,
                 reference=reference,
                 defaults=row.to_dict(),
             )
         else:
             return Authorship.objects.update_or_create(
-                law_project=project,
+                project=project,
                 reference=reference,
                 person_name=row["person_name"],
                 person_last_name=row["person_last_name"],

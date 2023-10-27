@@ -55,13 +55,9 @@ class LawProjectRetrieveSerializer(serializers.ModelSerializer):
         from recoleccion.serializers.authors import LawProjectAuthorsSerializer
 
         if obj.origin_chamber == ProjectChambers.SENATORS:
-            authors = Authorship.objects.filter(
-                law_project=obj, author_type=LegislatorSeats.SENATOR
-            )
+            authors = Authorship.objects.filter(project=obj, author_type=LegislatorSeats.SENATOR)
         else:
-            authors = Authorship.objects.filter(
-                law_project=obj, author_type=LegislatorSeats.DEPUTY
-            )
+            authors = Authorship.objects.filter(project=obj, author_type=LegislatorSeats.DEPUTY)
         return LawProjectAuthorsSerializer(authors, many=True).data
 
 
@@ -69,3 +65,17 @@ class LawProjectBasicInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = LawProject
         fields = ["title", "publication_date", "status"]
+
+
+class NeuralNetworkProjectSerializer(serializers.ModelSerializer):
+    project_year = serializers.SerializerMethodField()
+    project_text = serializers.CharField(source="text", read_only=True)
+    project_title = serializers.CharField(source="title", read_only=True)
+    project_id = serializers.CharField(source="id", read_only=True)
+
+    class Meta:
+        model = LawProject
+        fields = ["project_id", "project_text", "project_title", "project_year"]
+
+    def get_project_year(self, obj: LawProject):
+        return obj.publication_date.year

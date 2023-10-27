@@ -30,3 +30,9 @@ class LawProjectAuthorsSerializer(serializers.ModelSerializer):
     #     data = {**data, **data.pop("person")}
     #     data.pop("person")
     #     return data
+
+
+class NeuralNetworkAuthorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Authorship
+        fields = ["party", "person", "project"]

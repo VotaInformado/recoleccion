@@ -25,13 +25,9 @@ class LawProjectsText(DataSource):
         from multiprocessing import current_process
 
         this_process = current_process().name
-        cls.logger.info(
-            f"{this_process} > Getting text for project: {number}-{source}-{year}"
-        )
+        cls.logger.info(f"{this_process} > Getting text for project: {number}-{source}-{year}")
         text, link = cls._get_text(number, source, year)
-        cls.logger.info(
-            f"{this_process} > GOT text for project: {number}-{source}-{year}"
-        )
+        cls.logger.info(f"{this_process} > GOT text for project: {number}-{source}-{year}")
         return text, link
 
     @classmethod
@@ -39,11 +35,13 @@ class LawProjectsText(DataSource):
         raise NotImplementedError
 
 
-class DeputiesLawProyectsText(LawProjectsText):
+class DeputiesLawProjectsText(LawProjectsText):
     session = requests.Session()
     base_url = "https://www.diputados.gov.ar/proyectos/resultados-buscador.html"
     infobase_url = "https://www.hcdn.gob.ar/folio-cgi-bin/om_isapi.dll?infobase=tp.nfo&softpage=Doc_Frame_Pg42&record=dochitfirst&advquery={exp}"
-    infobase_record_url = "https://www.hcdn.gob.ar/folio-cgi-bin/om_isapi.dll?infobase=tp.nfo&record={record}&softpage=Document42"
+    infobase_record_url = (
+        "https://www.hcdn.gob.ar/folio-cgi-bin/om_isapi.dll?infobase=tp.nfo&record={record}&softpage=Document42"
+    )
     POST_HEADERS = {
         "Referer": "https://www.diputados.gov.ar/proyectos/index.html",
     }
@@ -107,13 +105,9 @@ class DeputiesLawProyectsText(LawProjectsText):
         cls.QUERY_DATA["strNumExpOrig"] = source
         cls.QUERY_DATA["strNumExpAnio"] = year
 
-        response = cls.session.post(
-            cls.base_url, data=cls.QUERY_DATA, headers=cls.POST_HEADERS
-        )
+        response = cls.session.post(cls.base_url, data=cls.QUERY_DATA, headers=cls.POST_HEADERS)
         soup = BeautifulSoup(response.content, "html.parser")
-        link_to_text = soup.find(
-            "a", string=["Texto completo del proyecto", "Ver documento original"]
-        )
+        link_to_text = soup.find("a", string=["Texto completo del proyecto", "Ver documento original"])
         text = ""
         link = ""
         if link_to_text and link_to_text.get("href", "").endswith(".pdf"):
@@ -131,7 +125,7 @@ class DeputiesLawProyectsText(LawProjectsText):
         return text, link
 
 
-class SenateLawProyectsText(LawProjectsText):
+class SenateLawProjectsText(LawProjectsText):
     session = requests.Session()
     domain = "https://www.senado.gob.ar"
     base_url = "https://www.senado.gob.ar/parlamentario/comisiones/verExp/{number}.{year}/{source}/PL"

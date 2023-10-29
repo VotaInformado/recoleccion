@@ -58,48 +58,30 @@ class PartyDetailsSerializer(serializers.ModelSerializer):
         return vote_sessions
 
     def get_total_members(self, obj: Party):
-        from django.db.models import Q
-        from recoleccion.models import Person, DeputySeat, SenateSeat, Vote, Authorship
-
-        # members_query = (
-        #     Q(deputy_seats__party=obj)
-        #     | Q(senate_seats__party=obj)
-        #     | Q(votes__party=obj)
-        #     | Q(authorships__party=obj)
-        # )
-        # count = Person.objects.filter(members_query).distinct().count()
-
-        deputy_seats = (
-            DeputySeat.objects.filter(party=obj).values("person_id").distinct()
-        )
-        senate_seats = (
-            SenateSeat.objects.filter(party=obj).values("person_id").distinct()
-        )
-        votes = Vote.objects.filter(party=obj).values("person_id").distinct()
-        authorships = (
-            Authorship.objects.filter(party=obj).values("person_id").distinct()
-        )
+        deputy_seats = obj.deputy_seats.values("person_id").distinct()
+        senate_seats = obj.senate_seats.values("person_id").distinct()
+        votes = obj.votes.values("person_id").distinct()
+        authorships = obj.authorships.values("person_id").distinct()
         count = deputy_seats.union(senate_seats, votes, authorships).count()
         return count
 
     def get_country_representation(self, obj: Party):
         # Returns how many senate seats and deputy seats correspond to the party
         # grouped by province
-
-        from recoleccion.models import DeputySeat, SenateSeat
         from recoleccion.utils.enums.provinces import Provinces
 
-        # TODO: maybe filter seats by distinct people
-        # members = Person.objects.filter(members_query).distinct()
-
-        senate_seats = SenateSeat.objects.filter(party=obj).values_list("province")
-        deputy_seats = DeputySeat.objects.filter(party=obj).values_list("district")
-        # TODO make sure all provinces are equal
         representation = {province: 0 for province in Provinces.values}
         for province in representation.keys():
+            senate_in_province = obj.deputy_seats.filter(district=province)
+            deputy_in_province = obj.senate_seats.filter(province=province)
+            votes = obj.votes.filter(province=province).values("person_id").distinct()
+            senators = senate_in_province.values("person_id").distinct()
+            deputies = deputy_in_province.values("person_id").distinct()
+
             representation[province] = {
-                "senate_seats": senate_seats.filter(province=province).count(),
-                "deputy_seats": deputy_seats.filter(district=province).count(),
+                "senate_seats": senate_in_province.count(),
+                "deputy_seats": deputy_in_province.count(),
+                "total_members": senators.union(deputies, votes).count(),
                 "province_name": Provinces(province).label,
             }
 

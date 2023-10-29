@@ -14,6 +14,7 @@ from recoleccion.components.utils import capitalize_text, trim_extra_spaces
 from recoleccion.utils.enums.project_chambers import ProjectChambers
 from recoleccion.utils.enums.vote_types import VoteTypes
 from recoleccion.utils.enums.vote_choices import VoteChoices
+from recoleccion.utils.enums.provinces import Provinces
 
 
 class DatasetVotesSource(DataSource):
@@ -153,6 +154,10 @@ class DeputyVotesSource(DataSource):
         name, last_name = cls.get_legislator_name(row_data[1].text.strip())
         party = row_data[2].text.strip()
         province = row_data[3].text.strip()
+        try: 
+            province = Provinces.get_choice(province)
+        except ValueError as e:
+            cls.logger.warning(f"Error while getting province from {province}: {e}")
         vote_text = row_data[4].text.strip()
         vote = VoteChoices.get_choice(vote_text)
         vote_info = {
@@ -484,6 +489,10 @@ class SenateVotesSource(DataSource):
         name, last_name = capitalize_text(name), capitalize_text(last_name)
         party = cells[headers["Bloque"]].get_text()
         province = cells[headers["Provincia"]].get_text()
+        try: 
+            province = Provinces.get_choice(province)
+        except ValueError as e:
+            cls.logger.warning(f"Error while getting province from {province}: {e}")
         try:
             vote = cells[headers["¿Cómo votó?"]].find("span").get_text()
             vote = VoteChoices.get_choice(vote)

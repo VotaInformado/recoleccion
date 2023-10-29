@@ -5,11 +5,12 @@ import pandas as pd
 # Project
 from recoleccion.components.data_sources import DataSource
 from recoleccion.components.utils import clean_text_formatting
+from recoleccion.utils.enums.provinces import Provinces
 
 
 class DeputiesHistory(DataSource):
     url = "https://datos.hcdn.gob.ar:443/dataset/a80e0fa7-d73a-4ed1-9dec-80465e368951/resource/169de2eb-465f-4007-a4c2-39a5ba4c0df3/download/diputados2.1.csv"
-    column_mappings = {    # cambiaron de nombre las columnas se ve
+    column_mappings = {  # cambiaron de nombre las columnas se ve
         "id": "deputy_id",
         "nombre": "name",
         "apellido": "last_name",
@@ -41,6 +42,12 @@ class DeputiesHistory(DataSource):
             data[column] = data[column].map(clean_text_formatting).astype(str)
         for column in ["start_of_term", "end_of_term"]:
             data[column] = pd.to_datetime(data[column]).dt.date
+
+        try:
+            data["district"] = data["district"].map(lambda x: Provinces.get_choice(x))
+        except ValueError as e:
+            cls.logger.warning(f"District not found in {cls.__class__.__name__}: {e}")
+
         return data
 
 
@@ -73,4 +80,9 @@ class CurrentDeputies(DataSource):
         for column in ["start_of_term", "end_of_term"]:
             data[column] = pd.to_datetime(data[column], format="mixed").dt.date
         data["is_active"] = True
+
+        try:
+            data["district"] = data["district"].map(lambda x: Provinces.get_choice(x))
+        except ValueError as e:
+            cls.logger.warning(f"District not found in {cls.__class__.__name__}: {e}")
         return data

@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 # Project
 from recoleccion.components.data_sources import DataSource
 from recoleccion.components.utils import clean_text_formatting
+from recoleccion.utils.enums.provinces import Provinces
 
 
 class SenateHistory(DataSource):
@@ -37,6 +38,11 @@ class SenateHistory(DataSource):
             data[column] = data[column].map(clean_text_formatting).astype(str)
         for column in ["start_of_term", "end_of_term"]:
             data[column] = pd.to_datetime(data[column]).dt.date
+        try:
+            data["province"] = data["province"].map(lambda x: Provinces.get_choice(x))
+        except ValueError as e:
+            cls.logger.warning(f"Province not found in {cls.__class__.__name__}: {e}")
+            
         return data
 
 
@@ -71,4 +77,10 @@ class CurrentSenate(DataSource):
         for column in ["start_of_term", "end_of_term"]:
             data[column] = pd.to_datetime(data[column]).dt.date
         data["is_active"] = True
+
+        try:
+            data["province"] = data["province"].map(lambda x: Provinces.get_choice(x))
+        except ValueError as e:
+            cls.logger.warning(f"Province not found in {cls.__class__.__name__}: {e}")
+
         return data

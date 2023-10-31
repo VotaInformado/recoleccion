@@ -112,9 +112,10 @@ class PartiesViewTestCase(APITestCase):
                 party=self.party,
             )
 
-    def test_retrieving_party_votes(self):
+    def test_retrieving_party_votes_with_limited_results(self):
         TOTAL_PROJECTS_WITH_VOTES = 10
         TOTAL_VOTES = 50
+        MAX_RESULTS = 5
         self.projects = list(LawProject.objects.all())
         self.chosen_project_titles = []
         for i in tqdm(range(TOTAL_PROJECTS_WITH_VOTES)):
@@ -122,9 +123,40 @@ class PartiesViewTestCase(APITestCase):
             self.projects.remove(law_project)
             self.chosen_project_titles.append(law_project.title)
             self.create_party_votes_for_project(law_project, TOTAL_VOTES)
-        url = f"/parties/{self.party.pk}/"
-        response = self.client.get(url)
+        url = f"/parties/{self.party.pk}/votes/"
+        params = {"max_results": MAX_RESULTS}
+        response = self.client.get(url, data=params)
         self.assertEqual(response.status_code, 200)
-        for retrieved_project in response.json()["party_votes"]:
+        law_projects = response.json()
+        self.assertEqual(len(law_projects), MAX_RESULTS)
+        for retrieved_project in law_projects:
             self.assertIn(retrieved_project["project_title"], self.chosen_project_titles)
             self.assertEqual(retrieved_project["total_votes"], TOTAL_VOTES)
+
+    def test_retrieving_party_votes_with_full_results(self):
+        TOTAL_PROJECTS_WITH_VOTES = 20
+        TOTAL_VOTES = 50
+        PAGE_SIZE = 10
+        self.projects = list(LawProject.objects.all())
+        self.chosen_project_titles = []
+        for i in tqdm(range(TOTAL_PROJECTS_WITH_VOTES)):
+            law_project = random.choice(self.projects)
+            self.projects.remove(law_project)
+            self.chosen_project_titles.append(law_project.title)
+            self.create_party_votes_for_project(law_project, TOTAL_VOTES)
+        url = f"/parties/{self.party.pk}/votes/"
+        params = {"page_size": PAGE_SIZE}
+        received_data = []
+        while True:
+            response = self.client.get(url, data=params)
+            self.assertEqual(response.status_code, 200)
+            response_results = response.json()["results"]
+            received_data.extend(response_results)
+            url = response.json()["next"]
+            params = None  # Si no se pisan, se overridean params de la url y queda en un loop infinito
+            if url is None:
+                break
+        self.assertEqual(len(received_data), TOTAL_PROJECTS_WITH_VOTES)
+        for project in received_data:
+            self.assertIn(project["project_title"], self.chosen_project_titles)
+            self.assertEqual(project["total_votes"], TOTAL_VOTES)

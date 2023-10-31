@@ -29,7 +29,6 @@ class PartyDetailsSerializer(serializers.ModelSerializer):
     sub_parties = serializers.SerializerMethodField()
     total_members = serializers.SerializerMethodField()
     country_representation = serializers.SerializerMethodField()
-    party_votes = serializers.SerializerMethodField()
 
     class Meta:
         model = Party
@@ -98,11 +97,8 @@ class PartyDetailsSerializer(serializers.ModelSerializer):
 
         return representation
 
-    def get_party_votes(self, party: Party):
-        party_projects = party.voted_projects
-        votes_per_project = [project.votes.all() for project in party_projects]
-        vote_sessions = [
-            PartyVoteSession(project, vote_list, party) for project, vote_list in zip(party_projects, votes_per_project)
-        ]
-        vote_session_data = PartyVoteSessionSerializer(vote_sessions, many=True).data
-        return vote_session_data
+
+class PartyVotesRequestSerializer(serializers.Serializer):
+    max_results = serializers.IntegerField(
+        required=False, allow_null=True, help_text="Limits the number of projects returned"
+    )

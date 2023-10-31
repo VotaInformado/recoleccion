@@ -61,10 +61,11 @@ class Party(BaseModel):
         project_ids = set(project_ids)
         return [LawProject.objects.get(pk=project_id) for project_id in project_ids if project_id]
 
-    @property
-    def voted_projects(self) -> List[LawProject]:
+    def get_voted_projects(self, max_results: int | None) -> List[LawProject]:
         project_ids = LawProject.objects.filter(votes__party=self).values_list("id", flat=True)
-        project_ids = set(project_ids)
+        project_ids = list(set(project_ids))
+        if max_results:
+            project_ids = project_ids[:max_results]
         return [LawProject.objects.get(pk=project_id) for project_id in project_ids if project_id]
 
     @property

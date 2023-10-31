@@ -8,9 +8,7 @@ from recoleccion.serializers.parties import PartyInfoSerializer, PartyDetailsSer
 from recoleccion.models import Party
 
 
-class PartiesViewSet(
-    viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin
-):
+class PartiesViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
     queryset = Party.objects.all()
 
     ordering_fields = ["main_denomination"]

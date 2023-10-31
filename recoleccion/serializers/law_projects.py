@@ -79,3 +79,7 @@ class NeuralNetworkProjectSerializer(serializers.ModelSerializer):
 
     def get_project_year(self, obj: LawProject):
         return obj.publication_date.year
+
+
+class FittingDataValidationSerializer(serializers.Serializer):
+    last_fetch_date = serializers.DateField()

@@ -1,4 +1,5 @@
 import random
+from tqdm import tqdm
 from django.core.management import call_command
 from django.db import transaction
 from rest_framework.test import APITestCase
@@ -14,10 +15,21 @@ from recoleccion.models import (
     Person,
     SenateSeat,
     Vote,
+    VoteSession,
 )
+from recoleccion.utils.enums.vote_choices import VoteChoices
+from recoleccion.utils.enums.project_chambers import ProjectChambers
 
 
 class PartiesViewTestCase(APITestCase):
+    fixtures = ["law_project.json", "person.json"]
+
+    def setUp(self):
+        self.MAIN_DENOMINATION = "Partido Justicialista"
+        self.ALTERNATIVE_DENOMINATIONS = ["Part. Justicialista", "Justicialismo"]
+        self.SUB_PARTIES = ["Partido Justicialista de Mendoza", "Part. Justicialista - Buenos Aires"]
+        self.party = self.create_party_and_denominations()
+
     def create_party_and_denominations(self):
         party = Party.objects.create(main_denomination=self.MAIN_DENOMINATION)
         for denomination in self.ALTERNATIVE_DENOMINATIONS:
@@ -33,10 +45,6 @@ class PartiesViewTestCase(APITestCase):
         return party
 
     def test_party_list(self):
-        self.MAIN_DENOMINATION = "Partido Justicialista"
-        self.ALTERNATIVE_DENOMINATIONS = ["Part. Justicialista", "Justicialismo"]
-        self.SUB_PARTIES = ["Partido Justicialista de Mendoza", "Part. Justicialista - Buenos Aires"]
-        party = self.create_party_and_denominations()
         URL = "/parties/"
         response = self.client.get(URL)
         self.assertEqual(response.status_code, 200)
@@ -52,24 +60,20 @@ class PartiesViewTestCase(APITestCase):
         self.assertEqual(sorted(response_sub_parties), sorted(self.SUB_PARTIES))
 
     def test_party_retrieval(self):
-        self.MAIN_DENOMINATION = "Partido Justicialista"
-        self.ALTERNATIVE_DENOMINATIONS = ["Part. Justicialista", "Justicialismo"]
-        self.SUB_PARTIES = ["Partido Justicialista de Mendoza", "Part. Justicialista - Buenos Aires"]
-        party = self.create_party_and_denominations()
         deputy = Person.objects.create(name="Juan", last_name="Perez")
         senator = Person.objects.create(name="Pedro", last_name="Gomez")
         voter = Person.objects.create(name="Maria", last_name="Gomez")
         law_project = LawProject.objects.create(title="Some title", origin_chamber="DEPUTIES")
         author = Person.objects.create(name="Roberto", last_name="Suárez")
         deputy_seat = DeputySeat.objects.create(
-            person=deputy, party=party, start_of_term="2020-01-01", end_of_term="2024-01-01"
+            person=deputy, party=self.party, start_of_term="2020-01-01", end_of_term="2024-01-01"
         )
         senate_seat = SenateSeat.objects.create(
-            person=senator, party=party, start_of_term="2020-01-01", end_of_term="2024-01-01"
+            person=senator, party=self.party, start_of_term="2020-01-01", end_of_term="2024-01-01"
         )
-        vote = Vote.objects.create(person=voter, party=party)
-        authorship = Authorship.objects.create(person=author, party=party, project=law_project)
-        URL = f"/parties/{party.pk}/"
+        vote = Vote.objects.create(person=voter, party=self.party)
+        authorship = Authorship.objects.create(person=author, party=self.party, project=law_project)
+        URL = f"/parties/{self.party.pk}/"
         response = self.client.get(URL)
         self.assertEqual(response.status_code, 200)
         response_content = response.json()
@@ -88,3 +92,39 @@ class PartiesViewTestCase(APITestCase):
         # expected_members = [deputy, senator, voter, author]
         # sorted_expected_members = sorted(expected_members, key=lambda x: x.pk)
         # self.assertEqual(response_member_objects, sorted_expected_members)
+
+    def create_party_votes_for_project(self, law_project, total_votes):
+        vote_choices = list(VoteChoices.values)
+        vote_choices.remove("PRESIDENT")
+        chamber = random.choice(ProjectChambers.values)
+        date = "2020-01-01"
+        persons = list(Person.objects.all())
+        for i in range(total_votes):
+            person = random.choice(persons)
+            persons.remove(person)
+            vote_choice = random.choice(vote_choices)
+            Vote.objects.create(
+                chamber=chamber,
+                date=date,
+                person=person,
+                project=law_project,
+                vote=vote_choice,
+                party=self.party,
+            )
+
+    def test_retrieving_party_votes(self):
+        TOTAL_PROJECTS_WITH_VOTES = 10
+        TOTAL_VOTES = 50
+        self.projects = list(LawProject.objects.all())
+        self.chosen_project_titles = []
+        for i in tqdm(range(TOTAL_PROJECTS_WITH_VOTES)):
+            law_project = random.choice(self.projects)
+            self.projects.remove(law_project)
+            self.chosen_project_titles.append(law_project.title)
+            self.create_party_votes_for_project(law_project, TOTAL_VOTES)
+        url = f"/parties/{self.party.pk}/"
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        for retrieved_project in response.json()["party_votes"]:
+            self.assertIn(retrieved_project["project_title"], self.chosen_project_titles)
+            self.assertEqual(retrieved_project["total_votes"], TOTAL_VOTES)

@@ -2,9 +2,10 @@
 from rest_framework import serializers
 
 # Project
-from recoleccion.models import Party
+from recoleccion.models import Party, PartyVoteSession
 from recoleccion.serializers.persons import PersonModelSerializer
 from recoleccion.serializers.law_projects import LawProjectBasicInfoSerializer
+from recoleccion.serializers.vote_sessions import PartyVoteSessionSerializer
 from recoleccion.serializers.votes import BasicVoteInfoSerializer
 
 
@@ -26,11 +27,9 @@ class PartyInfoSerializer(serializers.ModelSerializer):
 class PartyDetailsSerializer(serializers.ModelSerializer):
     alternative_denominations = serializers.SerializerMethodField()
     sub_parties = serializers.SerializerMethodField()
-    # members = serializers.SerializerMethodField()
-    # law_projects = serializers.SerializerMethodField()
-    # votes = serializers.SerializerMethodField()
     total_members = serializers.SerializerMethodField()
     country_representation = serializers.SerializerMethodField()
+    party_votes = serializers.SerializerMethodField()
 
     class Meta:
         model = Party
@@ -69,16 +68,10 @@ class PartyDetailsSerializer(serializers.ModelSerializer):
         # )
         # count = Person.objects.filter(members_query).distinct().count()
 
-        deputy_seats = (
-            DeputySeat.objects.filter(party=obj).values("person_id").distinct()
-        )
-        senate_seats = (
-            SenateSeat.objects.filter(party=obj).values("person_id").distinct()
-        )
+        deputy_seats = DeputySeat.objects.filter(party=obj).values("person_id").distinct()
+        senate_seats = SenateSeat.objects.filter(party=obj).values("person_id").distinct()
         votes = Vote.objects.filter(party=obj).values("person_id").distinct()
-        authorships = (
-            Authorship.objects.filter(party=obj).values("person_id").distinct()
-        )
+        authorships = Authorship.objects.filter(party=obj).values("person_id").distinct()
         count = deputy_seats.union(senate_seats, votes, authorships).count()
         return count
 
@@ -104,3 +97,12 @@ class PartyDetailsSerializer(serializers.ModelSerializer):
             }
 
         return representation
+
+    def get_party_votes(self, party: Party):
+        party_projects = party.voted_projects
+        votes_per_project = [project.votes.all() for project in party_projects]
+        vote_sessions = [
+            PartyVoteSession(project, vote_list, party) for project, vote_list in zip(party_projects, votes_per_project)
+        ]
+        vote_session_data = PartyVoteSessionSerializer(vote_sessions, many=True).data
+        return vote_session_data

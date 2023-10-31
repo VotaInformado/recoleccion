@@ -8,6 +8,6 @@ from .law_project import LawProject
 from .vote import Vote
 from .linking.person_linking import PersonLinking
 from .linking.party_linking import PartyLinking
-from .vote_session import VoteSession
+from .vote_session import PartyVoteSession, VoteSession
 from .authorship import Authorship
 from .party import Party, PartyDenomination, PartyRelationTypes

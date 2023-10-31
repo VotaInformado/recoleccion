@@ -1,6 +1,9 @@
 # Django rest framework
 from rest_framework import viewsets, mixins
 from rest_framework.decorators import action
+
+
+# Project
 from recoleccion.serializers.law_projects import (
     LawProjectListSerializer,
     LawProjectRetrieveSerializer,
@@ -8,9 +11,7 @@ from recoleccion.serializers.law_projects import (
 )
 from recoleccion.serializers.votes import VoteModelSerializer
 
-# Models
-from recoleccion.models import LawProject
-from recoleccion.utils.enums.project_chambers import ProjectChambers
+from recoleccion.models import LawProject, Vote
 
 
 class LawProjectsViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
@@ -43,9 +44,11 @@ class LawProjectVotesViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
     search_fields = ["person__name", "person__last_name", "vote"]
 
     def get_queryset(self):
-        law_project_id = self.kwargs["law_project_id"]
-        law_project = LawProject.objects.get(id=law_project_id)
-        return law_project.votes.all()
+        law_project_id = self.kwargs.get("law_project_id")
+        if law_project_id:
+            law_project = LawProject.objects.get(id=law_project_id)
+            return law_project.votes.all()
+        return Vote.objects.none()  # for swagger only
 
 
 class NeuralNetworkProjectsViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):

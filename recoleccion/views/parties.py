@@ -26,6 +26,8 @@ class PartiesViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.Retr
             return PartyInfoSerializer
         elif self.action == "retrieve":
             return PartyDetailsSerializer
+        elif self.action == "get_party_votes":
+            return PartyVoteSessionSerializer
 
     def _get_party_votes_per_project(self, party: Party, max_results):
         party_projects = party.get_voted_projects(max_results=max_results)
@@ -38,8 +40,8 @@ class PartiesViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.Retr
 
     @swagger_auto_schema(
         methods=["get"],
-        responses=[],
         query_serializer=PartyVotesRequestSerializer,
+        responses=[],
         operation_description="Retrieves the party votes for each law project where the party voted",
     )
     @action(detail=True, methods=["get"], url_path="votes")

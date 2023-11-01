@@ -28,17 +28,20 @@ class PartiesViewTestCase(APITestCase):
         self.MAIN_DENOMINATION = "Partido Justicialista"
         self.ALTERNATIVE_DENOMINATIONS = ["Part. Justicialista", "Justicialismo"]
         self.SUB_PARTIES = ["Partido Justicialista de Mendoza", "Part. Justicialista - Buenos Aires"]
-        self.party = self.create_party_and_denominations()
+        self.party = self.create_party_and_denominations(
+            self.MAIN_DENOMINATION, self.ALTERNATIVE_DENOMINATIONS, self.SUB_PARTIES
+        )
+        self.extra_party = self.create_party_and_denominations("Otro partido")
 
-    def create_party_and_denominations(self):
-        party = Party.objects.create(main_denomination=self.MAIN_DENOMINATION)
-        for denomination in self.ALTERNATIVE_DENOMINATIONS:
+    def create_party_and_denominations(self, party_denomination, alternative_denominations=[], sub_parties=[]):
+        party = Party.objects.create(main_denomination=party_denomination)
+        for denomination in alternative_denominations:
             PartyDenomination.objects.create(
                 party=party,
                 denomination=denomination,
                 relation_type=PartyRelationTypes.ALTERNATIVE_DENOMINATION,
             )
-        for sub_party_name in self.SUB_PARTIES:
+        for sub_party_name in sub_parties:
             PartyDenomination.objects.create(
                 party=party, denomination=sub_party_name, relation_type=PartyRelationTypes.SUB_PARTY
             )
@@ -49,7 +52,7 @@ class PartiesViewTestCase(APITestCase):
         response = self.client.get(URL)
         self.assertEqual(response.status_code, 200)
         response_content = response.json()
-        self.assertEqual(len(response_content), 1)
+        self.assertEqual(len(response_content), 2)  # party and extra_party
         response_party = response_content[0]
         self.assertEqual(response_party["main_denomination"], self.MAIN_DENOMINATION)
         response_alternative_denominations = response_party["alternative_denominations"]
@@ -93,7 +96,7 @@ class PartiesViewTestCase(APITestCase):
         # sorted_expected_members = sorted(expected_members, key=lambda x: x.pk)
         # self.assertEqual(response_member_objects, sorted_expected_members)
 
-    def create_party_votes_for_project(self, law_project, total_votes):
+    def create_party_votes_for_project(self, law_project, total_votes, add_extra_party_votes=True):
         vote_choices = list(VoteChoices.values)
         vote_choices.remove("PRESIDENT")
         chamber = random.choice(ProjectChambers.values)
@@ -111,6 +114,20 @@ class PartiesViewTestCase(APITestCase):
                 vote=vote_choice,
                 party=self.party,
             )
+        if add_extra_party_votes:
+            EXTRA_PARTY_VOTES = 10
+            for i in range(EXTRA_PARTY_VOTES):
+                person = random.choice(persons)
+                persons.remove(person)
+                vote_choice = random.choice(vote_choices)
+                Vote.objects.create(
+                    chamber=chamber,
+                    date=date,
+                    person=person,
+                    project=law_project,
+                    vote=vote_choice,
+                    party=self.extra_party,
+                )
 
     def test_retrieving_party_votes_with_limited_results(self):
         TOTAL_PROJECTS_WITH_VOTES = 10
@@ -162,10 +179,7 @@ class PartiesViewTestCase(APITestCase):
             self.assertEqual(project["total_votes"], TOTAL_VOTES)
 
     def create_new_party(self, party_name: str):
-        self.MAIN_DENOMINATION = party_name
-        self.ALTERNATIVE_DENOMINATIONS = []
-        self.SUB_PARTIES = []
-        return self.create_party_and_denominations()
+        return self.create_party_and_denominations(party_name)
 
     def test_retrieving_party_votes_when_the_party_has_no_votes(self):
         TOTAL_PROJECTS_WITH_VOTES = 20

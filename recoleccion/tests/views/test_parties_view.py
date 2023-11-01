@@ -160,3 +160,36 @@ class PartiesViewTestCase(APITestCase):
         for project in received_data:
             self.assertIn(project["project_title"], self.chosen_project_titles)
             self.assertEqual(project["total_votes"], TOTAL_VOTES)
+
+    def create_new_party(self, party_name: str):
+        self.MAIN_DENOMINATION = party_name
+        self.ALTERNATIVE_DENOMINATIONS = []
+        self.SUB_PARTIES = []
+        return self.create_party_and_denominations()
+
+    def test_retrieving_party_votes_when_the_party_has_no_votes(self):
+        TOTAL_PROJECTS_WITH_VOTES = 20
+        TOTAL_VOTES = 50
+        PAGE_SIZE = 10
+        EXPECTED_PARTY_PROJECTS = 0
+        self.projects = list(LawProject.objects.all())
+        self.chosen_project_titles = []
+        for i in tqdm(range(TOTAL_PROJECTS_WITH_VOTES)):
+            law_project = random.choice(self.projects)
+            self.projects.remove(law_project)
+            self.chosen_project_titles.append(law_project.title)
+            self.create_party_votes_for_project(law_project, TOTAL_VOTES)
+        new_party = self.create_new_party("Nuevo Partido")
+        url = f"/parties/{new_party.pk}/votes/"
+        params = {"page_size": PAGE_SIZE}
+        received_data = []
+        while True:
+            response = self.client.get(url, data=params)
+            self.assertEqual(response.status_code, 200)
+            response_results = response.json()["results"]
+            received_data.extend(response_results)
+            url = response.json()["next"]
+            params = None
+            if url is None:
+                break
+        self.assertEqual(len(received_data), EXPECTED_PARTY_PROJECTS)

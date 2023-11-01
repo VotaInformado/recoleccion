@@ -57,16 +57,13 @@ class Party(BaseModel):
 
     @property
     def law_projects(self) -> List[LawProject]:
-        project_ids = Authorship.objects.filter(party=self).values_list("project", flat=True)
-        project_ids = set(project_ids)
-        return [LawProject.objects.get(pk=project_id) for project_id in project_ids if project_id]
+        project_ids = Authorship.objects.filter(party=self).values_list("project", flat=True).distinct()
+        law_projects = [LawProject.objects.get(pk=project_id) for project_id in project_ids if project_id]
+        return law_projects
 
-    def get_voted_projects(self, max_results: int | None) -> List[LawProject]:
-        project_ids = LawProject.objects.filter(votes__party=self).values_list("id", flat=True)
-        project_ids = list(set(project_ids))
-        if max_results:
-            project_ids = project_ids[:max_results]
-        return [LawProject.objects.get(pk=project_id) for project_id in project_ids if project_id]
+    def get_voted_projects(self) -> List[LawProject]:
+        law_projects = LawProject.objects.filter(votes__party=self).distinct().order_by("-id")
+        return law_projects
 
     @property
     def votes(self) -> List[Vote]:

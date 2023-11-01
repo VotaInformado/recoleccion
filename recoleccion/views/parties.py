@@ -30,7 +30,7 @@ class PartiesViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.Retr
             return PartyVoteSessionSerializer
 
     def _get_party_votes_per_project(self, party: Party, max_results):
-        party_projects = party.get_voted_projects(max_results=max_results)
+        party_projects = party.get_voted_projects()[:max_results]
         votes_per_project = [project.votes.all() for project in party_projects]
         vote_sessions = [
             PartyVoteSession(project, vote_list, party) for project, vote_list in zip(party_projects, votes_per_project)

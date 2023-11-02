@@ -4,7 +4,12 @@ from django.db import models
 
 # Project
 from recoleccion.models.base import BaseModel
-from recoleccion.models import Authorship, DeputySeat, LawProject, Person, SenateSeat, Vote
+from recoleccion.models.authorship import Authorship
+from recoleccion.models.deputy_seat import DeputySeat
+from recoleccion.models.law_project import LawProject
+from recoleccion.models.person import Person
+from recoleccion.models.senate_seat import SenateSeat
+from recoleccion.models.vote import Vote
 
 
 class PartyRelationTypes(models.TextChoices):
@@ -52,13 +57,20 @@ class Party(BaseModel):
 
     @property
     def law_projects(self) -> List[LawProject]:
-        project_ids = Authorship.objects.filter(party=self).values_list("project", flat=True)
-        project_ids = set(project_ids)
-        return [LawProject.objects.get(pk=project_id) for project_id in project_ids if project_id]
+        project_ids = Authorship.objects.filter(party=self).values_list("project", flat=True).distinct()
+        law_projects = [LawProject.objects.get(pk=project_id) for project_id in project_ids if project_id]
+        return law_projects
+
+    def get_voted_projects(self) -> List[LawProject]:
+        law_projects = LawProject.objects.filter(votes__party=self).distinct().order_by("-id")
+        return law_projects
 
     @property
     def votes(self) -> List[Vote]:
         return Vote.objects.filter(party=self)
+
+    def get_project_votes(self, project: LawProject):
+        return Vote.objects.filter(project=project, party=self)
 
 
 class PartyDenomination(BaseModel):

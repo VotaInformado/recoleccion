@@ -2,9 +2,10 @@
 from rest_framework import serializers
 
 # Project
-from recoleccion.models import Party
+from recoleccion.models import Party, PartyVoteSession
 from recoleccion.serializers.persons import PersonModelSerializer
 from recoleccion.serializers.law_projects import LawProjectBasicInfoSerializer
+from recoleccion.serializers.vote_sessions import PartyVoteSessionSerializer
 from recoleccion.serializers.votes import BasicVoteInfoSerializer
 
 
@@ -26,9 +27,6 @@ class PartyInfoSerializer(serializers.ModelSerializer):
 class PartyDetailsSerializer(serializers.ModelSerializer):
     alternative_denominations = serializers.SerializerMethodField()
     sub_parties = serializers.SerializerMethodField()
-    # members = serializers.SerializerMethodField()
-    # law_projects = serializers.SerializerMethodField()
-    # votes = serializers.SerializerMethodField()
     total_members = serializers.SerializerMethodField()
     country_representation = serializers.SerializerMethodField()
 
@@ -86,3 +84,9 @@ class PartyDetailsSerializer(serializers.ModelSerializer):
             }
 
         return representation
+
+
+class PartyVotesRequestSerializer(serializers.Serializer):
+    max_results = serializers.IntegerField(
+        required=False, allow_null=True, help_text="Limits the number of projects returned"
+    )

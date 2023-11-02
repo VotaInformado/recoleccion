@@ -15,11 +15,10 @@ from recoleccion.serializers.legislators import (
 from recoleccion.models.person import Person
 from recoleccion.models.vote import Vote
 from recoleccion.serializers.votes import VoteModelSerializer
+from django_filters.rest_framework import DjangoFilterBackend
 
 
-class LegislatorsViewSet(
-    viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin
-):
+class LegislatorsViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
     def get_serializer_class(self):
         if self.action == "list":
             return LegislatorInfoSerializer
@@ -43,11 +42,7 @@ class LegislatorsViewSet(
 
         person = self.get_object()
         authorships = Authorship.objects.filter(person=person)
-        law_projects = [
-            authorship.law_project
-            for authorship in authorships
-            if authorship.law_project
-        ]
+        law_projects = [authorship.law_project for authorship in authorships if authorship.law_project]
         # TODO: ver esto, qué hacemos con las authorships con referencias en lugar de law_projects
         response = LawProjectBasicInfoSerializer(law_projects, many=True).data
         return Response(response, status=status.HTTP_200_OK)
@@ -67,6 +62,7 @@ class LegislatorVotesViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
     search_fields = ["project__title", "vote"]
 
     def get_queryset(self):
-        legislator_id = self.kwargs["legislator_id"]
-        votes = Vote.objects.filter(person_id=legislator_id)
-        return votes
+        legislator_id = self.kwargs.get("legislator_id")
+        if legislator_id is not None:
+            return Vote.objects.filter(person_id=legislator_id)
+        return Vote.objects.none()  # for swagger only

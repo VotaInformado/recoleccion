@@ -4,9 +4,10 @@ from rest_framework.decorators import action
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.response import Response
-from django.db.models import Q, Count
+from django.db.models import Q, Count, Max
 
 from recoleccion.views.paginator import StandardResultsSetPagination
+
 # Serializers
 from recoleccion.serializers.authors import (
     AuthorshipModelSerializer,
@@ -23,6 +24,7 @@ from recoleccion.models import PartyVoteSession
 
 # Models
 from recoleccion.models import Party, Authorship, LawProject, Person
+from recoleccion.utils.enums.vote_choices import VoteChoices
 
 
 class PartiesViewSet(
@@ -43,11 +45,27 @@ class PartiesViewSet(
 
     def _get_party_votes_per_project(self, party: Party, max_results):
         party_projects = party.get_voted_projects()[:max_results]
-        votes_per_project = [project.votes.all() for project in party_projects]
-        vote_sessions = [
-            PartyVoteSession(project, vote_list, party)
-            for project, vote_list in zip(party_projects, votes_per_project)
-        ]
+        party_projects = party_projects.annotate(
+            total_votes=Count("votes", filter=Q(votes__party=party)),
+            date=Max("votes__date", filter=Q(votes__party=party)),
+            afirmatives=Count(
+                "votes",
+                filter=Q(votes__party=party, votes__vote=VoteChoices.POSITIVE.value),
+            ),
+            negatives=Count(
+                "votes",
+                filter=Q(votes__party=party, votes__vote=VoteChoices.NEGATIVE.value),
+            ),
+            abstentions=Count(
+                "votes",
+                filter=Q(votes__party=party, votes__vote=VoteChoices.ABSTENTION.value),
+            ),
+            absents=Count(
+                "votes",
+                filter=Q(votes__party=party, votes__vote=VoteChoices.ABSENT.value),
+            ),
+        )
+        vote_sessions = [PartyVoteSession(project) for project in party_projects]
         vote_session_data = PartyVoteSessionSerializer(vote_sessions, many=True).data
         return vote_session_data
 

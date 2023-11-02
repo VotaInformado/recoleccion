@@ -16,39 +16,28 @@ class VoteSession:
         date = vote_list[0].date
         self.date = date
         self.votes = vote_list
-        # self.votes_summary = self.get_votes_summary(vote_list)
 
-        self.afirmatives = self.votes.all().filter(vote=VoteChoices.POSITIVE.value).count()
-        self.negatives = self.votes.all().filter(vote=VoteChoices.NEGATIVE.value).count()
-        self.abstentions = self.votes.all().filter(vote=VoteChoices.ABSTENTION.value).count()
+        self.afirmatives = (
+            self.votes.all().filter(vote=VoteChoices.POSITIVE.value).count()
+        )
+        self.negatives = (
+            self.votes.all().filter(vote=VoteChoices.NEGATIVE.value).count()
+        )
+        self.abstentions = (
+            self.votes.all().filter(vote=VoteChoices.ABSTENTION.value).count()
+        )
         self.absents = self.votes.all().filter(vote=VoteChoices.ABSENT.value).count()
 
 
 class PartyVoteSession:
     from recoleccion.models.party import Party
 
-    def __init__(self, law_project: LawProject, vote_list: List[Vote], party: Party = None):
-        date = vote_list[0].date
+    def __init__(self, law_project: LawProject):
         self.project_title = law_project.title
-        self.date = date
-        self.votes = vote_list.filter(party=party)
+        self.date = law_project.date
 
-        self.afirmatives = self.votes.filter(vote=VoteChoices.POSITIVE.value, party=party).count()
-        self.negatives = self.votes.filter(vote=VoteChoices.NEGATIVE.value, party=party).count()
-        self.abstentions = self.votes.filter(vote=VoteChoices.ABSTENTION.value, party=party).count()
-        self.absents = self.votes.filter(vote=VoteChoices.ABSENT.value, party=party).count()
-        self.total_votes = self.votes.count()
-
-    # def get_votes_summary(self, vote_list: List[Vote]):
-    #     vote_choices = VoteChoices.choices
-    #     summary = {}
-    #     for value, label in [
-    #         ("AFIRMATIVO", "afirmatives"),
-    #         ("NEGATIVO", "negatives"),
-    #         ("ABSTENCION", "abstentions"),
-    #         ("AUSENTE", "absents"),
-    #     ]:
-    #         summary[label] = len(
-    #             list(filter(lambda vote: vote.vote == value, vote_list))
-    #         )
-    #     return summary
+        self.afirmatives = law_project.afirmatives
+        self.negatives = law_project.negatives
+        self.abstentions = law_project.abstentions
+        self.absents = law_project.absents
+        self.total_votes = law_project.total_votes

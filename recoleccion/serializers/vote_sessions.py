@@ -13,7 +13,7 @@ class BaseVoteSessionSerializer(serializers.Serializer):
     absents = serializers.IntegerField()
 
 
-class PartyVoteSessionSerializer(serializers.Serializer):
+class PartyVoteSessionSerializer(BaseVoteSessionSerializer):
     project_title = serializers.CharField()
     total_votes = serializers.IntegerField()
 

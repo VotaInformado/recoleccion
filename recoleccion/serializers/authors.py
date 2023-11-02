@@ -3,9 +3,16 @@ from rest_framework import serializers
 
 # Models
 from recoleccion.models import Authorship
+from recoleccion.serializers.parties import PartyInfoSerializer
+from recoleccion.serializers.persons import PersonModelSerializer
+from recoleccion.serializers.law_projects import LawProjectListSerializer
 
 
 class AuthorshipModelSerializer(serializers.ModelSerializer):
+    party = PartyInfoSerializer()
+    person = PersonModelSerializer()
+    project = LawProjectListSerializer()
+
     class Meta:
         model = Authorship
         fields = "__all__"
@@ -36,3 +43,20 @@ class NeuralNetworkAuthorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Authorship
         fields = ["party", "person", "project"]
+
+
+class AuthorsProjectsCountSerializer(serializers.Serializer):
+    """
+    We use Method Fields because currently the serializer is receiving Person object
+    with the authorship_count attribute added by the queryset. Thus, we separate them
+    manually.
+    """
+
+    person = serializers.SerializerMethodField()
+    authorship_count = serializers.SerializerMethodField()
+
+    def get_person(self, obj):
+        return PersonModelSerializer().to_representation(obj)
+
+    def get_authorship_count(self, obj):
+        return obj.authorship_count

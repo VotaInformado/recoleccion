@@ -14,8 +14,16 @@ from recoleccion.views.deputies import DeputiesViewSet
 from recoleccion.views.legislators import LegislatorsViewSet, LegislatorVotesViewSet
 from recoleccion.views.senate import SenateViewSet
 from recoleccion.views.laws import LawsViewSet
-from recoleccion.views.law_projects import LawProjectsViewSet, LawProjectVotesViewSet, NeuralNetworkProjectsViewSet
-from recoleccion.views.parties import PartiesViewSet
+from recoleccion.views.law_projects import (
+    LawProjectsViewSet,
+    LawProjectVotesViewSet,
+    NeuralNetworkProjectsViewSet,
+)
+from recoleccion.views.parties import (
+    PartiesViewSet,
+    PartiesAuthorsProjectsCountViewSet,
+    PartiesLawProjectsViewSet,
+)
 from recoleccion.views.votes import NeuralNetworkVotesViewSet
 from recoleccion.views.authors import NeuralNetworkAuthorsViewSet
 
@@ -53,6 +61,16 @@ router.register(
     basename="legislator-votes",
 )
 router.register(r"parties", PartiesViewSet, basename="parties")
+router.register(
+    r"parties/(?P<party_id>[^/.]+)/authorships",
+    PartiesAuthorsProjectsCountViewSet,
+    basename="party-authorships",
+)
+router.register(
+    r"parties/(?P<party_id>[^/.]+)/law-projects",
+    PartiesLawProjectsViewSet,
+    basename="party-law-projects",
+)
 
 # Neural network data endpoints
 
@@ -60,7 +78,9 @@ network_router = SimpleRouter()
 
 network_router.register(r"votes", NeuralNetworkVotesViewSet, basename="votes")
 network_router.register(r"authors", NeuralNetworkAuthorsViewSet, basename="authors")
-network_router.register(r"law-projects", NeuralNetworkProjectsViewSet, basename="law-projects")
+network_router.register(
+    r"law-projects", NeuralNetworkProjectsViewSet, basename="law-projects"
+)
 
 
 def redirect_to_health(request):
@@ -82,5 +102,7 @@ urlpatterns = [
         schema_view.with_ui("swagger", cache_timeout=0),
         name="schema-swagger-ui",
     ),
-    path("swagger.json", schema_view.without_ui(cache_timeout=0), name="schema-json"),  # To download the swagger.json
+    path(
+        "swagger.json", schema_view.without_ui(cache_timeout=0), name="schema-json"
+    ),  # To download the swagger.json
 ]

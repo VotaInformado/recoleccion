@@ -9,10 +9,15 @@ from recoleccion.serializers.vote_sessions import VoteSessionSerializer
 
 
 class LawProjectListSerializer(serializers.ModelSerializer):
+    year = serializers.SerializerMethodField()
+
     class Meta:
         model = LawProject
         fields = "__all__"
         read_only_fields = ["id"]
+
+    def get_year(self, obj: LawProject):
+        return obj.get_year()
 
 
 class LawProjectRetrieveSerializer(serializers.ModelSerializer):
@@ -55,9 +60,13 @@ class LawProjectRetrieveSerializer(serializers.ModelSerializer):
         from recoleccion.serializers.authors import LawProjectAuthorsSerializer
 
         if obj.origin_chamber == ProjectChambers.SENATORS:
-            authors = Authorship.objects.filter(project=obj, author_type=LegislatorSeats.SENATOR)
+            authors = Authorship.objects.filter(
+                project=obj, author_type=LegislatorSeats.SENATOR
+            )
         else:
-            authors = Authorship.objects.filter(project=obj, author_type=LegislatorSeats.DEPUTY)
+            authors = Authorship.objects.filter(
+                project=obj, author_type=LegislatorSeats.DEPUTY
+            )
         return LawProjectAuthorsSerializer(authors, many=True).data
 
 

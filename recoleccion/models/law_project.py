@@ -49,6 +49,15 @@ class LawProject(BaseModel):
     def project_id(self):
         return self.deputies_project_id or self.senate_project_id
 
+    def get_year(self):
+        year = self.deputies_year or self.senate_year
+        if year is None: return None
+        if year < 1000 and year > 75:
+            return year + 1900
+        elif year < 1000 and year <= 75:
+            return year + 2000
+        return year
+
     @classmethod
     def recognize_format(cls, project_id):
         if re.match(cls.FORMAT_3, project_id):  # FORMAT_3 is the most restrictive

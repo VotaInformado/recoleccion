@@ -43,8 +43,8 @@ class PartiesViewSet(
         elif self.action == "get_party_votes":
             return PartyVoteSessionSerializer
 
-    def _get_party_votes_per_project(self, party: Party, max_results):
-        party_projects = party.get_voted_projects()[:max_results]
+    def _get_party_votes_per_project(self, party: Party):
+        party_projects = party.get_voted_projects()
         party_projects = party_projects.annotate(
             total_votes=Count("votes", filter=Q(votes__party=party)),
             date=Max("votes__date", filter=Q(votes__party=party)),
@@ -64,10 +64,8 @@ class PartiesViewSet(
                 "votes",
                 filter=Q(votes__party=party, votes__vote=VoteChoices.ABSENT.value),
             ),
-        )
-        vote_sessions = [PartyVoteSession(project) for project in party_projects]
-        vote_session_data = PartyVoteSessionSerializer(vote_sessions, many=True).data
-        return vote_session_data
+        ).order_by("-date")
+        return party_projects
 
     @swagger_auto_schema(
         methods=["get"],
@@ -79,12 +77,12 @@ class PartiesViewSet(
     def get_party_votes(self, request, pk=None):
         serializer = PartyVotesRequestSerializer(data=request.query_params)
         serializer.is_valid(raise_exception=True)
-        max_results = serializer.validated_data.get("max_results")
         party: Party = self.get_object()
-        vote_session_data = self._get_party_votes_per_project(party, max_results)
+        vote_session_data = self._get_party_votes_per_project(party)
         page = self.paginate_queryset(vote_session_data)
         if page is None:
-            return Response(vote_session_data, status=status.HTTP_200_OK)
+            serializer = PartyVoteSessionSerializer(vote_session_data, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
 
         paginator = StandardResultsSetPagination()
         paginated_data = paginator.paginate_queryset(vote_session_data, request)

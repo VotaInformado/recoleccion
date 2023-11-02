@@ -27,13 +27,18 @@ class PartiesViewTestCase(APITestCase):
     def setUp(self):
         self.MAIN_DENOMINATION = "Partido Justicialista"
         self.ALTERNATIVE_DENOMINATIONS = ["Part. Justicialista", "Justicialismo"]
-        self.SUB_PARTIES = ["Partido Justicialista de Mendoza", "Part. Justicialista - Buenos Aires"]
+        self.SUB_PARTIES = [
+            "Partido Justicialista de Mendoza",
+            "Part. Justicialista - Buenos Aires",
+        ]
         self.party = self.create_party_and_denominations(
             self.MAIN_DENOMINATION, self.ALTERNATIVE_DENOMINATIONS, self.SUB_PARTIES
         )
         self.extra_party = self.create_party_and_denominations("Otro partido")
 
-    def create_party_and_denominations(self, party_denomination, alternative_denominations=[], sub_parties=[]):
+    def create_party_and_denominations(
+        self, party_denomination, alternative_denominations=[], sub_parties=[]
+    ):
         party = Party.objects.create(main_denomination=party_denomination)
         for denomination in alternative_denominations:
             PartyDenomination.objects.create(
@@ -78,13 +83,21 @@ class PartiesViewTestCase(APITestCase):
         )
         author = Person.objects.create(name="Roberto", last_name="Suárez")
         deputy_seat = DeputySeat.objects.create(
-            person=deputy, party=self.party, start_of_term="2020-01-01", end_of_term="2024-01-01"
+            person=deputy,
+            party=self.party,
+            start_of_term="2020-01-01",
+            end_of_term="2024-01-01",
         )
         senate_seat = SenateSeat.objects.create(
-            person=senator, party=self.party, start_of_term="2020-01-01", end_of_term="2024-01-01"
+            person=senator,
+            party=self.party,
+            start_of_term="2020-01-01",
+            end_of_term="2024-01-01",
         )
         vote = Vote.objects.create(person=voter, party=self.party)
-        authorship = Authorship.objects.create(person=author, party=self.party, project=law_project)
+        authorship = Authorship.objects.create(
+            person=author, party=self.party, project=law_project
+        )
         URL = f"/parties/{self.party.pk}/"
         response = self.client.get(URL)
         self.assertEqual(response.status_code, 200)
@@ -104,8 +117,10 @@ class PartiesViewTestCase(APITestCase):
         self.assertEqual(len(response_sub_parties), len(self.SUB_PARTIES))
         self.assertEqual(sorted(response_sub_parties), sorted(self.SUB_PARTIES))
         self.assertEqual(response_content["total_members"], 4)
-    
-    def create_party_votes_for_project(self, law_project, total_votes, add_extra_party_votes=True):
+
+    def create_party_votes_for_project(
+        self, law_project, total_votes, add_extra_party_votes=True
+    ):
         vote_choices = list(VoteChoices.values)
         vote_choices.remove("PRESIDENT")
         chamber = random.choice(ProjectChambers.values)
@@ -150,13 +165,12 @@ class PartiesViewTestCase(APITestCase):
             self.chosen_project_titles.append(law_project.title)
             self.create_party_votes_for_project(law_project, TOTAL_VOTES)
         url = f"/parties/{self.party.pk}/votes/"
-        params = {"max_results": MAX_RESULTS}
-        response = self.client.get(url, data=params)
+        response = self.client.get(url + f"?page=1&page_size={MAX_RESULTS}")
         self.assertEqual(response.status_code, 200)
-        law_projects = response.json()
+        law_projects = response.json()["results"]
         self.assertEqual(len(law_projects), MAX_RESULTS)
         for retrieved_project in law_projects:
-            self.assertIn(retrieved_project["project_title"], self.chosen_project_titles)
+            self.assertIn(retrieved_project["title"], self.chosen_project_titles)
             self.assertEqual(retrieved_project["total_votes"], TOTAL_VOTES)
 
     def test_retrieving_party_votes_with_full_results(self):
@@ -184,7 +198,7 @@ class PartiesViewTestCase(APITestCase):
                 break
         self.assertEqual(len(received_data), TOTAL_PROJECTS_WITH_VOTES)
         for project in received_data:
-            self.assertIn(project["project_title"], self.chosen_project_titles)
+            self.assertIn(project["title"], self.chosen_project_titles)
             self.assertEqual(project["total_votes"], TOTAL_VOTES)
 
     def create_new_party(self, party_name: str):

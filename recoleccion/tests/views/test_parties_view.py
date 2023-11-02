@@ -19,6 +19,7 @@ from recoleccion.models import (
 )
 from recoleccion.utils.enums.vote_choices import VoteChoices
 from recoleccion.utils.enums.project_chambers import ProjectChambers
+from recoleccion.utils.enums.provinces import Provinces
 
 
 class PartiesViewTestCase(APITestCase):
@@ -230,6 +231,47 @@ class PartiesViewTestCase(APITestCase):
             if url is None:
                 break
         self.assertEqual(len(received_data), EXPECTED_PARTY_PROJECTS)
+
+    def test_get_country_representation(self):
+        party = self.create_new_party("Nuevo Partido")
+        deputy = Person.objects.create(name="Juan", last_name="Perez")
+        DeputySeat.objects.create(
+            person=deputy,
+            party=party,
+            start_of_term="2020-01-01",
+            end_of_term="2024-01-01",
+            district=Provinces.FORMOSA.value,
+        )
+        SenateSeat.objects.create(
+            person=deputy,
+            party=party,
+            start_of_term="2020-01-01",
+            end_of_term="2024-01-01",
+            province=Provinces.CORDOBA.value,
+        )
+        response = self.client.get(f"/parties/{party.pk}/")
+
+        self.assertEqual(response.status_code, 200)
+        response_content = response.json()
+
+        formosa_values = response_content["country_representation"][
+            Provinces.FORMOSA.value
+        ]
+        self.assertEqual(formosa_values["senate_seats"], 0)
+        self.assertEqual(formosa_values["deputy_seats"], 1)
+        self.assertEqual(formosa_values["total_members"], 1)
+        self.assertEqual(formosa_values["province_name"], Provinces.FORMOSA.label)
+        cordoba_values = response_content["country_representation"][
+            Provinces.CORDOBA.value
+        ]
+        self.assertEqual(cordoba_values["senate_seats"], 1)
+        self.assertEqual(cordoba_values["deputy_seats"], 0)
+        la_rioja_values = response_content["country_representation"][
+            Provinces.LA_RIOJA.value
+        ]
+        self.assertEqual(la_rioja_values["senate_seats"], 0)
+        self.assertEqual(la_rioja_values["deputy_seats"], 0)
+        self.assertEqual(la_rioja_values["total_members"], 0)
 
 
 class PartiesAuthorsProjectsCountViewTestCase(APITestCase):

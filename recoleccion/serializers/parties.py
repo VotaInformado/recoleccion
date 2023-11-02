@@ -70,8 +70,8 @@ class PartyDetailsSerializer(serializers.ModelSerializer):
 
         representation = {province: 0 for province in Provinces.values}
         for province in representation.keys():
-            senate_in_province = obj.deputy_seats.filter(district=province)
-            deputy_in_province = obj.senate_seats.filter(province=province)
+            senate_in_province = obj.senate_seats.filter(province=province)
+            deputy_in_province = obj.deputy_seats.filter(district=province)
             votes = obj.votes.filter(province=province).values("person_id").distinct()
             senators = senate_in_province.values("person_id").distinct()
             deputies = deputy_in_province.values("person_id").distinct()
@@ -88,5 +88,7 @@ class PartyDetailsSerializer(serializers.ModelSerializer):
 
 class PartyVotesRequestSerializer(serializers.Serializer):
     max_results = serializers.IntegerField(
-        required=False, allow_null=True, help_text="Limits the number of projects returned"
+        required=False,
+        allow_null=True,
+        help_text="Limits the number of projects returned",
     )

@@ -117,7 +117,7 @@ class PartiesViewTestCase(APITestCase):
         response_sub_parties = response_content["sub_parties"]
         self.assertEqual(len(response_sub_parties), len(self.SUB_PARTIES))
         self.assertEqual(sorted(response_sub_parties), sorted(self.SUB_PARTIES))
-        self.assertEqual(response_content["total_members"], 4)
+        self.assertEqual(response_content["total_legislators"], 4)
 
     def create_party_votes_for_project(
         self, law_project, total_votes, add_extra_party_votes=True

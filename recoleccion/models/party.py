@@ -56,6 +56,14 @@ class Party(BaseModel):
         return [Person.objects.get(pk=member_id) for member_id in members if member_id]
 
     @property
+    def members_ids(self) -> List[int]:
+        deputy_seats = self.deputy_seats.values("person_id").distinct()
+        senate_seats = self.senate_seats.values("person_id").distinct()
+        votes = self.votes.values("person_id").distinct()
+        authorships = self.authorships.values("person_id").distinct()
+        return deputy_seats.union(senate_seats, votes, authorships)
+
+    @property
     def law_projects(self) -> List[LawProject]:
         project_ids = Authorship.objects.filter(party=self).values_list("project", flat=True).distinct()
         law_projects = [LawProject.objects.get(pk=project_id) for project_id in project_ids if project_id]

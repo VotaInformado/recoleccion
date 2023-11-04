@@ -14,6 +14,7 @@ from recoleccion.serializers.authors import (
     AuthorsProjectsCountSerializer,
 )
 from recoleccion.serializers.law_projects import LawProjectListSerializer
+from recoleccion.serializers.legislators import LegislatorDetailsSerializer
 from recoleccion.serializers.parties import (
     PartyInfoSerializer,
     PartyDetailsSerializer,
@@ -105,6 +106,19 @@ class PartiesAuthorsProjectsCountViewSet(
             .order_by("-authorship_count")
         )
         return authorships
+
+class PartiesLegislatorsViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
+    serializer_class = LegislatorDetailsSerializer
+
+    search_fields = ["name", "last_name"]
+    filterset_fields = ["is_active", "last_seat"]
+    ordering_fields = ["name", "last_name", "last_seat", "is_active"]
+
+    def get_queryset(self):
+        party_id = self.kwargs["party_id"]
+        party = Party.objects.get(pk=party_id)
+        members_ids = party.members_ids
+        return Person.objects.filter(id__in=members_ids)
 
 
 class PartiesLawProjectsViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):

@@ -27,7 +27,7 @@ class PartyInfoSerializer(serializers.ModelSerializer):
 class PartyDetailsSerializer(serializers.ModelSerializer):
     alternative_denominations = serializers.SerializerMethodField()
     sub_parties = serializers.SerializerMethodField()
-    total_members = serializers.SerializerMethodField()
+    total_legislators = serializers.SerializerMethodField()
     country_representation = serializers.SerializerMethodField()
 
     class Meta:
@@ -55,13 +55,8 @@ class PartyDetailsSerializer(serializers.ModelSerializer):
         vote_sessions = BasicVoteInfoSerializer(votes, many=True).data
         return vote_sessions
 
-    def get_total_members(self, obj: Party):
-        deputy_seats = obj.deputy_seats.values("person_id").distinct()
-        senate_seats = obj.senate_seats.values("person_id").distinct()
-        votes = obj.votes.values("person_id").distinct()
-        authorships = obj.authorships.values("person_id").distinct()
-        count = deputy_seats.union(senate_seats, votes, authorships).count()
-        return count
+    def get_total_legislators(self, obj: Party):
+        return obj.members_ids.count()
 
     def get_country_representation(self, obj: Party):
         # Returns how many senate seats and deputy seats correspond to the party

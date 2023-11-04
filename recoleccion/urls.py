@@ -23,6 +23,7 @@ from recoleccion.views.parties import (
     PartiesViewSet,
     PartiesAuthorsProjectsCountViewSet,
     PartiesLawProjectsViewSet,
+    PartiesLegislatorsViewSet,
 )
 from recoleccion.views.votes import NeuralNetworkVotesViewSet
 from recoleccion.views.authors import NeuralNetworkAuthorsViewSet
@@ -70,6 +71,11 @@ router.register(
     r"parties/(?P<party_id>[^/.]+)/law-projects",
     PartiesLawProjectsViewSet,
     basename="party-law-projects",
+)
+router.register(
+    r"parties/(?P<party_id>[^/.]+)/legislators",
+    PartiesLegislatorsViewSet,
+    basename="party-legislators",
 )
 
 # Neural network data endpoints

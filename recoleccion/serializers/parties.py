@@ -79,11 +79,3 @@ class PartyDetailsSerializer(serializers.ModelSerializer):
             }
 
         return representation
-
-
-class PartyVotesRequestSerializer(serializers.Serializer):
-    max_results = serializers.IntegerField(
-        required=False,
-        allow_null=True,
-        help_text="Limits the number of projects returned",
-    )

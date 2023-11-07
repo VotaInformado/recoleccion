@@ -24,6 +24,7 @@ from recoleccion.views.parties import (
     PartiesAuthorsProjectsCountViewSet,
     PartiesLawProjectsViewSet,
     PartiesLegislatorsViewSet,
+    PartiesLawProjectVotesViewSet
 )
 from recoleccion.views.votes import NeuralNetworkVotesViewSet
 from recoleccion.views.authors import NeuralNetworkAuthorsViewSet
@@ -75,6 +76,11 @@ router.register(
 router.register(
     r"parties/(?P<party_id>[^/.]+)/legislators",
     PartiesLegislatorsViewSet,
+    basename="party-legislators",
+)
+router.register(
+    r"parties/(?P<party_id>[^/.]+)/votes",
+    PartiesLawProjectVotesViewSet,
     basename="party-legislators",
 )
 

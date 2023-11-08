@@ -109,7 +109,15 @@ class PartiesLegislatorsViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
 class PartiesLawProjectsViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
     serializer_class = LawProjectListSerializer
 
-    # ordering_fields = [""]
+    search_fields = ["title"]
+    ordering_fields = ["title", "publication_date", "status"]
+    ordering = ["-publication_date"]
+    filterset_fields = {
+        "origin_chamber": ["exact"],
+        "status": ["in"],
+        "publication_date": ["gte", "lte"],
+    }
+
 
     def get_queryset(self):
         party_id = self.kwargs["party_id"]

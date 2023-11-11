@@ -16,8 +16,12 @@ class LawProjectsText(DataSource):
     def _get_pdf_text(cls, url):
         # cls.logger.info(f"Getting text from pdf: {url}")
         response = cls.session.get(url, stream=True)
-        stream = BytesIO(response.content)
-        pdf = Pdf(stream)
+        try:
+            stream = BytesIO(response.content)
+            pdf = Pdf(stream)
+        except Exception as e:
+            cls.logger.error(f"Error while getting pdf from url {url}: {e}")
+            return ""
         return pdf.get_text_and_close()
 
     @classmethod
@@ -25,9 +29,13 @@ class LawProjectsText(DataSource):
         from multiprocessing import current_process
 
         this_process = current_process().name
-        cls.logger.info(f"{this_process} > Getting text for project: {number}-{source}-{year}")
+        cls.logger.info(
+            f"{this_process} > Getting text for project: {number}-{source}-{year}"
+        )
         text, link = cls._get_text(number, source, year)
-        cls.logger.info(f"{this_process} > GOT text for project: {number}-{source}-{year}")
+        cls.logger.info(
+            f"{this_process} > GOT text for project: {number}-{source}-{year}"
+        )
         return text, link
 
     @classmethod
@@ -39,9 +47,7 @@ class DeputiesLawProjectsText(LawProjectsText):
     session = requests.Session()
     base_url = "https://www.diputados.gov.ar/proyectos/resultados-buscador.html"
     infobase_url = "https://www.hcdn.gob.ar/folio-cgi-bin/om_isapi.dll?infobase=tp.nfo&softpage=Doc_Frame_Pg42&record=dochitfirst&advquery={exp}"
-    infobase_record_url = (
-        "https://www.hcdn.gob.ar/folio-cgi-bin/om_isapi.dll?infobase=tp.nfo&record={record}&softpage=Document42"
-    )
+    infobase_record_url = "https://www.hcdn.gob.ar/folio-cgi-bin/om_isapi.dll?infobase=tp.nfo&record={record}&softpage=Document42"
     POST_HEADERS = {
         "Referer": "https://www.diputados.gov.ar/proyectos/index.html",
     }
@@ -105,9 +111,13 @@ class DeputiesLawProjectsText(LawProjectsText):
         cls.QUERY_DATA["strNumExpOrig"] = source
         cls.QUERY_DATA["strNumExpAnio"] = year
 
-        response = cls.session.post(cls.base_url, data=cls.QUERY_DATA, headers=cls.POST_HEADERS)
+        response = cls.session.post(
+            cls.base_url, data=cls.QUERY_DATA, headers=cls.POST_HEADERS
+        )
         soup = BeautifulSoup(response.content, "html.parser")
-        link_to_text = soup.find("a", string=["Texto completo del proyecto", "Ver documento original"])
+        link_to_text = soup.find(
+            "a", string=["Texto completo del proyecto", "Ver documento original"]
+        )
         text = ""
         link = ""
         if link_to_text and link_to_text.get("href", "").endswith(".pdf"):
@@ -137,6 +147,8 @@ class SenateLawProjectsText(LawProjectsText):
     @classmethod
     def _get_final_text(cls, soup):
         final_text_container = soup.find("div", {"id": "textoDefinitivo"})
+        if not final_text_container:
+            return ""
         link = final_text_container.find("a")
         if link and link["href"]:
             link = cls.full_path(link["href"])
@@ -155,6 +167,8 @@ class SenateLawProjectsText(LawProjectsText):
     @classmethod
     def _get_initial_text(cls, page):
         initial_text_container = page.find("div", {"id": "textoOriginal"})
+        if not initial_text_container:
+            return ""
         link = initial_text_container.find("a")
         if link and link["href"]:
             link = cls.full_path(link["href"])

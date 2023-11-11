@@ -35,11 +35,14 @@ class Command(BaseCommand):
         this_process = current_process().name
         try:
             project = projects_queue.get(timeout=2)
-            if project.origin_chamber == ProjectChambers.DEPUTIES:
+            if project.origin_chamber == ProjectChambers.DEPUTIES and project.deputies_project_id:
                 num, source, year = project.deputies_project_id.split("-")
                 text, link = DeputiesLawProjectsText.get_text(num, source, year)
                 data_queue.put((project, text, link))
-            elif project.origin_chamber == ProjectChambers.SENATORS:
+            elif (
+                project.origin_chamber == ProjectChambers.SENATORS
+                and project.senate_project_id
+            ):
                 parts = project.senate_project_id.split("-")
                 # Ugly FIX: some projects have a wrong format TODO: fix
                 if len(parts) == 3:
@@ -49,11 +52,18 @@ class Command(BaseCommand):
                     year = parts[-1]
                     source = "S"
                 else:
-                    self.logger.error(f"{this_process} > Invalid project id: {project.senate_project_id}")
+                    self.logger.error(
+                        f"{this_process} > Invalid project id: {project.senate_project_id}"
+                    )
                     return False
                 text, link = SenateLawProjectsText.get_text(num, source, year)
                 # TODO: if text is empty try to get text with deputies Projects source
                 data_queue.put((project, text, link))
+            else:
+                self.logger.error(
+                    f"{this_process} > Could not handle project with id: {project.id}"
+                )
+                return False
         except Empty:
             self.logger.info(f"{this_process} > Projects queue empty")
             return True
@@ -81,7 +91,9 @@ class Command(BaseCommand):
         self.num_processes = options.get("processes", self.num_processes)
         only_missing = options.get("only_missing", False)
         projects = (
-            LawProject.objects.filter(Q(text=None) | Q(text="")).all() if only_missing else LawProject.objects.all()
+            LawProject.objects.filter(Q(text=None) | Q(text="")).all()
+            if only_missing
+            else LawProject.objects.all()
         )
         self.projects_queue = Queue()
         self.data_queue = Queue()
@@ -121,6 +133,9 @@ class Command(BaseCommand):
                 )
                 sleep(1)
             self.writer.stop_and_join()
+            self.logger.info("Writer stopped")
+            self.logger.info("Killing missing processes and queues...")
+            self._stop_threads()
             self.logger.info("All processes stopped")
         except KeyboardInterrupt:
             self.logger.warning("Keyboard interrupt received. Stopping threads...")
@@ -130,8 +145,12 @@ class Command(BaseCommand):
             self._stop_threads()
 
     def _stop_threads(self):
-        self.logger.info(f"Projects remaining in workers queue: {self.projects_queue.qsize()}")
-        self.logger.info(f"Projects remaining in writer queue: {self.data_queue.qsize()}")
+        self.logger.info(
+            f"Projects remaining in workers queue: {self.projects_queue.qsize()}"
+        )
+        self.logger.info(
+            f"Projects remaining in writer queue: {self.data_queue.qsize()}"
+        )
         # To avoid the need of flushing the queues
         self.projects_queue.cancel_join_thread()
         self.data_queue.cancel_join_thread()

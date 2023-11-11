@@ -52,6 +52,7 @@ class StoppableProcess(Process):
                 self.logger.error(
                     f"{this_process} > BaseException: {repr(e), traceback.print_exc()}"
                 )
+            self.stop()
             self.logger.warning(f"{this_process} > Stopped")
 
         return wrapper

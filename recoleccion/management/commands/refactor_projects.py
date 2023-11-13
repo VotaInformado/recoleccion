@@ -46,6 +46,7 @@ class Command(BaseCommand):
         if len(comps) == 2:
             num, year = comps
         project.senate_number = int(num)
+        # TODO: SET SOURCE TO project.origin_chamer? or have that in mind?
         project.senate_source = source.upper() if source else None
         project.senate_year = int(year)
         project.senate_project_id = project_id

@@ -6,6 +6,7 @@ import requests
 import pandas as pd
 import datetime as dt
 from bs4 import BeautifulSoup
+from dateutil.parser import parse, ParserError
 
 # Project
 from recoleccion.components.utils import digitize_text
@@ -70,7 +71,9 @@ class HCDNLawProjects(DataSource):
     def get_raw_data(cls) -> pd.DataFrame:
         base_data = cls.get_projects_base_data()
         extra_data = cls.get_projects_extra_data()
-        return base_data.merge(extra_data, left_on="proyecto_id", right_on="expediente_id", how="left")
+        return base_data.merge(
+            extra_data, left_on="proyecto_id", right_on="expediente_id", how="left"
+        )
 
     @classmethod
     def clean_project_ids(cls, data: pd.DataFrame) -> pd.DataFrame:
@@ -129,7 +132,9 @@ class ExternalLawProjectsSource(DataSource):
                     projects_info.append(project_info)
                 added_projects += 1
             except Exception as e:
-                cls.logger.warning(f"An error occurred at item {i} while extracting project info: {e}")
+                cls.logger.warning(
+                    f"An error occurred at item {i} while extracting project info: {e}"
+                )
                 continue
 
         return added_projects
@@ -224,7 +229,9 @@ class ExternalLawProjectsSource(DataSource):
     def get_data(cls, starting_page: int, step_size: int, projects_info=list) -> int:
         # gets data of 10
         ending_page = starting_page + step_size
-        cls.logger.info(f"Retrieving data from page {starting_page} to {ending_page}...")
+        cls.logger.info(
+            f"Retrieving data from page {starting_page} to {ending_page}..."
+        )
         projects_info = []
         total_added = 0
         for i in range(starting_page, ending_page):
@@ -293,7 +300,9 @@ class DeputyLawProjectsSource(DataSource):
         if page_number == 1:
             url = cls.base_url
             cls.logger.info(f"Sending POST request to {url}...")
-            response = cls.session.post(url, data=cls.QUERY_DATA, headers=cls.POST_HEADERS)
+            response = cls.session.post(
+                url, data=cls.QUERY_DATA, headers=cls.POST_HEADERS
+            )
         else:
             url = f"{cls.base_url}?pagina={page_number}"
             cls.logger.info(f"Sending GET request to {url}...")
@@ -328,20 +337,26 @@ class DeputyLawProjectsSource(DataSource):
         return date.strftime("%Y-%m-%d")
 
     @classmethod
-    def get_data(cls, starting_page: int, first_time: bool, step_size: int, projects_info=list) -> int:
+    def get_data(
+        cls, starting_page: int, first_time: bool, step_size: int, projects_info=list
+    ) -> int:
         ending_page = starting_page + step_size
         cls.logger.info(f"Retrieving data from page {starting_page}...")
         projects_info = []
         total_added = 0
         for i in range(starting_page, ending_page):
-            added = cls.retrieve_items(page=i, first_time=first_time, projects_info=projects_info)
+            added = cls.retrieve_items(
+                page=i, first_time=first_time, projects_info=projects_info
+            )
             total_added += added
             if not added:
                 break
         data = pd.DataFrame(projects_info)
         data = cls.get_and_rename_relevant_columns(data)
         if "publication_date" not in data.columns:
-            cls.logger.warning(f"No data retrieved from page {starting_page}, re-trying...")
+            cls.logger.warning(
+                f"No data retrieved from page {starting_page}, re-trying..."
+            )
             # especial, para marcar un problema con la request, reintentar
             return -1, -1
         data["publication_date"] = data["publication_date"].apply(cls.fix_date_format)
@@ -355,7 +370,11 @@ class SenateLawProjectsSource(DataSource):
         self.session = requests.Session()
         self.threading = threading
         self.logger = CustomLogger(threading=threading)
+        self.deputies_exp = re.compile(self.DEPUTIES_PROJECT_ID_PATTERN)
+        self.date_exp = re.compile(self.DATE_PATTERN)
 
+    DEPUTIES_PROJECT_ID_PATTERN = r"(\d{1,4}-[A-Z,a-z]{1,3}-\d{1,4})"
+    DATE_PATTERN = r"\b\d{2}-\d{2}-\d{4}\b"
     ROWS_PER_PAGE = 100
     BASE_URL = "https://www.senado.gob.ar/parlamentario/parlamentaria/avanzada"
     POST_HEADERS = {
@@ -394,13 +413,20 @@ class SenateLawProjectsSource(DataSource):
     def get_origin_chamber(self, raw_chamber: str):
         chambers_info = {
             "S": ProjectChambers.SENATORS,
+            "Senado De La Nación": ProjectChambers.SENATORS,
+            "Poder Ejecutivo Nacional": ProjectChambers.SENATORS,
+            "PE": ProjectChambers.SENATORS,
             "D": ProjectChambers.DEPUTIES,
             "CD": ProjectChambers.DEPUTIES,
+            "Cámara De Diputados": ProjectChambers.DEPUTIES,
         }
         return chambers_info.get(raw_chamber, None)
 
-    def get_project_info(self, project_id: str, origin_chamber: str, title: str):
-        origin_chamber = self.get_origin_chamber(origin_chamber)
+    def get_project_info(self, project_id: str, source: str, title: str):
+        origin_chamber = self.get_origin_chamber(source)
+        if len(source) <= 3:
+            project_number, project_year = project_id.split("/")
+            project_id = f"{project_number}/{source}/{project_year}"
         project_info = {
             "senate_project_id": project_id,
             "origin_chamber": origin_chamber,
@@ -408,24 +434,41 @@ class SenateLawProjectsSource(DataSource):
         }
         return project_info
 
-    def get_publication_date(self, raw_link: str):
-        link = raw_link.find("a")["href"]
-        url = f"https://www.senado.gob.ar{link}"
-        response = self.session.get(url)
-        raw_content = response.content.decode("utf-8")
-        date_pattern = r"\b\d{2}-\d{2}-\d{4}\b"
-        matches = re.finditer(date_pattern, raw_content)
+    def get_publication_date(self, page_content):
+        raw_content = page_content.decode("utf-8")
+        matches = self.date_exp.finditer(raw_content)
         if not matches:
             return None
         matched_dates = [match.group() for match in matches]
         dates = [self.fix_date_format(date) for date in matched_dates]
-        min_date = min(dates)
+        # remove dates before the year 1800 (to remove bad matches)
+        filtered_dates = [date for date in dates if int(date.split("-")[0]) >= 1800]
+        min_date = min(filtered_dates)
         return min_date
+
+    def get_deputies_project_id(self, page_content):
+        soup = BeautifulSoup(page_content, "html.parser")
+        project_id_element = soup.find("div", {"id": "etapaDiputado"})
+        if not project_id_element:
+            return None
+        match = self.deputies_exp.findall(project_id_element.get_text())
+        deputies_project_id = match[0] if match else None
+        return deputies_project_id
+
+    def get_details_of_project(self, link: str):
+        url = f"https://www.senado.gob.ar{link}"
+        response = self.session.get(url)
+        content = response.content
+        publication_date = self.get_publication_date(content)
+        deputies_project_id = self.get_deputies_project_id(content)
+        return publication_date, deputies_project_id
 
     def send_base_request(self, year: int):
         url = self.BASE_URL
         self.logger.info(f"Sending base POST request to {url}...")
-        response = self.session.post(url, data=self.get_payload(year), headers=self.POST_HEADERS)
+        response = self.session.post(
+            url, data=self.get_payload(year), headers=self.POST_HEADERS
+        )
         return response
 
     def send_page_request(self, page_number):
@@ -446,12 +489,27 @@ class SenateLawProjectsSource(DataSource):
         for i, row in enumerate(table_rows[1:]):
             cells = row.find_all("td")
             cell_texts = [cell.text.strip() for cell in cells]
-            project_id, project_type, origin_chamber, title = cell_texts
+            project_id, project_type, source, title = cell_texts
             self.logger.info(f"Extracting info from project: {project_id}")
-            publication_date = self.get_publication_date(cells[0])
-            project_info = self.get_project_info(project_id, origin_chamber, title)
-            project_info["publication_date"] = publication_date
-            page_info.append(project_info)
+            try:
+                link = cells[0].find("a")["href"]
+                publication_date = None
+                deputies_project_id = None
+                if link:
+                    source = link.split("/")[-2]
+                    publication_date, deputies_project_id = self.get_details_of_project(
+                        link
+                    )
+
+                project_info = self.get_project_info(project_id, source, title)
+                project_info["publication_date"] = publication_date
+                project_info["deputies_project_id"] = deputies_project_id
+                page_info.append(project_info)
+            except BaseException as e:
+                self.logger.error(
+                    f"An error occurred at project {i} while extracting project info: {e}"
+                )
+                continue
         return page_info
 
     def get_year_info(self, year: int):
@@ -469,14 +527,16 @@ class SenateLawProjectsSource(DataSource):
         return year_info
 
     def fix_date_format(self, date: str):
-        initial_format = "%d-%m-%Y"
         final_format = "%Y-%m-%d"
-        return dt.datetime.strptime(date, initial_format).strftime(final_format)
+        try:
+            return parse(date, dayfirst=True).strftime(final_format)
+        except ParserError:
+            initial_format = "%d-%m-%Y"
+            return dt.datetime.strptime(date, initial_format).strftime(final_format)
 
     def get_data(self, year: int):
         projects_info = self.get_year_info(year)
         data = pd.DataFrame(projects_info)
         data["source"] = "Senadores (web)"
-        data["origin_chamber"] = ProjectChambers.SENATORS
         self.logger.info(f"Retrieved {len(data)} projects")
         return data

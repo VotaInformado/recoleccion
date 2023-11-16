@@ -13,3 +13,11 @@ class PersonModelSerializer(serializers.ModelSerializer):
         model = Person
         fields = "__all__"
         read_only_fields = ["id"]
+
+
+class ReducedPersonSerializer(serializers.ModelSerializer):
+    # Used for neural network prediction only, we just need the id
+
+    class Meta:
+        model = Person
+        fields = ["id"]

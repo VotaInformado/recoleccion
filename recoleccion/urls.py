@@ -12,6 +12,7 @@ from rest_framework import permissions
 from recoleccion.views import PersonViewSet
 from recoleccion.views.deputies import DeputiesViewSet
 from recoleccion.views.legislators import LegislatorsViewSet, LegislatorVotesViewSet
+from recoleccion.views.prediction import PredictionViewSet
 from recoleccion.views.senate import SenateViewSet
 from recoleccion.views.laws import LawsViewSet
 from recoleccion.views.law_projects import (
@@ -93,6 +94,7 @@ network_router.register(r"authors", NeuralNetworkAuthorsViewSet, basename="autho
 network_router.register(
     r"law-projects", NeuralNetworkProjectsViewSet, basename="law-projects"
 )
+network_router.register(r"", PredictionViewSet, basename="predictions")
 
 
 def redirect_to_health(request):

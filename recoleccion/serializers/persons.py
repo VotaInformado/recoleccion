@@ -15,9 +15,8 @@ class PersonModelSerializer(serializers.ModelSerializer):
         read_only_fields = ["id"]
 
 
-class ReducedPersonSerializer(serializers.ModelSerializer):
-    # Used for neural network prediction only, we just need the id
+class ReducedPersonSerializer(serializers.Serializer):
+    person = serializers.SerializerMethodField()
 
-    class Meta:
-        model = Person
-        fields = ["id"]
+    def get_person(self, obj: Person):
+        return obj.id

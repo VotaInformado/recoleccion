@@ -426,7 +426,7 @@ class SenateLawProjectsSource(DataSource):
         origin_chamber = self.get_origin_chamber(source)
         if len(source) <= 3:
             project_number, project_year = project_id.split("/")
-            project_id = f"{project_number}/{source}/{project_year}"
+            project_id = f"{int(project_number)}/{source}/{int(project_year)}"
         project_info = {
             "senate_project_id": project_id,
             "origin_chamber": origin_chamber,

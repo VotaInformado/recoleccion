@@ -36,7 +36,11 @@ class Command(BaseCommand):
         try:
             project = projects_queue.get(timeout=2)
             if project.origin_chamber == ProjectChambers.DEPUTIES and project.deputies_project_id:
-                num, source, year = project.deputies_project_id.split("-")
+                try:
+                    num, source, year = project.deputies_project_id.split("-")
+                except ValueError:
+                    num, year = project.deputies_project_id.split("-")
+                    source = "D"
                 text, link = DeputiesLawProjectsText.get_text(num, source, year)
                 data_queue.put((project, text, link))
             elif (

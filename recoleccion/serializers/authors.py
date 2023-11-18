@@ -60,3 +60,10 @@ class AuthorsProjectsCountSerializer(serializers.Serializer):
 
     def get_authorship_count(self, obj):
         return obj.authorship_count
+
+
+class ReducedAuthorSerializer(serializers.ModelSerializer):
+    # Used for prediction only, we just need the party
+    class Meta:
+        model = Authorship
+        fields = ["party"]

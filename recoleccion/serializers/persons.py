@@ -13,3 +13,10 @@ class PersonModelSerializer(serializers.ModelSerializer):
         model = Person
         fields = "__all__"
         read_only_fields = ["id"]
+
+
+class ReducedPersonSerializer(serializers.Serializer):
+    person = serializers.SerializerMethodField()
+
+    def get_person(self, obj: Person):
+        return obj.id

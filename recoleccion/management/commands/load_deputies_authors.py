@@ -25,7 +25,11 @@ class Command(BaseCommand):
         page = options["starting_page"]
         threads = []
         for i in range(self.THREAD_AMOUNT):
-            thread = threading.Thread(name=f"Thread {i+1}", target=self.main_function, args=(page, self.THREAD_AMOUNT))
+            thread = threading.Thread(
+                name=f"Thread {i+1}",
+                target=self.main_function,
+                args=(page, self.THREAD_AMOUNT),
+            )
             threads.append(thread)
             thread.start()
             page += 1
@@ -36,9 +40,13 @@ class Command(BaseCommand):
     def main_function(self, page: int, step_size: int):
         source = DeputiesAuthorsSource()
         while True:
-            data = source.get_data(page)
-            if data.empty:
-                return
+            attempts = 0
+            while attempts < 5:
+                data = source.get_data(page)
+                if data.empty:
+                    break
+                attempts += 1
+                self.logger.warning(f"Empty data for page {page}. Attempt {attempts}")
             linker = PersonLinker()
             linked_data = linker.link_persons(data)
             AuthorsWriter.write(linked_data)

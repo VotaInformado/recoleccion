@@ -247,12 +247,12 @@ class ExternalLawProjectsSource(DataSource):
 
 class DeputyLawProjectsSource(DataSource):
     session = requests.Session()
-    base_url = "https://www.diputados.gov.ar/proyectos/resultados-buscador.html"
+    BASE_URL = "https://www.diputados.gov.ar/proyectos/resultado.html"
     POST_HEADERS = {
         "Referer": "https://www.diputados.gov.ar/proyectos/index.html",
     }
     GET_HEADERS = {
-        "Referer": "https://www.diputados.gov.ar/proyectos/resultados-buscador.html",
+        "Referer": "https://www.diputados.gov.ar/proyectos/resultado.html",
     }
 
     QUERY_DATA = {
@@ -278,8 +278,26 @@ class DeputyLawProjectsSource(DataSource):
         "law": "law",
     }
 
-    @classmethod
-    def extract_project_info(cls, metadata) -> dict:
+    PAGE_PATTERN = re.compile(r"Página \d{1,6} de (\d{1,6})")
+
+    def send_base_request(self):
+        url = self.BASE_URL
+        self.logger.info(f"Sending POST request to {url}...")
+        response = self.session.post(
+            url, data=self.QUERY_DATA, headers=self.POST_HEADERS
+        )
+        return response
+
+    def get_total_pages(self):
+        response = self.send_base_request()
+        content = response.content.decode("utf-8")
+        match = self.PAGE_PATTERN.search(content)
+        if not match:
+            return 0
+        total_pages = int(match.group(1))
+        return total_pages
+
+    def extract_project_info(self, metadata) -> dict:
         spans = metadata.find_all("span")
         # Create an empty dictionary to store the data
         project_info = {}
@@ -295,74 +313,51 @@ class DeputyLawProjectsSource(DataSource):
             project_info[key] = value
         return project_info
 
-    @classmethod
-    def send_request(cls, page_number):
-        if page_number == 1:
-            url = cls.base_url
-            cls.logger.info(f"Sending POST request to {url}...")
-            response = cls.session.post(
-                url, data=cls.QUERY_DATA, headers=cls.POST_HEADERS
+    def send_page_request(self, page_number: int):
+        url = f"{self.BASE_URL}?pagina={page_number}"
+        self.logger.info(f"Sending GET request to {url}...")
+        response = self.session.get(url, headers=self.GET_HEADERS)
+        if response.status_code != 200:
+            self.logger.error(
+                f"Request to {url} failed with status code: {response.status_code}"
             )
-        else:
-            url = f"{cls.base_url}?pagina={page_number}"
-            cls.logger.info(f"Sending GET request to {url}...")
-            response = cls.session.get(url, headers=cls.GET_HEADERS)
+
         return response
 
-    @classmethod
-    def retrieve_items(cls, page, first_time: bool, projects_info: List[dict]) -> int:
-        if first_time:
-            response = cls.send_request(page_number=1)  # always, the POST request
-        if page != 1:
-            response = cls.send_request(page_number=page)
-        page_content = response.content
+    def retrieve_items(self, page) -> int:
+        self.send_base_request()
 
+        response = self.send_page_request(page)
+        page_content = response.content
         soup = BeautifulSoup(page_content, "html.parser")
-        projects = soup.find_all(class_="detalle-proyecto")
-        added = 0
-        for project in projects:
-            metadata = project.find(class_="dp-metadata")
-            project_text = project.find(class_="dp-texto")
-            project_info = cls.extract_project_info(metadata)
+        projects_meta = soup.find_all(class_="dp-metadata")
+        projects_text = soup.find_all(class_="dp-texto")
+        projects_info = []
+        for i in range(len(projects_meta)):
+            metadata = projects_meta[i]
+            project_text = projects_text[i]
+            project_info = self.extract_project_info(metadata)
             project_info["title"] = project_text.get_text()
             project_info.pop("Publicado en:", None)
             projects_info.append(project_info)
-            added += 1
 
-        return added
+        return projects_info
 
-    @classmethod
-    def fix_date_format(cls, original_date: str) -> str:
+    def fix_date_format(self, original_date: str) -> str:
         date = dt.datetime.strptime(original_date, "%d/%m/%Y")
         return date.strftime("%Y-%m-%d")
 
-    @classmethod
-    def get_data(
-        cls, starting_page: int, first_time: bool, step_size: int, projects_info=list
-    ) -> int:
-        ending_page = starting_page + step_size
-        cls.logger.info(f"Retrieving data from page {starting_page}...")
-        projects_info = []
-        total_added = 0
-        for i in range(starting_page, ending_page):
-            added = cls.retrieve_items(
-                page=i, first_time=first_time, projects_info=projects_info
-            )
-            total_added += added
-            if not added:
-                break
+    def get_data(self, page: int) -> int:
+        self.logger.info(f"Retrieving data from page {page}...")
+        projects_info = self.retrieve_items(page=page)
         data = pd.DataFrame(projects_info)
-        data = cls.get_and_rename_relevant_columns(data)
-        if "publication_date" not in data.columns:
-            cls.logger.warning(
-                f"No data retrieved from page {starting_page}, re-trying..."
-            )
-            # especial, para marcar un problema con la request, reintentar
-            return -1, -1
-        data["publication_date"] = data["publication_date"].apply(cls.fix_date_format)
+        if data.empty:
+            return data
+        data = self.get_and_rename_relevant_columns(data)
+        data["publication_date"] = data["publication_date"].apply(self.fix_date_format)
         data["source"] = "Diputados"
-        cls.logger.info(f"Retrieved {len(data)} projects")
-        return data, total_added
+        self.logger.info(f"Retrieved {len(data)} projects")
+        return data
 
 
 class SenateLawProjectsSource(DataSource):

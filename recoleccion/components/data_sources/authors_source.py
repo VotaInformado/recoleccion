@@ -23,12 +23,12 @@ logger = logging.getLogger(__name__)
 
 class DeputiesAuthorsSource(DataSource):
     session = requests.Session()
-    BASE_URL = "https://www.diputados.gov.ar/proyectos/resultados-buscador.html"
+    BASE_URL = "https://www.diputados.gov.ar/proyectos/resultados.html"
     POST_HEADERS = {
         "Referer": "https://www.diputados.gov.ar/proyectos/index.html",
     }
     GET_HEADERS = {
-        "Referer": "https://www.diputados.gov.ar/proyectos/resultados-buscador.html",
+        "Referer": "https://www.diputados.gov.ar/proyectos/resultados.html",
     }
 
     QUERY_DATA = {

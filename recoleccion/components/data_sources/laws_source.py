@@ -39,7 +39,7 @@ class LawSource(DataSource):
         response = requests.get(url)
         data = response.content
         df = pd.read_csv(io.StringIO(data.decode("utf-8")))
-        reduced_df = df[["ley", "expediente_inicial", "proyecto_id"]]
+        reduced_df = df[["ley", "expediente_inicial", "proyecto-id"]]
         return pd.DataFrame(reduced_df)
 
     @classmethod

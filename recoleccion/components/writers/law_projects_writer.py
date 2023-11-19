@@ -6,6 +6,7 @@ from recoleccion.models import LawProject
 from recoleccion.components.writers import Writer
 from recoleccion.models.law import Law
 from recoleccion.utils.enums.project_chambers import ProjectChambers
+import re
 
 
 class LawProjectsWriter(Writer):
@@ -30,7 +31,7 @@ class LawProjectsWriter(Writer):
     def format_year(cls, project_id: str):
         if not project_id:
             return None
-        project_year = project_id.split("/")[-1]
+        project_year = re.split("-|/", project_id)[-1]
         year = int(project_year)
         if year < 50:
             return year + 2000
@@ -88,8 +89,12 @@ class LawProjectsWriter(Writer):
         senate_year = cls.format_year(senate_project_id)
         row.update(
             {
-                "deputies_project_id": f"{deputies_number}-{deputies_source}-{deputies_year}",
-                "senate_project_id": f"{senate_number}-{senate_source}-{senate_year}",
+                "deputies_project_id": f"{deputies_number}-{deputies_source}-{deputies_year}"
+                if deputies_project_id
+                else None,
+                "senate_project_id": f"{senate_number}-{senate_source}-{senate_year}"
+                if senate_project_id
+                else None,
                 "deputies_number": deputies_number,
                 "deputies_source": deputies_source,
                 "deputies_year": deputies_year,

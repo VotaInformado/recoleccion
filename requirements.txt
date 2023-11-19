@@ -22,3 +22,5 @@ PyPDF2==3.0.1  # se sigue necesitando
 tqdm
 django-filter
 python-dateutil
+axiom-py
+

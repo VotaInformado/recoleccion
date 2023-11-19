@@ -27,6 +27,19 @@ class LawProjectsWriter(Writer):
         return num, source, year
 
     @classmethod
+    def format_year(cls, project_id: str):
+        if not project_id:
+            return None
+        project_year = project_id.split("/")[-1]
+        year = int(project_year)
+        if year < 50:
+            return year + 2000
+        if year < 100:
+            return year + 1900
+
+        return int(project_year)
+
+    @classmethod
     def write(cls, data: pd.DataFrame, update_existing=True):
         cls.logger.info(f"Received {len(data)} law projects to write...")
         written, updated = [], []
@@ -70,9 +83,13 @@ class LawProjectsWriter(Writer):
         deputies_number, deputies_source, deputies_year = cls.split_id(
             deputies_project_id
         )
+        deputies_year = cls.format_year(deputies_project_id)
         senate_number, senate_source, senate_year = cls.split_id(senate_project_id)
+        senate_year = cls.format_year(senate_project_id)
         row.update(
             {
+                "deputies_project_id": f"{deputies_number}-{deputies_source}-{deputies_year}",
+                "senate_project_id": f"{senate_number}-{senate_source}-{senate_year}",
                 "deputies_number": deputies_number,
                 "deputies_source": deputies_source,
                 "deputies_year": deputies_year,
@@ -99,12 +116,14 @@ class LawProjectsWriter(Writer):
                 else:
                     law_project, was_created = LawProject.objects.update_or_create(
                         senate_year=senate_year,
+                        senate_source=senate_source,
                         senate_number=senate_number,
                         defaults=row.to_dict(),
                     )
             else:
                 law_project, was_created = LawProject.objects.update_or_create(
                     deputies_year=deputies_year,
+                    deputies_source=deputies_source,
                     deputies_number=deputies_number,
                     defaults=row.to_dict(),
                 )
@@ -115,10 +134,6 @@ class LawProjectsWriter(Writer):
             cls.logger.warning(
                 f"An error occurred while updating or creating law project with id {project_id}: {e}"
             )
-            import traceback
-
-            traceback.print_exc()
-            raise e
         return law_project, was_created
 
     @classmethod

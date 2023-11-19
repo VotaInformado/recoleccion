@@ -4,14 +4,41 @@ import colorlog
 
 # Django settings
 from django.conf import settings
+from axiom import Client
+from datetime import datetime
+
+
+class AxiomHandler(logging.Handler):
+    def __init__(self, level=logging.NOTSET):
+        super().__init__(level)
+        self.axiom = Client()  # TOKEN and ORG_ID defined in .env
+
+    def format(self, record):
+        return {
+            "_time": datetime.now().isoformat(),
+            "level": record.levelname,
+            "thread": record.threadName,
+            "message": record.getMessage(),
+            "traceback": record.exc_text if record.exc_text else None,
+            "stacktrace": record.stack_info if record.stack_info else None,
+        }
+
+    def emit(self, record):
+        try:
+            event = self.format(record)
+            self.axiom.ingest_events(dataset="command_errors", events=[event])
+        except Exception as e:
+            self.handleError(record)
 
 
 class CustomLogger:
-    def __init__(self, name=__name__, log_file_path=None, log_level=None, threading=False):
+    def __init__(
+        self, name=__name__, log_file_path=None, log_level=None, threading=False
+    ):
         self.logger = logging.getLogger(name)
         log_level = log_level or getattr(settings, "log_level", None) or "INFO"
         self.logger.setLevel(log_level)
-
+        self.logger.addHandler(AxiomHandler())
         # Prevent the log messages from being duplicated in the output.
         self.logger.propagate = False
 
@@ -19,9 +46,13 @@ class CustomLogger:
             return
 
         if threading:
-            format = "\n%(log_color)s%(levelname)-8s%(white)s(%(threadName)s) %(message)s"
+            format = (
+                "\n%(log_color)s%(levelname)-8s%(white)s(%(threadName)s) %(message)s"
+            )
         else:
-            format = "\n%(log_color)s%(levelname)-8s%(white)s(%(threadName)s) %(message)s"
+            format = (
+                "\n%(log_color)s%(levelname)-8s%(white)s(%(threadName)s) %(message)s"
+            )
 
         log_formatter = colorlog.ColoredFormatter(
             format,
@@ -54,7 +85,11 @@ class CustomLogger:
 
             fh = logging.FileHandler(log_file_path)
             fh.setLevel(log_level)
-            fh.setFormatter(logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s"))
+            fh.setFormatter(
+                logging.Formatter(
+                    "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+                )
+            )
 
             self.logger.addHandler(fh)
 

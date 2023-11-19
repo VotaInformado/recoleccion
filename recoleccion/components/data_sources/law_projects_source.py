@@ -443,6 +443,8 @@ class SenateLawProjectsSource(DataSource):
         dates = [self.fix_date_format(date) for date in matched_dates]
         # remove dates before the year 1800 (to remove bad matches)
         filtered_dates = [date for date in dates if int(date.split("-")[0]) >= 1800]
+        if len(filtered_dates) == 0:
+            return None
         min_date = min(filtered_dates)
         return min_date
 
@@ -507,7 +509,7 @@ class SenateLawProjectsSource(DataSource):
                 page_info.append(project_info)
             except BaseException as e:
                 self.logger.error(
-                    f"An error occurred at project {i} while extracting project info: {e}"
+                    f"An error occurred at project {project_id} while extracting project info: {e}"
                 )
                 continue
         return page_info

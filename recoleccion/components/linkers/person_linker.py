@@ -9,7 +9,7 @@ from recoleccion.exceptions.custom import IncompatibleLinkingDatasets
 from recoleccion.components.linkers import Linker
 from recoleccion.components.utils import unidecode_text
 from recoleccion.models import Person
-from recoleccion.utils.custom_logger import CustomLogger
+import logging
 from recoleccion.models import PersonLinking
 from recoleccion.utils.enums.linking_decisions import LinkingDecisions
 
@@ -21,7 +21,7 @@ class PersonLinker(Linker):
     ]
 
     def __init__(self):
-        self.logger = CustomLogger(self.__class__.__name__)
+        self.logger = logging.getLogger(__name__)
         self.gazetteer = Gazetteer(self.fields)
         self.canonical_data = self.get_canonical_data()
 

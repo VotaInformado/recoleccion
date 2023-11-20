@@ -11,12 +11,12 @@ from django.db.models import F
 # Components
 from recoleccion.models import DeputySeat, SenateSeat, Vote
 from recoleccion.utils.enums.provinces import Provinces
-from recoleccion.utils.custom_logger import CustomLogger
+import logging
 from tqdm import tqdm
 
 
 class Command(BaseCommand):
-    logger = CustomLogger()
+    logger = logging.getLogger(__name__)
     help = "Formatea las provincias en Votos, DeputySeats y SenateSeats."
 
     def handle(self, *args, **options):
@@ -38,9 +38,7 @@ class Command(BaseCommand):
         self.logger.info("Loading votes...")
         votes = Vote.objects.all()
         for vote in tqdm(votes):
-            vote.province = (
-                Provinces.get_choice(vote.province) if vote.province else None
-            )
+            vote.province = Provinces.get_choice(vote.province) if vote.province else None
         # Use bulk_update to update all the votes at once
         self.logger.info("Saving changes...")
         Vote.objects.bulk_update(votes, ["province"], 200)

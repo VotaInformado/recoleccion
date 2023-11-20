@@ -9,11 +9,11 @@ from django.db import transaction
 
 # Components
 from recoleccion.models import Authorship, DeputySeat, Party, PartyDenomination, PartyRelationTypes, SenateSeat, Vote
-from recoleccion.utils.custom_logger import CustomLogger
+import logging
 
 
 class Command(BaseCommand):
-    logger = CustomLogger()
+    logger = logging.getLogger(__name__)
     help = "Crea un sub partido a partir de un partido existente."
 
     def add_arguments(self, parser):

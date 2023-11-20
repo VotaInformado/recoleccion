@@ -2,11 +2,11 @@ from abc import ABC
 from pandas import DataFrame
 
 # Project
-from recoleccion.utils.custom_logger import CustomLogger
+import logging
 
 
 class Writer(ABC):
-    logger = CustomLogger("Writer")
+    logger = logging.getLogger(__name__)
 
     @classmethod
     def write(cls, data: DataFrame):

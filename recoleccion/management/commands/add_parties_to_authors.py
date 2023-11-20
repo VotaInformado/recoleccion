@@ -7,13 +7,13 @@ from tqdm import tqdm
 
 # Project
 from recoleccion.models.linking import DENIED_INDICATOR
-from recoleccion.utils.custom_logger import CustomLogger
+import logging
 from recoleccion.components.linkers.party_linker import PartyLinker
 from recoleccion.models import Authorship, Party, PartyDenomination
 
 
 class Command(BaseCommand):
-    logger = CustomLogger(threading=True)
+    logger = logging.getLogger(__name__)
 
     def handle(self, *args, **options):
         authors_without_party = Authorship.objects.filter(party__isnull=True)

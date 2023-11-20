@@ -7,7 +7,7 @@ from pprint import pp
 from recoleccion.exceptions.custom import IncompatibleLinkingDatasets
 
 # Project
-from recoleccion.utils.custom_logger import CustomLogger
+import logging
 
 
 class Linker:
@@ -16,7 +16,7 @@ class Linker:
     MIN_ACCEPTABLE_LOWER_LIMIT = 0.05
     MIN_ACCEPTABLE_UPPER_LIMIT = 0.6
     TRAINING_DIR = "recoleccion/components/linkers/training"
-    logger = CustomLogger("Linker")
+    logger = logging.getLogger(__name__)
 
     def clean_record(self, record):
         # for any record, returns name, last_name and id (only if it exists)

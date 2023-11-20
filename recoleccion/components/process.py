@@ -1,6 +1,6 @@
 from multiprocessing import Process, Queue, Event, current_process, active_children
 from queue import Empty
-from recoleccion.utils.custom_logger import CustomLogger
+import logging
 
 
 class StoppableProcess(Process):
@@ -16,7 +16,7 @@ class StoppableProcess(Process):
     process has finished its work.
     """
 
-    logger = CustomLogger()
+    logger = logging.getLogger(__name__)
 
     def __init__(self, target, args=(), kwargs={}, auto_start=True, **other):
         target = self._wrap_target(target)
@@ -49,9 +49,7 @@ class StoppableProcess(Process):
             except BaseException as e:
                 import traceback
 
-                self.logger.error(
-                    f"{this_process} > BaseException: {repr(e), traceback.print_exc()}"
-                )
+                self.logger.error(f"{this_process} > BaseException: {repr(e), traceback.print_exc()}")
             self.stop()
             self.logger.warning(f"{this_process} > Stopped")
 

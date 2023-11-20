@@ -10,11 +10,11 @@ from django.db import transaction
 from recoleccion.components.data_sources.authors_source import SenateAuthorsSource
 from recoleccion.components.linkers.person_linker import PersonLinker
 from recoleccion.components.writers.authors_writer import AuthorsWriter
-from recoleccion.utils.custom_logger import CustomLogger
+import logging
 
 
 class Command(BaseCommand):
-    logger = CustomLogger(threading=True)
+    logger = logging.getLogger(__name__)
     help = "Load laws from the deputy source"
 
     def add_arguments(self, parser):

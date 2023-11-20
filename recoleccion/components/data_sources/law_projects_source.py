@@ -11,7 +11,7 @@ from dateutil.parser import parse, ParserError
 # Project
 from recoleccion.components.utils import digitize_text
 from recoleccion.components.data_sources import DataSource
-from recoleccion.utils.custom_logger import CustomLogger
+import logging
 from recoleccion.utils.enums.project_chambers import ProjectChambers
 from recoleccion.utils.enums.project_status import ProjectStatus
 
@@ -71,9 +71,7 @@ class HCDNLawProjects(DataSource):
     def get_raw_data(cls) -> pd.DataFrame:
         base_data = cls.get_projects_base_data()
         extra_data = cls.get_projects_extra_data()
-        return base_data.merge(
-            extra_data, left_on="proyecto_id", right_on="expediente_id", how="left"
-        )
+        return base_data.merge(extra_data, left_on="proyecto_id", right_on="expediente_id", how="left")
 
     @classmethod
     def clean_project_ids(cls, data: pd.DataFrame) -> pd.DataFrame:
@@ -132,9 +130,7 @@ class ExternalLawProjectsSource(DataSource):
                     projects_info.append(project_info)
                 added_projects += 1
             except Exception as e:
-                cls.logger.warning(
-                    f"An error occurred at item {i} while extracting project info: {e}"
-                )
+                cls.logger.warning(f"An error occurred at item {i} while extracting project info: {e}")
                 continue
 
         return added_projects
@@ -229,9 +225,7 @@ class ExternalLawProjectsSource(DataSource):
     def get_data(cls, starting_page: int, step_size: int, projects_info=list) -> int:
         # gets data of 10
         ending_page = starting_page + step_size
-        cls.logger.info(
-            f"Retrieving data from page {starting_page} to {ending_page}..."
-        )
+        cls.logger.info(f"Retrieving data from page {starting_page} to {ending_page}...")
         projects_info = []
         total_added = 0
         for i in range(starting_page, ending_page):
@@ -283,9 +277,7 @@ class DeputyLawProjectsSource(DataSource):
     def send_base_request(self):
         url = self.BASE_URL
         self.logger.info(f"Sending POST request to {url}...")
-        response = self.session.post(
-            url, data=self.QUERY_DATA, headers=self.POST_HEADERS
-        )
+        response = self.session.post(url, data=self.QUERY_DATA, headers=self.POST_HEADERS)
         return response
 
     def get_total_pages(self):
@@ -318,9 +310,7 @@ class DeputyLawProjectsSource(DataSource):
         self.logger.info(f"Sending GET request to {url}...")
         response = self.session.get(url, headers=self.GET_HEADERS)
         if response.status_code != 200:
-            self.logger.error(
-                f"Request to {url} failed with status code: {response.status_code}"
-            )
+            self.logger.error(f"Request to {url} failed with status code: {response.status_code}")
 
         return response
 
@@ -364,7 +354,7 @@ class SenateLawProjectsSource(DataSource):
     def __init__(self, threading=True):
         self.session = requests.Session()
         self.threading = threading
-        self.logger = CustomLogger(threading=threading)
+        self.logger = logging.getLogger(__name__)
         self.deputies_exp = re.compile(self.DEPUTIES_PROJECT_ID_PATTERN)
         self.date_exp = re.compile(self.DATE_PATTERN)
 
@@ -463,9 +453,7 @@ class SenateLawProjectsSource(DataSource):
     def send_base_request(self, year: int):
         url = self.BASE_URL
         self.logger.info(f"Sending base POST request to {url}...")
-        response = self.session.post(
-            url, data=self.get_payload(year), headers=self.POST_HEADERS
-        )
+        response = self.session.post(url, data=self.get_payload(year), headers=self.POST_HEADERS)
         return response
 
     def send_page_request(self, page_number):
@@ -494,18 +482,14 @@ class SenateLawProjectsSource(DataSource):
                 deputies_project_id = None
                 if link:
                     source = link.split("/")[-2]
-                    publication_date, deputies_project_id = self.get_details_of_project(
-                        link
-                    )
+                    publication_date, deputies_project_id = self.get_details_of_project(link)
 
                 project_info = self.get_project_info(project_id, source, title)
                 project_info["publication_date"] = publication_date
                 project_info["deputies_project_id"] = deputies_project_id
                 page_info.append(project_info)
             except BaseException as e:
-                self.logger.error(
-                    f"An error occurred at project {project_id} while extracting project info: {e}"
-                )
+                self.logger.error(f"An error occurred at project {project_id} while extracting project info: {e}")
                 continue
         return page_info
 

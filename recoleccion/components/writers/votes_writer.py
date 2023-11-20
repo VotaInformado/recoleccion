@@ -5,7 +5,7 @@ import numpy as np
 
 # Project
 from recoleccion.models.linking import DENIED_INDICATOR
-from recoleccion.utils.custom_logger import CustomLogger
+import logging
 from recoleccion.models import Law, LawProject, Party, Person, Vote
 from recoleccion.components.writers import Writer
 from recoleccion.utils.enums.project_chambers import ProjectChambers
@@ -21,7 +21,7 @@ class VotesWriter(Writer):
         self.last_senate_project_id = None
         self.last_deputies_project = None
         self.last_senate_project = None
-        self.logger = CustomLogger(name="Writer", log_file_path="logs/votes_writer.log")
+        self.logger = logging.getLogger(__name__)
 
     def write(self, data: pd.DataFrame):
         self.logger.info(f"Received {len(data)} law projects to write...")
@@ -42,30 +42,18 @@ class VotesWriter(Writer):
             return None
         number, year = LawProject.get_project_year_and_number(project_id)
         if chamber == ProjectChambers.DEPUTIES:
-            project = LawProject.objects.filter(
-                deputies_year=year, deputies_number=number
-            ).first()
+            project = LawProject.objects.filter(deputies_year=year, deputies_number=number).first()
             if project:
-                self.logger.info(
-                    f"Found deputies project with year {year} and number {number}"
-                )
+                self.logger.info(f"Found deputies project with year {year} and number {number}")
         else:
-            project = LawProject.objects.filter(
-                senate_year=year, senate_number=number
-            ).first()
+            project = LawProject.objects.filter(senate_year=year, senate_number=number).first()
             if project:
-                self.logger.info(
-                    f"Found senate project with year {year} and number {number}"
-                )
+                self.logger.info(f"Found senate project with year {year} and number {number}")
         if not project:
-            self.logger.info(
-                f"Project with year {year} and number {number} not found for chamber {chamber}"
-            )
+            self.logger.info(f"Project with year {year} and number {number} not found for chamber {chamber}")
         return project
 
-    def retrieve_project_from_day_order(
-        self, day_order: int, chamber: str
-    ) -> LawProject:
+    def retrieve_project_from_day_order(self, day_order: int, chamber: str) -> LawProject:
         if pd.isnull(day_order) or not day_order:
             return None
         if not chamber:
@@ -90,9 +78,7 @@ class VotesWriter(Writer):
         row = row.drop(["name", "last_name"], errors="ignore")
         return row, person
 
-    def _get_vote_project(
-        self, row: pd.Series, project_id: str, chamber: str
-    ) -> pd.Series:
+    def _get_vote_project(self, row: pd.Series, project_id: str, chamber: str) -> pd.Series:
         if not project_id:
             return row, None
         if chamber == ProjectChambers.DEPUTIES:
@@ -121,15 +107,11 @@ class VotesWriter(Writer):
 
     def get_vote_project(self, row: pd.Series) -> pd.Series:
         deputies_project_id = row.get("deputies_project_id", None)
-        row, project = self._get_vote_project(
-            row, deputies_project_id, ProjectChambers.DEPUTIES
-        )
+        row, project = self._get_vote_project(row, deputies_project_id, ProjectChambers.DEPUTIES)
         if project:
             return row, project
         senate_project_id = row.get("senate_project_id", None)
-        row, project = self._get_vote_project(
-            row, senate_project_id, ProjectChambers.SENATORS
-        )
+        row, project = self._get_vote_project(row, senate_project_id, ProjectChambers.SENATORS)
         if project:
             return row, project
 
@@ -137,9 +119,7 @@ class VotesWriter(Writer):
         if not day_order:
             return row, None
         if day_order == self.last_day_order:
-            self.logger.info(
-                f"Day order {day_order} coincides, using last project: {self.last_project.project_id}"
-            )
+            self.logger.info(f"Day order {day_order} coincides, using last project: {self.last_project.project_id}")
             row["project"] = self.last_project
             return row, self.last_project
         project = self.retrieve_project_from_day_order(day_order, row["chamber"])
@@ -215,9 +195,7 @@ class VotesWriter(Writer):
         row = row.dropna()
         row, person = self.clean_person_data(row)
         row, law_project = self.get_vote_project(row)
-        row = row.drop(
-            ["deputies_project_id", "senate_project_id", "day_order"], errors="ignore"
-        )
+        row = row.drop(["deputies_project_id", "senate_project_id", "day_order"], errors="ignore")
         if row.get("law", None) is not None:
             row, law = self.get_vote_law(row)
         else:

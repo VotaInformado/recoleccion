@@ -12,7 +12,7 @@ import logging
 from recoleccion.components.utils import capitalize_text, digitize_text, trim_extra_spaces
 from recoleccion.components.data_sources import DataSource
 from recoleccion.models.law_project import LawProject
-from recoleccion.utils.custom_logger import CustomLogger
+import logging
 from recoleccion.utils.enums.legislator_seats import LegislatorSeats
 from recoleccion.utils.enums.project_chambers import ProjectChambers
 from recoleccion.utils.enums.project_status import ProjectStatus
@@ -53,6 +53,15 @@ class DeputiesAuthorsSource(DataSource):
         "title": "title",
         "law": "law",
     }
+
+    def get_total_pages(self):
+        response = self.send_base_request()
+        content = response.content.decode("utf-8")
+        match = self.PAGE_PATTERN.search(content)
+        if not match:
+            return 0
+        total_pages = int(match.group(1))
+        return total_pages
 
     @classmethod
     def extract_project_info(cls, metadata) -> dict:
@@ -170,7 +179,7 @@ class SenateAuthorsSource(DataSource):
     def __init__(self, threading=True):
         self.session = requests.Session()
         self.threading = threading
-        self.logger = CustomLogger(threading=threading)
+        self.logger = logging.getLogger(__name__)
 
     ROWS_PER_PAGE = 100
     BASE_URL = "https://www.senado.gob.ar/parlamentario/parlamentaria/avanzada"

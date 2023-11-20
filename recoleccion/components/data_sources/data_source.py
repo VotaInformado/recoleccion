@@ -1,4 +1,4 @@
-from recoleccion.utils.custom_logger import CustomLogger
+import logging
 
 
 class DataSource:
@@ -12,8 +12,8 @@ class DataSource:
     name = None
     key = None
     column_mappings = {}
-    logger = CustomLogger()
-    
+    logger = logging.getLogger(__name__)
+
     def __str__(self):
         return self.name
 

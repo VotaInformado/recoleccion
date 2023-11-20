@@ -11,7 +11,7 @@ from recoleccion.components.linkers import Linker
 from recoleccion.components.utils import unidecode_text
 from recoleccion.models import PartyLinking
 from recoleccion.models.party import PartyDenomination
-from recoleccion.utils.custom_logger import CustomLogger
+import logging
 from recoleccion.utils.enums.linking_decisions import LinkingDecisions
 
 
@@ -21,7 +21,7 @@ class PartyLinker(Linker):
     ]
 
     def __init__(self):
-        self.logger = CustomLogger(self.__class__.__name__)
+        self.logger = logging.getLogger(__name__)
         self.gazetteer = Gazetteer(self.fields)
         self.canonical_data = self.get_canonical_data()
 

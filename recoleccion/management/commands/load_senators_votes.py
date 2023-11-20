@@ -11,11 +11,11 @@ from datetime import datetime as dt, timezone
 from recoleccion.components.data_sources.votes_source import SenateVotesSource
 from recoleccion.components.writers.votes_writer import VotesWriter
 from recoleccion.components.linkers import PersonLinker
-from recoleccion.utils.custom_logger import CustomLogger
+import logging
 
 
 class Command(BaseCommand):
-    logger = CustomLogger(threading=True)
+    logger = logging.getLogger(__name__)
 
     def add_arguments(self, parser):
         parser.add_argument("--starting-year", type=int, default=2023)

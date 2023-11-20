@@ -19,8 +19,10 @@ lxml==4.9.3
 html5lib==1.1
 pypdfium2==4.18.0
 PyPDF2==3.0.1  # se sigue necesitando
-tqdm
+d
 django-filter
 python-dateutil
-axiom-py
+axiom-py==0.2.0
+tqdm==4.66.1
+
 

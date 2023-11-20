@@ -10,12 +10,12 @@ from datetime import datetime as dt, timezone
 # Project
 from recoleccion.components.data_sources.votes_source import DeputyVotesSource
 from recoleccion.components.writers.votes_writer import VotesWriter
-from recoleccion.utils.custom_logger import CustomLogger
+import logging
 from recoleccion.models import Person, Vote
 
 
 class Command(BaseCommand):
-    logger = CustomLogger(name="add_persons_from_votes")
+    logger = l
 
     def add_arguments(self, parser):
         parser.add_argument("--starting-year", type=int, default=2023)

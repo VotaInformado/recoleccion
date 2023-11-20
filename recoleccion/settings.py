@@ -136,11 +136,8 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
 LANGUAGE_CODE = "en-us"
-
 TIME_ZONE = "UTC"
-
 USE_I18N = True
-
 USE_TZ = True
 
 
@@ -164,4 +161,40 @@ REST_FRAMEWORK = {
         "rest_framework.filters.SearchFilter",
         "rest_framework.filters.OrderingFilter",
     ],
+}
+
+# Logging
+AXIOM_DATASET = config.get("AXIOM_DATASET", False)
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "filters": {"require_debug_false": {"()": "django.utils.log.RequireDebugFalse"}},
+    "formatters": {
+        "verbose": {"format": "%(levelname)s %(asctime)s %(module)s " "%(process)d %(thread)d %(message)s"},
+        "colored_formatter": {
+            "()": "colorlog.ColoredFormatter",
+            "format": "\n%(log_color)s%(levelname)-8s%(white)s%(message)s",
+            "log_colors": {
+                "DEBUG": "bold_black",
+                "INFO": "green",
+                "WARNING": "yellow",
+                "ERROR": "red",
+                "CRITICAL": "bold_red",
+            },
+        },
+    },
+    "handlers": {
+        "console": {
+            "level": "DEBUG",
+            "class": "logging.StreamHandler",
+            "formatter": "colored_formatter",
+        },
+        "axiom_handler": {
+            "level": "DEBUG",  # Set your desired log level
+            "class": "recoleccion.settings.AxiomHandler",  # Use the path to the function
+        },
+    },
+    "loggers": {
+        "recoleccion": {"level": "DEBUG", "handlers": ["console", "axiom_handler"], "propagate": True},
+    },
 }

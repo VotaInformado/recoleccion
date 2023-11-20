@@ -7,11 +7,11 @@ from django.db import transaction
 # Components
 from recoleccion.components.data_sources.law_projects_source import ExternalLawProjectsSource
 from recoleccion.components.writers.law_projects_writer import LawProjectsWriter
-from recoleccion.utils.custom_logger import CustomLogger
+import logging
 
 
 class Command(BaseCommand):
-    logger = CustomLogger()
+    logger = logging.getLogger(__name__)
     help = "Load laws from the deputy source"
 
     def add_arguments(self, parser):

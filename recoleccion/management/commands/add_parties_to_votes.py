@@ -6,14 +6,14 @@ import pandas as pd
 
 # Project
 from recoleccion.models.linking import DENIED_INDICATOR
-from recoleccion.utils.custom_logger import CustomLogger
+import logging
 from recoleccion.components.linkers.party_linker import PartyLinker
 from recoleccion.models.party import Party, PartyDenomination
 from recoleccion.models.vote import Vote
 
 
 class Command(BaseCommand):
-    logger = CustomLogger(threading=True)
+    logger = logging.getLogger(__name__)
 
     def handle(self, *args, **options):
         votes_without_party = Vote.objects.filter(party__isnull=True)

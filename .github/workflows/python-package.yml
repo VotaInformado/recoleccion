@@ -41,6 +41,9 @@ jobs:
 
     - name: Run Django tests
       env:
+        AXIOM_TOKEN: ${{ secrets.AXIOM_TOKEN }}
+        AXIOM_ORG_ID: ${{ secrets.AXIOM_ORG_ID }}
+        AXIOM_DATASET: local-logs
         POSTGRES_HOST: localhost
         POSTGRES_USER: postgres
         POSTGRES_PASSWORD: postgres

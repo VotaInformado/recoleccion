@@ -190,8 +190,8 @@ LOGGING = {
             "formatter": "colored_formatter",
         },
         "axiom_handler": {
-            "level": "DEBUG",  # Set your desired log level
-            "class": "recoleccion.settings.AxiomHandler",  # Use the path to the function
+            "level": "DEBUG",
+            "class": "recoleccion.utils.log_handlers.AxiomHandler",
         },
     },
     "loggers": {

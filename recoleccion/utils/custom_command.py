@@ -1,5 +1,9 @@
-from django.core.management.base import BaseCommand
+import argparse
+from django.core.management.base import BaseCommand, CommandParser
 import threading
+
+# Project
+from recoleccion.models.missing_record import MissingRecord
 
 
 class CustomCommand(BaseCommand):
@@ -9,13 +13,30 @@ class CustomCommand(BaseCommand):
     class Meta:
         abstract = True
 
+    def delete_missing_record(self, record_value: int):
+        MissingRecord.objects.filter(class_name=self.__class__.__name__, record_value=record_value).delete()
+
+    def save_missing_record(self, record_value: int):
+        MissingRecord.objects.create(class_name=self.__class__.__name__, record_value=record_value)
+
+    def get_missing_records(self):
+        return MissingRecord.objects.filter(class_name=self.__class__.__name__)
+
+    def add_arguments(self, parser: CommandParser) -> None:
+        parser.add_argument("--only-missing", action=argparse.BooleanOptionalAction, default=False)
+
     def handle(self, *args, **options):
         threads = []
+        if options["only_missing"]:
+            target_function = self.missing_only_function
+        else:
+            target_function = self.main_function
         for index in range(self.THREAD_AMOUNT):
+            if not options["only_missing"]:
+                index_name = self.index_name  # starting_page, starting_period or starting_year
+                options[index_name] = index
             options["step_size"] = self.THREAD_AMOUNT
-            index_name = self.index_name  # starting_page, starting_period or starting_year
-            options[index_name] = index
-            thread = threading.Thread(name=f"Thread {index+1}", target=self.main_function, kwargs=options)
+            thread = threading.Thread(name=f"Thread {index+1}", target=target_function, kwargs=options)
             threads.append(thread)
             thread.start()
             if self.reverse_index:
@@ -27,6 +48,9 @@ class CustomCommand(BaseCommand):
             thread.join()
 
     def main_function(self):
+        raise NotImplementedError
+
+    def missing_only_function(self):
         raise NotImplementedError
 
 

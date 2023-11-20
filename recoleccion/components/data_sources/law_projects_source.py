@@ -280,10 +280,11 @@ class DeputyLawProjectsSource(DataSource):
         response = self.session.post(url, data=self.QUERY_DATA, headers=self.POST_HEADERS)
         return response
 
-    def get_total_pages(self):
-        response = self.send_base_request()
+    @classmethod
+    def get_total_pages(cls):
+        response = cls().send_base_request()
         content = response.content.decode("utf-8")
-        match = self.PAGE_PATTERN.search(content)
+        match = cls.PAGE_PATTERN.search(content)
         if not match:
             return 0
         total_pages = int(match.group(1))

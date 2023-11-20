@@ -54,10 +54,13 @@ class DeputiesAuthorsSource(DataSource):
         "law": "law",
     }
 
-    def get_total_pages(self):
-        response = self.send_base_request()
+    PAGE_PATTERN = re.compile(r"Página \d{1,6} de (\d{1,6})")
+
+    @classmethod
+    def get_total_pages(cls):
+        response = cls().send_base_request()
         content = response.content.decode("utf-8")
-        match = self.PAGE_PATTERN.search(content)
+        match = cls.PAGE_PATTERN.search(content)
         if not match:
             return 0
         total_pages = int(match.group(1))

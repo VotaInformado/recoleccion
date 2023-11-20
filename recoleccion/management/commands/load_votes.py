@@ -11,10 +11,10 @@ from recoleccion.components.linkers import PersonLinker
 
 
 class Command(BaseCommand):
-
     def handle(self, *args, **options):
         votes = DatasetVotesSource.get_data()
         linker = PersonLinker()
         linked_data = linker.link_persons(votes)
         VotesWriter.write(votes)
-        
+
+# TODO: Delete?

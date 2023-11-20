@@ -16,7 +16,6 @@ from recoleccion.utils.enums.legislator_seats import LegislatorSeats
 class Command(BaseCommand):
     SENATE_CAPACITY = 72
 
-    
     def handle(self, *args, **options):
         senators_data = CurrentSenate.get_data()
         linker = PersonLinker()

@@ -19,33 +19,19 @@ class Command(BaseCommand):
     help = "Load laws from the deputy source"
 
     def add_arguments(self, parser):
-        parser.add_argument("--starting-page", type=int, default=1)
+        parser.add_argument("starting_page", type=int, default=1)
 
     def handle(self, *args, **options):
-        self.THREAD_AMOUNT = 8
-        page = options["starting_page"]
-        threads = []
         self.source = DeputiesAuthorsSource()
         total_pages = self.source.get_total_pages()
-        for i in range(self.THREAD_AMOUNT):
-            thread = threading.Thread(
-                name=f"Thread {i+1}",
-                target=self.main_function,
-                args=(page, total_pages, self.THREAD_AMOUNT),
-            )
-            threads.append(thread)
-            thread.start()
-            page += 1
-
-        for thread in threads:
-            thread.join()
+        options["total_pages"] = total_pages
+        super().handle(*args, **options)
 
     def main_function(self, starting_page: int, total_pages: int, step_size: int):
-        source = DeputiesAuthorsSource()
         for page in tqdm(range(starting_page, total_pages + 1, step_size)):
             attempts = 0
             while attempts < 5:
-                data = source.get_data(page)
+                data = self.source.get_data(page)
                 if data.empty:
                     break
                 attempts += 1

@@ -15,7 +15,7 @@ class Command(BaseCommand):
     help = "Load laws from the deputy source"
 
     def add_arguments(self, parser):
-        parser.add_argument("--starting-page", type=int, default=1)
+        parser.add_argument("starting_page", type=int, default=1)
         parser.add_argument("--ending-page", type=int, default=None)
 
     def handle(self, *args, **options):
@@ -29,3 +29,6 @@ class Command(BaseCommand):
             if not added or i >= ending_page:
                 break
             LawProjectsWriter.write(data)
+
+
+# TODO: Delete?

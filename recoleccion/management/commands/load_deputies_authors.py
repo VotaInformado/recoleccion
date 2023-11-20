@@ -1,4 +1,5 @@
 import threading
+from tqdm import tqdm
 
 # Base command
 from django.core.management.base import BaseCommand
@@ -41,7 +42,7 @@ class Command(BaseCommand):
 
     def main_function(self, starting_page: int, total_pages: int, step_size: int):
         source = DeputiesAuthorsSource()
-        for page in range(starting_page, total_pages + 1, step_size):
+        for page in tqdm(range(starting_page, total_pages + 1, step_size)):
             attempts = 0
             while attempts < 5:
                 data = source.get_data(page)

@@ -1,5 +1,6 @@
 import threading
 import time
+from tqdm import tqdm
 
 # Base command
 from django.core.management.base import BaseCommand
@@ -26,7 +27,8 @@ class Command(BaseCommand):
         self.THREAD_AMOUNT = 8
         page = options["starting_page"]
         threads = []
-        total_pages = DeputyLawProjectsSource().get_total_pages()
+        self.source = DeputyLawProjectsSource()
+        total_pages = self.source.get_total_pages()
         for i in range(self.THREAD_AMOUNT):
             thread = threading.Thread(
                 name=f"Thread {i+1}",
@@ -40,12 +42,11 @@ class Command(BaseCommand):
         for thread in threads:
             thread.join()
 
-    def main_function(self, starting_page: int, total_pages, step_size: int):
-        source = DeputyLawProjectsSource()
-        for page in range(starting_page, total_pages + 1, step_size):
+    def main_function(self, starting_page: int, total_pages: int, step_size: int):
+        for page in tqdm(range(starting_page, total_pages + 1, step_size)):
             attempts = 0
             while attempts < 5:
-                data = source.get_data(page)
+                data = self.source.get_data(page)
                 if not data.empty:
                     break
                 attempts += 1

@@ -15,11 +15,11 @@ class Command(BaseCommand):
     help = "Load laws from the deputy source"
 
     def add_arguments(self, parser):
-        parser.add_argument("starting_page", type=int, default=1)
+        parser.add_argument("--starting-page", type=int, default=1)
         parser.add_argument("--ending-page", type=int, default=None)
 
     def handle(self, *args, **options):
-        starting_page = options["starting_page"]
+        starting_page = options["--starting-page"]
         ending_page = options["ending_page"] or float("inf")
         i = starting_page
         step_size = 10

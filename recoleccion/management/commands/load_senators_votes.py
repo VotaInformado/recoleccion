@@ -1,22 +1,18 @@
 import pandas as pd
 
 # Project
-from recoleccion.utils.custom_command import CustomCommand
+from recoleccion.utils.custom_command import YearThreadedCommand
 from recoleccion.components.data_sources.votes_source import SenateVotesSource
 from recoleccion.components.writers.votes_writer import VotesWriter
 from recoleccion.components.linkers import PersonLinker
 import logging
 
 
-class Command(CustomCommand):
+class Command(YearThreadedCommand):
     logger = logging.getLogger(__name__)
 
-    def __init__(self):
-        super().__init__()
-        self.reverse_index = True
-
     def add_arguments(self, parser):
-        parser.add_argument("starting_year", type=int, default=2023)
+        parser.add_argument("--starting-year", type=int, default=2023)
 
     def write_year_votes(self, starting_year: int, step_size: int):
         self.logger.info(f"Writing votes for year {starting_year}...")

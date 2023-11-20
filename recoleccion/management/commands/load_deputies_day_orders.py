@@ -1,18 +1,18 @@
 import pandas as pd
 
 # Components
-from recoleccion.utils.custom_command import CustomCommand
+from recoleccion.utils.custom_command import PeriodThreadedCommand
 from recoleccion.components.data_sources.day_orders_source import DeputiesDayOrderSource
 from recoleccion.components.writers.law_projects_writer import LawProjectsWriter
 import logging
 
 
-class Command(CustomCommand):
+class Command(PeriodThreadedCommand):
     logger = logging.getLogger(__name__)
     help = "Load laws from the deputy source"
 
     def add_arguments(self, parser):
-        parser.add_argument("starting_period", type=int, default=0)
+        parser.add_argument("--starting-period", type=int, default=0)
 
     def main_function(self, starting_period: int, step_size: int):
         i = starting_period

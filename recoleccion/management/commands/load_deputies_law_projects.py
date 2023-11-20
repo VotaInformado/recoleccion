@@ -3,18 +3,18 @@ import time
 from tqdm import tqdm
 
 # Base command
-from recoleccion.utils.custom_command import CustomCommand
+from recoleccion.utils.custom_command import PageThreadedCommand
 from recoleccion.components.writers.law_projects_writer import LawProjectsWriter
 from recoleccion.components.data_sources.law_projects_source import DeputyLawProjectsSource
 import logging
 
 
-class Command(CustomCommand):
+class Command(PageThreadedCommand):
     logger = logging.getLogger(__name__)
     help = "Load laws from the deputy source"
 
     def add_arguments(self, parser):
-        parser.add_argument("starting_page", type=int, default=1)
+        parser.add_argument("--starting-page", type=int, default=1)
 
     def handle(self, *args, **options):
         self.source = DeputyLawProjectsSource()

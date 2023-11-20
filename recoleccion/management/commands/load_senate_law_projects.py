@@ -1,5 +1,5 @@
 # Components
-from recoleccion.utils.custom_command import CustomCommand
+from recoleccion.utils.custom_command import YearThreadedCommand
 from recoleccion.components.data_sources.law_projects_source import (
     SenateLawProjectsSource,
 )
@@ -7,16 +7,12 @@ from recoleccion.components.writers.law_projects_writer import LawProjectsWriter
 import logging
 
 
-class Command(CustomCommand):
+class Command(YearThreadedCommand):
     logger = logging.getLogger(__name__)
     help = "Load laws from the deputy source"
 
-    def __init__(self):
-        super().__init__()
-        self.reverse_index = True
-
     def add_arguments(self, parser):
-        parser.add_argument("starting_year", type=int, default=2023)
+        parser.add_argument("--starting-year", type=int, default=2023)
 
     def main_function(self, starting_year: int, step_size: int):
         source = SenateLawProjectsSource(threading=True)

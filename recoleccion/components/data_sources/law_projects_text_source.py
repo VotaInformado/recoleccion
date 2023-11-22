@@ -14,7 +14,7 @@ class LawProjectsText(DataSource):
 
     @classmethod
     def _get_pdf_text(cls, url):
-        # cls.logger.info(f"Getting text from pdf: {url}")
+        cls.logger.info(f"Getting text from pdf: {url}")
         response = cls.session.get(url, stream=True)
         try:
             stream = BytesIO(response.content)
@@ -79,6 +79,8 @@ class DeputiesLawProjectsText(LawProjectsText):
     @classmethod
     def _get_text_from_infobase(cls, url):
         response = cls.session.get(url)
+        if response.status_code != 200:
+            return ""
         soup = BeautifulSoup(response.content, "html.parser")
         record_url = soup.find("frame").get("src", "")
         pattern = r"record=({[^}]+})"

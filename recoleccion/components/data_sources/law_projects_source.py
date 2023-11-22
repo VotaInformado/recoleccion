@@ -492,7 +492,10 @@ class SenateLawProjectsSource(DataSource):
                 project_info["deputies_project_id"] = deputies_project_id
                 page_info.append(project_info)
             except BaseException as e:
-                self.logger.error(f"An error occurred at project {project_id} while extracting project info: {e}")
+                self.logger.error(
+                    f"An error occurred at project {project_id} while extracting project info: {e}",
+                    exc_info=True,
+                )
                 continue
         return page_info
 

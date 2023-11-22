@@ -18,6 +18,7 @@ logger = logging.getLogger(__name__)
 
 class Command(YearThreadedCommand):
     help = "Load laws from the deputy source"
+    denomination = "load_senate_authors"
 
     def add_arguments(self, parser):
         parser.add_argument("--starting-year", type=int, default=2023)

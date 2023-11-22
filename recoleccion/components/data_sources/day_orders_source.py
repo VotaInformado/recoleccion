@@ -1,20 +1,17 @@
-import re
 import datetime as dt
-import time
 from typing import List
 import requests
 import pandas as pd
-import datetime as dt
 from bs4 import BeautifulSoup
 
 # Project
-from recoleccion.components.utils import digitize_text
 from recoleccion.components.data_sources import DataSource
+from recoleccion.exceptions.custom import PageNotFound
 
 
 class DeputiesDayOrderSource(DataSource):
     session = requests.Session()
-    BASE_URL = "https://www.hcdn.gob.ar/secparl/dcomisiones/s_od/buscador.html"
+    BASE_URL = "https://www2.hcdn.gob.ar/secparl/dcomisiones/s_od/buscador.html"
 
     @classmethod
     def retrieve_projects(cls, day_order: int, projects_div) -> List[dict]:
@@ -33,10 +30,13 @@ class DeputiesDayOrderSource(DataSource):
         data = []
         url = f"{cls.BASE_URL}?periodo={period}"
         response = cls.session.get(url)
+        if response.status_code == 500:
+            raise PageNotFound()
         page_content = response.content
 
         soup = BeautifulSoup(page_content, "html.parser")
         table_element = soup.find("table", id="licitaciones")
+        # TODO: filtrar sólo proyectos de ley
         rows = table_element.find_all("tr")[1:]  # Skip the header row
         rows = list(filter(lambda row: len(row) > 5, rows))  # Forros que son con su tabla mal hecha
         for row in rows:

@@ -278,6 +278,8 @@ class DeputyLawProjectsSource(DataSource):
         url = self.BASE_URL
         self.logger.info(f"Sending POST request to {url}...")
         response = self.session.post(url, data=self.QUERY_DATA, headers=self.POST_HEADERS)
+        if response.status_code != 200:
+            self.logger.error(f"Base Request to {url} failed with status code: {response.status_code}")
         return response
 
     @classmethod
@@ -311,7 +313,7 @@ class DeputyLawProjectsSource(DataSource):
         self.logger.info(f"Sending GET request to {url}...")
         response = self.session.get(url, headers=self.GET_HEADERS)
         if response.status_code != 200:
-            self.logger.error(f"Request to {url} failed with status code: {response.status_code}")
+            self.logger.error(f"Page Request to {url} failed with status code: {response.status_code}")
 
         return response
 

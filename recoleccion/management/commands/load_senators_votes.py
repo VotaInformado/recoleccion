@@ -10,6 +10,7 @@ import logging
 
 class Command(YearThreadedCommand):
     logger = logging.getLogger(__name__)
+    denomination = "load_senators_votes"
 
     def add_arguments(self, parser):
         parser.add_argument("--starting-year", type=int, default=2023)

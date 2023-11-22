@@ -73,17 +73,11 @@ class LawProjectsWriter(Writer):
         row = row.dropna()
         deputies_project_id = row.get("deputies_project_id", None)
         senate_project_id = row.get("senate_project_id", None)
-        senate_project_id = (
-            senate_project_id.replace("/", "-") if senate_project_id else None
-        )
-        row[
-            "senate_project_id"
-        ] = senate_project_id  # fix for senate projects with wrong format
+        senate_project_id = senate_project_id.replace("/", "-") if senate_project_id else None
+        row["senate_project_id"] = senate_project_id  # fix for senate projects with wrong format
         law = row.get("law", None)
         row = row.drop("law", errors="ignore")
-        deputies_number, deputies_source, deputies_year = cls.split_id(
-            deputies_project_id
-        )
+        deputies_number, deputies_source, deputies_year = cls.split_id(deputies_project_id)
         deputies_year = cls.format_year(deputies_project_id)
         senate_number, senate_source, senate_year = cls.split_id(senate_project_id)
         senate_year = cls.format_year(senate_project_id)
@@ -92,9 +86,7 @@ class LawProjectsWriter(Writer):
                 "deputies_project_id": f"{deputies_number}-{deputies_source}-{deputies_year}"
                 if deputies_project_id
                 else None,
-                "senate_project_id": f"{senate_number}-{senate_source}-{senate_year}"
-                if senate_project_id
-                else None,
+                "senate_project_id": f"{senate_number}-{senate_source}-{senate_year}" if senate_project_id else None,
                 "deputies_number": deputies_number,
                 "deputies_source": deputies_source,
                 "deputies_year": deputies_year,
@@ -106,25 +98,23 @@ class LawProjectsWriter(Writer):
         try:
             source = row.get("source", "")
             if "senado" in source.lower():
-                if not update_existing:
-                    law_project = LawProject.objects.filter(
-                        senate_number=senate_number, senate_year=senate_year
-                    ).first()
-                    if law_project:
-                        cls.logger.info(
-                            f"Law project {law_project.project_id} already exists, skipping..."
-                        )
-                        return law_project, False
-                    else:
-                        law_project = LawProject.objects.create(**row.to_dict())
-                        return law_project, True
-                else:
+                if update_existing:
                     law_project, was_created = LawProject.objects.update_or_create(
                         senate_year=senate_year,
                         senate_source=senate_source,
                         senate_number=senate_number,
                         defaults=row.to_dict(),
                     )
+                else:
+                    law_project = LawProject.objects.filter(
+                        senate_number=senate_number, senate_source=senate_source, senate_year=senate_year
+                    ).first()
+                    if law_project:
+                        cls.logger.info(f"Law project {law_project.project_id} already exists, skipping...")
+                        return law_project, False
+                    else:
+                        law_project = LawProject.objects.create(**row.to_dict())
+                        return law_project, True
             else:
                 law_project, was_created = LawProject.objects.update_or_create(
                     deputies_year=deputies_year,
@@ -136,9 +126,7 @@ class LawProjectsWriter(Writer):
                 cls.update_law(law, law_project)
         except Exception as e:
             project_id = deputies_project_id or senate_project_id
-            cls.logger.warning(
-                f"An error occurred while updating or creating law project with id {project_id}: {e}"
-            )
+            cls.logger.warning(f"An error occurred while updating or creating law project with id {project_id}: {e}")
         return law_project, was_created
 
     @classmethod
@@ -151,7 +139,7 @@ class LawProjectsWriter(Writer):
             day_order = row.get("day_order")
             deputies_number, deputies_source, deputies_year = cls.split_id(project_id)
             project = LawProject.objects.filter(
-                deputies_number=deputies_number, deputies_year=deputies_year
+                deputies_number=deputies_number, deputies_source=deputies_source, deputies_year=deputies_year
             ).first()
             if project:
                 project.deputies_day_order = day_order
@@ -159,9 +147,7 @@ class LawProjectsWriter(Writer):
                 cls.logger.info(f"Updated day order for project {project_id}")
                 updated.append(project)
             else:
-                cls.logger.warning(
-                    f"Project {project_id} not found, day order {day_order} not updated"
-                )
+                cls.logger.warning(f"Project {project_id} not found, day order {day_order} not updated")
                 not_found.append(project_id)
         cls.logger.info(f"Updated {len(updated)} day orders")
         cls.logger.info(f"{len(not_found)} day orders not found")

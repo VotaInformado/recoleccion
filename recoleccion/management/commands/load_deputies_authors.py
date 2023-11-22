@@ -16,11 +16,13 @@ import logging
 class Command(PageThreadedCommand):
     logger = logging.getLogger(__name__)
     help = "Load laws from the deputy source"
+    denomination = "load_deputies_authors"
 
     def add_arguments(self, parser):
         parser.add_argument("--starting-page", type=int, default=1)
 
     def handle(self, *args, **options):
+        self.logger.info(f"Requesting total pages...")
         total_pages = DeputiesAuthorsSource.get_total_pages()
         if not options.get("only_missing"):
             options["total_pages"] = total_pages

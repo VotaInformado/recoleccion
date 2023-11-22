@@ -55,3 +55,12 @@ class DeputiesLoadingException(CustomException):
 
     def __init__(self, description=None):
         super().__init__(self.CODE, self.STATUS_CODE, description or self.DESCRIPTION)
+
+
+class PageNotFound(CustomException):
+    CODE = "PAGE_NOT_FOUND"
+    STATUS_CODE = 404
+    DESCRIPTION = "Page not found"
+
+    def __init__(self, description=None):
+        super().__init__(self.CODE, self.STATUS_CODE, description or self.DESCRIPTION)

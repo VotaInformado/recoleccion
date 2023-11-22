@@ -10,6 +10,8 @@ from recoleccion.components.linkers import PersonLinker
 
 
 class Command(YearThreadedCommand):
+    denomination = "load_deputies_votes"
+
     def add_arguments(self, parser):
         parser.add_argument("--starting-year", type=int, default=2023)
 

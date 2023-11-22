@@ -173,7 +173,7 @@ LOGGING = {
         "verbose": {"format": "%(levelname)s %(asctime)s %(module)s " "%(process)d %(thread)d %(message)s"},
         "colored_formatter": {
             "()": "colorlog.ColoredFormatter",
-            "format": "\n%(log_color)s%(levelname)-8s%(white)s%(message)s",
+            "format": "\n%(log_color)s%(levelname)-8s%(white)s(%(threadName)s) %(message)s",
             "log_colors": {
                 "DEBUG": "bold_black",
                 "INFO": "green",

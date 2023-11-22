@@ -35,13 +35,23 @@ class Command(BaseCommand):
         this_process = current_process().name
         try:
             project = projects_queue.get(timeout=2)
-            if project.origin_chamber == ProjectChambers.DEPUTIES and project.deputies_project_id:
+            if (
+                project.origin_chamber == ProjectChambers.DEPUTIES
+                and project.deputies_project_id
+            ):
                 try:
                     num, source, year = project.deputies_project_id.split("-")
                 except ValueError:
                     num, year = project.deputies_project_id.split("-")
                     source = "D"
-                text, link = DeputiesLawProjectsText.get_text(num, source, year)
+                try:
+                    text, link = DeputiesLawProjectsText.get_text(num, source, year)
+                except Exception as e:
+                    self.logger.error(
+                        f"{this_process} > Error while getting text for project: {project.deputies_project_id}",
+                        exc_info=True,
+                    )
+                    return False
                 data_queue.put((project, text, link))
             elif project.origin_chamber == ProjectChambers.SENATORS and project.senate_project_id:
                 parts = project.senate_project_id.split("-")
@@ -55,11 +65,23 @@ class Command(BaseCommand):
                 else:
                     self.logger.error(f"{this_process} > Invalid project id: {project.senate_project_id}")
                     return False
-                text, link = SenateLawProjectsText.get_text(num, source, year)
+                try:
+                    text, link = SenateLawProjectsText.get_text(num, source, year)
+                except Exception as e:
+                    self.logger.error(
+                        f"{this_process} > Error while getting text for project: {project.senate_project_id}",
+                        exc_info=True,
+                    )
+                    return False
                 # TODO: if text is empty try to get text with deputies Projects source
                 data_queue.put((project, text, link))
             else:
-                self.logger.error(f"{this_process} > Could not handle project with id: {project.id}")
+                self.logger.error(
+                    f"{this_process} > Could not handle project with id: {project.id}"
+                    + f" deputies_project_id: {project.deputies_project_id},"
+                    + f" senate_project_id: {project.senate_project_id},"
+                    + f" origin_chamber: {project.origin_chamber}"
+                )
                 return False
         except Empty:
             self.logger.info(f"{this_process} > Projects queue empty")
@@ -89,6 +111,9 @@ class Command(BaseCommand):
         only_missing = options.get("only_missing", False)
         projects = (
             LawProject.objects.filter(Q(text=None) | Q(text="")).all() if only_missing else LawProject.objects.all()
+        )
+        self.logger.info(
+            f"STARTING COMMAND: load_law_projects_text with {self.num_processes} processes"
         )
         self.projects_queue = Queue()
         self.data_queue = Queue()
@@ -138,6 +163,8 @@ class Command(BaseCommand):
         except BaseException as e:
             self.logger.error(f"Exception occurred: {repr(e)}. Stopping threads...")
             self._stop_threads()
+
+        self.logger.info("FINISHED COMMAND: load_law_projects_text")
 
     def _stop_threads(self):
         self.logger.info(f"Projects remaining in workers queue: {self.projects_queue.qsize()}")

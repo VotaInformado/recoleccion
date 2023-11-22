@@ -20,6 +20,7 @@ class LegislatorDetailsSerializer(serializers.ModelSerializer):
     last_seat = LegislatorSeatSerializer()
     legislator_seats = serializers.SerializerMethodField()
     votes = serializers.SerializerMethodField()
+    # projects = serializers.SerializerMethodField()
 
     class Meta:
         model = Person
@@ -37,6 +38,13 @@ class LegislatorDetailsSerializer(serializers.ModelSerializer):
             absents=Count("vote", filter=Q(vote=VoteChoices.ABSENT.value)),
         )
         return votes_summary
+
+    # def get_projects(self, obj):
+    #     from recoleccion.models import LawProject
+
+    #     obj.authorships.
+    #     projects = LawProject.objects.filter(authorships__person=obj)
+    #     return projects.values("id", "title", "chamber", "origin_chamber")
 
     def get_legislator_seats(self, obj):
         senate_seats = ReducedSenateSeatSerializer(

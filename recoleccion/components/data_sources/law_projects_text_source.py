@@ -15,12 +15,19 @@ class LawProjectsText(DataSource):
     @classmethod
     def _get_pdf_text(cls, url):
         cls.logger.info(f"Getting text from pdf: {url}")
-        response = cls.session.get(url, stream=True)
         try:
+            response = cls.session.get(url, stream=True)
+            if response.status_code != 200:
+                cls.logger.error(
+                    f"Error while getting pdf from url {url}: {response.status_code}"
+                )
+                return ""
             stream = BytesIO(response.content)
             pdf = Pdf(stream)
         except Exception as e:
-            cls.logger.error(f"Error while getting pdf from url {url}: {e}")
+            cls.logger.error(
+                f"Error while getting pdf from url {url}: {e}", exc_info=True
+            )
             return ""
         return pdf.get_text_and_close()
 
@@ -45,14 +52,14 @@ class LawProjectsText(DataSource):
 
 class DeputiesLawProjectsText(LawProjectsText):
     session = requests.Session()
-    base_url = "https://www.diputados.gov.ar/proyectos/resultados-buscador.html"
+    base_url = "https://www.hcdn.gob.ar/proyectos/resultado.html"
     infobase_url = "https://www.hcdn.gob.ar/folio-cgi-bin/om_isapi.dll?infobase=tp.nfo&softpage=Doc_Frame_Pg42&record=dochitfirst&advquery={exp}"
     infobase_record_url = "https://www.hcdn.gob.ar/folio-cgi-bin/om_isapi.dll?infobase=tp.nfo&record={record}&softpage=Document42"
     POST_HEADERS = {
-        "Referer": "https://www.diputados.gov.ar/proyectos/index.html",
+        "Referer": "https://www.hcdn.gob.ar/proyectos/",
     }
     GET_HEADERS = {
-        "Referer": "https://www.diputados.gov.ar/proyectos/resultados-buscador.html",
+        "Referer": "https://www.hcdn.gob.ar/proyectos/resultado.html",
     }
 
     QUERY_DATA = {
@@ -80,6 +87,9 @@ class DeputiesLawProjectsText(LawProjectsText):
     def _get_text_from_infobase(cls, url):
         response = cls.session.get(url)
         if response.status_code != 200:
+            cls.logger.error(
+                f"Error while getting infobase url: {url}: {response.status_code}"
+            )
             return ""
         soup = BeautifulSoup(response.content, "html.parser")
         record_url = soup.find("frame").get("src", "")
@@ -88,7 +98,13 @@ class DeputiesLawProjectsText(LawProjectsText):
         if not match:
             return ""
         record_name = match.group(1)
-        response = cls.session.get(cls.infobase_record_url.format(record=record_name))
+        infobase_url = cls.infobase_record_url.format(record=record_name)
+        response = cls.session.get(infobase_url)
+        if response.status_code != 200:
+            cls.logger.error(
+                f"Error while getting infobase record: {record_name} from url {infobase_url}: {response.status_code}"
+            )
+            return ""
         soup = BeautifulSoup(response.content, "html5lib")
         record = soup.find("a", attrs={"name": record_name})
         # remove scripts
@@ -100,6 +116,11 @@ class DeputiesLawProjectsText(LawProjectsText):
     @classmethod
     def _get_html_text(cls, url):
         response = cls.session.get(url)
+        if response.status_code != 200:
+            cls.logger.error(
+                f"Error while getting html text from url: {url}: {response.status_code}"
+            )
+            return ""
         soup = BeautifulSoup(response.content, "html.parser")
         text_container = soup.find("div", attrs={"class": "container interno"})
         if not text_container:
@@ -116,6 +137,11 @@ class DeputiesLawProjectsText(LawProjectsText):
         response = cls.session.post(
             cls.base_url, data=cls.QUERY_DATA, headers=cls.POST_HEADERS
         )
+        if response.status_code != 200:
+            cls.logger.error(
+                f"Error while getting projects from url {cls.base_url} for project {number}-{source}-{year}: {response.status_code}"
+            )
+            return "", None
         soup = BeautifulSoup(response.content, "html.parser")
         link_to_text = soup.find(
             "a", string=["Texto completo del proyecto", "Ver documento original"]

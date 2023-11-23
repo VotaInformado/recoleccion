@@ -9,11 +9,10 @@ from recoleccion.components.data_sources.law_projects_text_source import (
     DeputiesLawProjectsText,
     SenateLawProjectsText,
 )
-from recoleccion.components.writers.law_projects_writer import LawProjectsWriter
 import logging
 from recoleccion.models.law_project import LawProject
 from recoleccion.utils.enums.project_chambers import ProjectChambers
-from multiprocessing import Process, Queue, Event, current_process, active_children
+from multiprocessing import Queue, Event, current_process
 from queue import Empty
 from time import sleep
 import argparse
@@ -36,7 +35,7 @@ class Command(BaseCommand):
         try:
             project = projects_queue.get(timeout=2)
             if (
-                project.origin_chamber == ProjectChambers.DEPUTIES
+                project.origin_chamber == ProjectChambers.DEPUTIES.value
                 and project.deputies_project_id
             ):
                 try:
@@ -53,7 +52,10 @@ class Command(BaseCommand):
                     )
                     return False
                 data_queue.put((project, text, link))
-            elif project.origin_chamber == ProjectChambers.SENATORS and project.senate_project_id:
+            elif (
+                project.origin_chamber == ProjectChambers.SENATORS.value
+                and project.senate_project_id
+            ):
                 parts = project.senate_project_id.split("-")
                 # Ugly FIX: some projects have a wrong format TODO: fix
                 if len(parts) == 3:
@@ -63,7 +65,9 @@ class Command(BaseCommand):
                     year = parts[-1]
                     source = "S"
                 else:
-                    self.logger.error(f"{this_process} > Invalid project id: {project.senate_project_id}")
+                    self.logger.error(
+                        f"{this_process} > Invalid project id: {project.senate_project_id}"
+                    )
                     return False
                 try:
                     text, link = SenateLawProjectsText.get_text(num, source, year)
@@ -110,7 +114,9 @@ class Command(BaseCommand):
         self.num_processes = options.get("processes", self.num_processes)
         only_missing = options.get("only_missing", False)
         projects = (
-            LawProject.objects.filter(Q(text=None) | Q(text="")).all() if only_missing else LawProject.objects.all()
+            LawProject.objects.filter(Q(text=None) | Q(text="")).all()
+            if only_missing
+            else LawProject.objects.all()
         )
         self.logger.info(
             f"STARTING COMMAND: load_law_projects_text with {self.num_processes} processes"
@@ -167,8 +173,12 @@ class Command(BaseCommand):
         self.logger.info("FINISHED COMMAND: load_law_projects_text")
 
     def _stop_threads(self):
-        self.logger.info(f"Projects remaining in workers queue: {self.projects_queue.qsize()}")
-        self.logger.info(f"Projects remaining in writer queue: {self.data_queue.qsize()}")
+        self.logger.info(
+            f"Projects remaining in workers queue: {self.projects_queue.qsize()}"
+        )
+        self.logger.info(
+            f"Projects remaining in writer queue: {self.data_queue.qsize()}"
+        )
         # To avoid the need of flushing the queues
         self.projects_queue.cancel_join_thread()
         self.data_queue.cancel_join_thread()

@@ -1,5 +1,4 @@
-from multiprocessing import Process, Queue, Event, current_process, active_children
-from queue import Empty
+from multiprocessing import Process, Event, current_process
 import logging
 
 
@@ -39,7 +38,7 @@ class StoppableProcess(Process):
         def wrapper(*args, **kwargs):
             this_process = current_process().name
             try:
-                while not self._stop_event.is_set():
+                while not self.stopped():
                     if target(*args, **kwargs):
                         self.stop()
             except KeyboardInterrupt:
@@ -49,7 +48,9 @@ class StoppableProcess(Process):
             except BaseException as e:
                 import traceback
 
-                self.logger.error(f"{this_process} > BaseException: {repr(e), traceback.print_exc()}")
+                self.logger.error(
+                    f"{this_process} > BaseException ocurred", exc_info=True
+                )
             self.stop()
             self.logger.warning(f"{this_process} > Stopped")
 

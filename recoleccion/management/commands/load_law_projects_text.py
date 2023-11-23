@@ -47,7 +47,7 @@ class Command(BaseCommand):
                     text, link = DeputiesLawProjectsText.get_text(num, source, year)
                 except Exception as e:
                     self.logger.error(
-                        f"{this_process} > Error while getting text for project: {project.deputies_project_id}",
+                        f"{this_process} > Error while getting text for project with deputies id: {project.deputies_project_id}",
                         exc_info=True,
                     )
                     return False
@@ -73,7 +73,7 @@ class Command(BaseCommand):
                     text, link = SenateLawProjectsText.get_text(num, source, year)
                 except Exception as e:
                     self.logger.error(
-                        f"{this_process} > Error while getting text for project: {project.senate_project_id}",
+                        f"{this_process} > Error while getting text for project with senate id: {project.senate_project_id}",
                         exc_info=True,
                     )
                     return False

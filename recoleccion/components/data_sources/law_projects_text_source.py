@@ -92,7 +92,7 @@ class DeputiesLawProjectsText(LawProjectsText):
             )
             return ""
         soup = BeautifulSoup(response.content, "html.parser")
-        record_url = soup.find("frame").get("src", "")
+        record_url = soup.find("frame").get("src", "") if soup.find("frame") else ""
         pattern = r"record=({[^}]+})"
         match = re.search(pattern, record_url)
         if not match:
@@ -107,6 +107,11 @@ class DeputiesLawProjectsText(LawProjectsText):
             return ""
         soup = BeautifulSoup(response.content, "html5lib")
         record = soup.find("a", attrs={"name": record_name})
+        if not record:
+            cls.logger.warning(
+                f"Could not find record {record_name} in infobase url: {infobase_url}"
+            )
+            return ""
         # remove scripts
         scripts = record.find_all("script")
         for script in scripts:

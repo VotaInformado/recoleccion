@@ -25,6 +25,8 @@ class StoppableProcess(Process):
             self.start()
 
     def stop(self):
+        if self.stopped():
+            return
         self._stop_event.set()
 
     def stop_and_join(self):

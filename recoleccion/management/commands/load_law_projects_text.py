@@ -32,69 +32,85 @@ class Command(BaseCommand):
 
     def worker_target(self, projects_queue, data_queue):
         this_process = current_process().name
+
+        def get_text_from_source(number, source, year, project_id, text_source):
+            try:
+                text, link = text_source.get_text(number, source, year)
+                return text, link
+            except Exception:
+                self.logger.error(
+                    f"{this_process} > Error while getting text with {text_source.__name__}"
+                    + f"for project with {project_id} id"
+                    + f" and number: {number}, source: {source}, year: {year}",
+                    exc_info=True,
+                )
+                return None, None
+
         try:
             project = projects_queue.get(timeout=2)
-            if (
-                project.origin_chamber == ProjectChambers.DEPUTIES.value
-                and project.deputies_project_id
-            ):
-                try:
-                    num, source, year = project.deputies_project_id.split("-")
-                except ValueError:
-                    num, year = project.deputies_project_id.split("-")
-                    source = "D"
-                try:
-                    text, link = DeputiesLawProjectsText.get_text(num, source, year)
-                except Exception as e:
-                    self.logger.error(
-                        f"{this_process} > Error while getting text for project with deputies id: {project.deputies_project_id}",
-                        exc_info=True,
-                    )
-                    return False
-                data_queue.put((project, text, link))
-            elif (
-                project.origin_chamber == ProjectChambers.SENATORS.value
-                and project.senate_project_id
-            ):
-                parts = project.senate_project_id.split("-")
-                # Ugly FIX: some projects have a wrong format TODO: fix
-                if len(parts) == 3:
-                    num, source, year = parts
-                elif len(parts) >= 2:
-                    num = parts[0]
-                    year = parts[-1]
-                    source = "S"
-                else:
-                    self.logger.error(
-                        f"{this_process} > Invalid project id: {project.senate_project_id}"
-                    )
-                    return False
-                try:
-                    text, link = SenateLawProjectsText.get_text(num, source, year)
-                except Exception as e:
-                    self.logger.error(
-                        f"{this_process} > Error while getting text for project with senate id: {project.senate_project_id}",
-                        exc_info=True,
-                    )
-                    return False
-                # TODO: if text is empty try to get text with deputies Projects source
-                data_queue.put((project, text, link))
-            else:
-                self.logger.error(
-                    f"{this_process} > Could not handle project with id: {project.id}"
-                    + f" deputies_project_id: {project.deputies_project_id},"
-                    + f" senate_project_id: {project.senate_project_id},"
-                    + f" origin_chamber: {project.origin_chamber}"
+
+            # First get project text from deputies source
+            text, link = get_text_from_source(
+                project.deputies_number,
+                project.deputies_source,
+                project.deputies_year,
+                project.deputies_project_id,
+                DeputiesLawProjectsText,
+            )
+
+            # If text is empty, get it from senate source
+            if not text:
+                text, link = get_text_from_source(
+                    project.senate_number,
+                    project.senate_source,
+                    project.senate_year,
+                    project.senate_project_id,
+                    SenateLawProjectsText,
                 )
+
+            # If text is still empty, get it from deputies source with the senate id
+            if not text:
+                text, link = get_text_from_source(
+                    project.senate_number,
+                    project.senate_source,
+                    project.senate_year,
+                    project.senate_project_id,
+                    DeputiesLawProjectsText,
+                )
+
+            if text:
+                data_queue.put((project, text, link))
                 return False
+
+            self.logger.info(
+                f"{this_process} > No text found for project with deputies id: {project.deputies_project_id} and senate id: {project.senate_project_id}"
+            )
+
         except Empty:
             self.logger.info(f"{this_process} > Projects queue empty")
             return True
+
         return False
 
     def writer_target(self, data_queue, workers_finished):
         this_process = current_process().name
         try:
+            if workers_finished.is_set():
+                self.logger.info(f"{this_process} > Bulk updating projects...")
+                projects = []
+                while not data_queue.empty():
+                    data = data_queue.get(timeout=1)
+                    project, text, link = data
+                    text = text.replace("\x00", "\uFFFD")
+                    link = link.replace("\x00", "\uFFFD")
+                    project.text = text
+                    project.link = link
+                    projects.append(project)
+                self.logger.info(f"{this_process} > Bulk updating {projects}...")
+                LawProject.objects.bulk_update(
+                    projects, ["text", "link"], batch_size=500
+                )
+                return True
             data = data_queue.get(timeout=1)
             project, text, link = data
             self.logger.info(

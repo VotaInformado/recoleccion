@@ -5,6 +5,8 @@ from recoleccion.utils.pdf_reader import Pdf
 from recoleccion.components.utils import len_gt
 from io import BytesIO
 import re
+from urllib3.util import Retry
+from multiprocessing import current_process
 
 
 class LawProjectsText(DataSource):
@@ -14,19 +16,20 @@ class LawProjectsText(DataSource):
 
     @classmethod
     def _get_pdf_text(cls, url):
-        cls.logger.info(f"Getting text from pdf: {url}")
+        cls.logger.info(f"{current_process().name} > Getting text from pdf: {url}")
         try:
             response = cls.session.get(url, stream=True)
             if response.status_code != 200:
                 cls.logger.error(
-                    f"Error while getting pdf from url {url}: {response.status_code}"
+                    f"{current_process().name} > Error while getting pdf from url {url}: {response.status_code}"
                 )
                 return ""
             stream = BytesIO(response.content)
             pdf = Pdf(stream)
         except Exception as e:
             cls.logger.error(
-                f"Error while getting pdf from url {url}: {e}", exc_info=True
+                f"{current_process().name} > Error while getting pdf from url {url}: {e}",
+                exc_info=True,
             )
             return ""
         return pdf.get_text_and_close()
@@ -52,6 +55,13 @@ class LawProjectsText(DataSource):
 
 class DeputiesLawProjectsText(LawProjectsText):
     session = requests.Session()
+    retries = Retry(
+        total=5,
+        backoff_factor=0.1,
+        status_forcelist=[500, 502, 503, 504],
+        allowed_methods=None,  # To allow all
+    )
+    session.mount("https://", requests.adapters.HTTPAdapter(max_retries=retries))
     base_url = "https://www.hcdn.gob.ar/proyectos/resultado.html"
     infobase_url = "https://www.hcdn.gob.ar/folio-cgi-bin/om_isapi.dll?infobase=tp.nfo&softpage=Doc_Frame_Pg42&record=dochitfirst&advquery={exp}"
     infobase_record_url = "https://www.hcdn.gob.ar/folio-cgi-bin/om_isapi.dll?infobase=tp.nfo&record={record}&softpage=Document42"
@@ -79,6 +89,7 @@ class DeputiesLawProjectsText(LawProjectsText):
 
     @classmethod
     def _get_infobase_url(cls, number, source, year):
+        year = str(int(year))  # remove leading zeros
         year = year[-2:] if len(year) > 2 else year
         exp = f"{number}-{source}-{year}"
         return cls.infobase_url.format(exp=exp)
@@ -88,7 +99,7 @@ class DeputiesLawProjectsText(LawProjectsText):
         response = cls.session.get(url)
         if response.status_code != 200:
             cls.logger.error(
-                f"Error while getting infobase url: {url}: {response.status_code}"
+                f"{current_process().name} > Error while getting infobase url: {url}: {response.status_code}"
             )
             return ""
         soup = BeautifulSoup(response.content, "html.parser")
@@ -102,14 +113,14 @@ class DeputiesLawProjectsText(LawProjectsText):
         response = cls.session.get(infobase_url)
         if response.status_code != 200:
             cls.logger.error(
-                f"Error while getting infobase record: {record_name} from url {infobase_url}: {response.status_code}"
+                f"{current_process().name} > Error while getting infobase record: {record_name} from url {infobase_url}: {response.status_code}"
             )
             return ""
         soup = BeautifulSoup(response.content, "html5lib")
         record = soup.find("a", attrs={"name": record_name})
         if not record:
             cls.logger.warning(
-                f"Could not find record {record_name} in infobase url: {infobase_url}"
+                f"{current_process().name} > Could not find record {record_name} in infobase url: {infobase_url}"
             )
             return ""
         # remove scripts
@@ -123,7 +134,7 @@ class DeputiesLawProjectsText(LawProjectsText):
         response = cls.session.get(url)
         if response.status_code != 200:
             cls.logger.error(
-                f"Error while getting html text from url: {url}: {response.status_code}"
+                f"{current_process().name} > Error while getting html text from url: {url}: {response.status_code}"
             )
             return ""
         soup = BeautifulSoup(response.content, "html.parser")
@@ -135,6 +146,11 @@ class DeputiesLawProjectsText(LawProjectsText):
 
     @classmethod
     def _get_text(cls, number, source, year):
+        if not number or not source or not year:
+            cls.logger.info(
+                f"{current_process().name} > Missing data for project: {number}-{source}-{year}. Skipping..."
+            )
+            return "", None
         cls.QUERY_DATA["strNumExp"] = number
         cls.QUERY_DATA["strNumExpOrig"] = source
         cls.QUERY_DATA["strNumExpAnio"] = year
@@ -144,7 +160,7 @@ class DeputiesLawProjectsText(LawProjectsText):
         )
         if response.status_code != 200:
             cls.logger.error(
-                f"Error while getting projects from url {cls.base_url} for project {number}-{source}-{year}: {response.status_code}"
+                f"{current_process().name} > Error while getting projects from url {cls.base_url} for project {number}-{source}-{year}: {response.status_code}"
             )
             return "", None
         soup = BeautifulSoup(response.content, "html.parser")
@@ -222,11 +238,17 @@ class SenateLawProjectsText(LawProjectsText):
     def _parse_input(cls, number, source, year):
         number = str(int(number))  # remove leading zeros
         source = source.upper()
+        year = str(int(year))  # remove leading zeros
         year = year[-2:] if len(year) > 2 else year
         return number, source, year
 
     @classmethod
     def _get_text(cls, number, source, year):
+        if not number or not source or not year:
+            cls.logger.info(
+                f"{current_process().name} > Missing data for project: {number}-{source}-{year}. Skipping..."
+            )
+            return "", None
         number, source, year = cls._parse_input(number, source, year)
         url = cls.base_url.format(number=number, source=source, year=year)
         response = cls.session.get(url)

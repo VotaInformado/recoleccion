@@ -51,7 +51,8 @@ class LawProject(BaseModel):
 
     def get_year(self):
         year = self.deputies_year or self.senate_year
-        if year is None: return None
+        if year is None:
+            return None
         if year < 1000 and year > 75:
             return year + 1900
         elif year < 1000 and year <= 75:
@@ -185,3 +186,6 @@ class LawProject(BaseModel):
             "CD": ProjectChambers.DEPUTIES,
         }
         return CHAMBER_MAPPING.get(raw_chamber, None)
+
+    def __repr__(self):
+        return f"LawProject(deputy_project_id: {self.deputies_project_id}, senate_project_id: {self.senate_project_id})"

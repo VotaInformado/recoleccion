@@ -10,7 +10,7 @@ from recoleccion.components.linkers import Linker
 from recoleccion.components.utils import unidecode_text
 from recoleccion.models import Person
 import logging
-from recoleccion.models import PersonLinking
+from recoleccion.models import PersonLinkingDecision
 from recoleccion.utils.enums.linking_decisions import LinkingDecisions
 
 
@@ -70,6 +70,12 @@ class PersonLinker(Linker):
         return matched_df, unmatched_data
 
     def link_persons(self, data: pd.DataFrame):
+        """
+        Receives a DF with columns: name, last_name, district, party, start_of_term, end_of_term, is_active
+        Returns a DF with columns: name, last_name, district, party, start_of_term, end_of_term, is_active, person_id, linking_id
+        person_id is the id of the linked person if the linking was made, None otherwise
+        linking_id is the id of the pending linking decision that has to be made, if linking entered in the dubious range
+        """
         self.logger.info(f"Linking {len(data)} persons...")
         try:
             linked_persons = 0
@@ -84,15 +90,18 @@ class PersonLinker(Linker):
             except IncompatibleLinkingDatasets as e:
                 undefined_df["party_id"] = None
                 return self.merge_dataframes(exactly_matched_data, manually_linked_data, undefined_df)
-            certain, _ = self.classify(undefined_data)
-            mapping = [None for x in range(undefined_df.shape[0])]
-            for messy_data_index, canonical_data_index in certain:  # Probably could be done in paralell
+            certain, undefined, __ = self.classify(undefined_data)
+            certain_mapping = [None for x in range(undefined_df.shape[0])]
+            for messy_data_index, canonical_data_index in certain:
                 canonical_data_id = self.canonical_data[canonical_data_index]["id"]
-                mapping[messy_data_index] = canonical_data_id
+                certain_mapping[messy_data_index] = canonical_data_id
                 linked_persons += 1
-
-            undefined_df["person_id"] = mapping
+            undefined_df["person_id"] = certain_mapping
             self.logger.info(f"Linked {linked_persons} persons")
+            undefined_mapping = [None for x in range(undefined_df.shape[0])]
+            for messy_data_index, canonical_data_index, linking_id in undefined:
+                undefined_mapping[messy_data_index] = linking_id
+            undefined_df["linking_id"] = undefined_mapping
             unlinked_persons = undefined_df["person_id"].isnull().sum()
             self.logger.info(f"{unlinked_persons} persons remain unlinked")
         except ValueError as e:  # TODO: creo que esto se puede sacar
@@ -127,15 +136,15 @@ class PersonLinker(Linker):
     def are_the_same_record(self, record_1, record_2):
         return record_1["name"] == record_2["name"] and record_1["last_name"] == record_2["last_name"]
 
-    def save_linking_decision(self, person_id, messy_name, canonical_name):
-        if person_id < 0:
-            decision = LinkingDecisions.DENIED
-        else:
-            decision = LinkingDecisions.APPROVED
-        person_id = person_id if person_id > 0 else None
-        PersonLinking.objects.create(
-            person_id=person_id, full_name=messy_name, compared_against=canonical_name, decision=decision
-        )
+    # def save_linking_decision(self, person_id, messy_name, canonical_name):
+    #     if person_id < 0:
+    #         decision = LinkingDecisions.DENIED
+    #     else:
+    #         decision = LinkingDecisions.APPROVED
+    #     person_id = person_id if person_id > 0 else None
+    #     PersonLinkingDecision.objects.create(
+    #         person_id=person_id, messy_name=messy_name, compared_against=canonical_name, decision=decision
+    #     )
 
     def clean_record(self, record):
         # for any record, returns name, last_name and id (only if it exists)
@@ -149,15 +158,15 @@ class PersonLinker(Linker):
     def get_record_id(self, record: dict):
         return record["id"]
 
-    def approved_linking(self, canonical_name: str, messy_name: str) -> Tuple[bool, int]:
-        person_link = PersonLinking.objects.filter(full_name=messy_name, compared_against=canonical_name).first()
+    def approved_linking(self, canonical_id: int, messy_name: str) -> Tuple[bool, int]:
+        person_link = PersonLinkingDecision.objects.filter(messy_name=messy_name, person_id=canonical_id).first()
         if person_link:
             if person_link.decision == LinkingDecisions.APPROVED:
                 return True, person_link.person_id
         return False, None
 
-    def rejected_linking(self, canonical_name: str, messy_name: str) -> bool:
-        person_link = PersonLinking.objects.filter(full_name=messy_name, compared_against=canonical_name).first()
+    def rejected_linking(self, canonical_id: int, messy_name: str) -> bool:
+        person_link = PersonLinkingDecision.objects.filter(messy_name=messy_name, person_id=canonical_id).first()
         if person_link:
             if person_link.decision == LinkingDecisions.DENIED:
                 return True
@@ -177,15 +186,15 @@ class PersonLinker(Linker):
             messy_full_name = messy_record["name"] + " " + messy_record["last_name"]
             decision_found = False
             for canonical_index, canonical_record in canonical_data.items():
-                canonical_full_name = canonical_record["name"] + " " + canonical_record["last_name"]
-                is_approved, person_id = self.approved_linking(canonical_full_name, messy_full_name)
+                canonical_id = canonical_record["id"]
+                is_approved, person_id = self.approved_linking(canonical_id, messy_full_name)
                 if is_approved:
                     messy_record: dict = messy_data[messy_index]
                     messy_record["person_id"] = person_id
                     approved_data.append(messy_record)
                     decision_found = True
                     break
-                elif self.rejected_linking(canonical_full_name, messy_full_name):
+                elif self.rejected_linking(canonical_id, messy_full_name):
                     messy_record: dict = messy_data[messy_index]
                     messy_record["party_id"] = DENIED_INDICATOR
                     rejected_data.append(messy_record)
@@ -196,3 +205,13 @@ class PersonLinker(Linker):
                 undefined_data[messy_index] = messy_record
         manually_linked_data: pd.DataFrame = self.assemble_manually_linked_data(approved_data, rejected_data)
         return manually_linked_data, undefined_data
+
+    def save_pending_linking_decision(self, canonical_record: dict, messy_record: dict) -> int:
+        person_id = canonical_record["id"]
+        messy_name = messy_record["name"] + " " + messy_record["last_name"]
+        decision = PersonLinkingDecision.objects.create(person_id=person_id, messy_name=messy_name)
+        return decision.pk
+
+    def get_linking_key(self, canonical_data_index: int, messy_record: dict):
+        messy_full_name = self.get_record_full_name(messy_record)
+        return (canonical_data_index, messy_full_name)

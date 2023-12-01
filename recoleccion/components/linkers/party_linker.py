@@ -1,15 +1,15 @@
-from typing import List, Tuple
+from typing import Tuple
 from dedupe import Gazetteer
 import pandas as pd
-from datetime import date
-from pprint import pp
+from django.apps import apps
+
 
 # Project
 from recoleccion.models.linking import DENIED_INDICATOR
 from recoleccion.exceptions.custom import IncompatibleLinkingDatasets
 from recoleccion.components.linkers import Linker
 from recoleccion.components.utils import unidecode_text
-from recoleccion.models import PartyLinking
+from recoleccion.models import PartyLinkingDecision
 from recoleccion.models.party import PartyDenomination
 import logging
 from recoleccion.utils.enums.linking_decisions import LinkingDecisions
@@ -85,9 +85,9 @@ class PartyLinker(Linker):
                 undefined_df["party_id"] = None
                 return self.merge_dataframes(exactly_matched_data, manually_linked_data, undefined_df)
 
-            certain, _ = self.classify(undefined_data)
+            certain, _, _ = self.classify(undefined_data)
             mapping = [None for x in range(undefined_df.shape[0])]
-            for messy_data_index, canonical_data_index in certain:  # Probably could be done in paralell
+            for messy_data_index, canonical_data_index in certain:
                 canonical_data_id = self.canonical_data[canonical_data_index]["party_id"]
                 mapping[messy_data_index] = canonical_data_id
                 linked_parties += 1
@@ -114,9 +114,12 @@ class PartyLinker(Linker):
         else:
             decision = LinkingDecisions.APPROVED
         party_id = party_id if party_id > 0 else None
-        PartyLinking.objects.create(
-            party_id=party_id, denomination=denomination, compared_against=canonical_name, decision=decision
-        )
+        # PartyLinking.objects.create(
+        #     party_id=party_id, denomination=denomination, compared_against=canonical_name, decision=decision
+        # )
+
+    def _save_pending_decisions(self, identical_pairs):
+        pass
 
     def clean_record(self, record):
         # for any record, returns name, last_name and id (only if it exists)
@@ -183,3 +186,24 @@ class PartyLinker(Linker):
                 ud_index += 1
         manually_linked_data: pd.DataFrame = self.assemble_manually_linked_data(approved_data, rejected_data)
         return manually_linked_data, undefined_data
+
+    def _set_record_id(self, party_denomination_id: int, record_linking_id: int):
+        party_id = PartyDenomination.objects.get(id=party_denomination_id).party_id
+        classes = ["Authorship", "DeputySeat", "SenateSeat", "Vote"]
+        for each_class in classes:
+            model = apps.get_model("recoleccion", each_class)
+            matches = model.objects.filter(linking_id=record_linking_id)
+            matches.update(party_id=party_id)
+        canonical_name = PartyDenomination.objects.get(
+            party_id=party_id
+        ).denomination  # OJO: Denomination id != party id
+
+    def save_pending_linking_decision(self, canonical_record: dict, messy_record: dict) -> int:
+        person_id = canonical_record["id"]
+        messy_denomination = messy_record["denomination"]
+        decision = PartyLinkingDecision.objects.create(person_id=person_id, messy_denomination=messy_denomination)
+        return decision.pk
+
+    def get_linking_key(self, canonical_data_index: int, messy_record: dict):
+        messy_denomination = messy_record["denomination"]
+        return (canonical_data_index, messy_denomination)

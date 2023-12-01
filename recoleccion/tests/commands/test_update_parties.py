@@ -7,7 +7,7 @@ from django.core.management import call_command
 import recoleccion.tests.test_helpers.utils as ut
 from recoleccion.components.linkers.party_linker import PartyLinker
 from recoleccion.components.writers.votes_writer import VotesWriter
-from recoleccion.models import Authorship, LawProject, Party, PartyDenomination, PartyLinking, Person, Vote
+from recoleccion.models import Authorship, LawProject, Party, PartyDenomination, PartyLinkingDecision, Person, Vote
 from recoleccion.tests.test_helpers.test_case import LinkingTestCase
 from recoleccion.utils.enums.linking_decisions import LinkingDecisions
 
@@ -17,9 +17,8 @@ class UpdateVotesParties(LinkingTestCase):
         self, messy_denomination: str, canonical_denomination: str, decision: str, party_id: int = None
     ):
         party_id = party_id if decision == LinkingDecisions.APPROVED else None
-        PartyLinking.objects.create(
+        PartyLinkingDecision.objects.create(
             denomination=messy_denomination,
-            compared_against=canonical_denomination,
             decision=decision,
             party_id=party_id,
         )
@@ -213,7 +212,7 @@ class UpdateAuthorsParties(LinkingTestCase):
         self, messy_denomination: str, canonical_denomination: str, decision: str, party_id: int = None
     ):
         party_id = party_id if decision == LinkingDecisions.APPROVED else None
-        PartyLinking.objects.create(
+        PartyLinkingDecision.objects.create(
             denomination=messy_denomination,
             compared_against=canonical_denomination,
             decision=decision,

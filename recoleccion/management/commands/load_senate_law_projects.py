@@ -20,6 +20,8 @@ class Command(YearThreadedCommand):
         year = starting_year
         while True:
             data = source.get_data(year)
+            if data.empty:
+                self.save_missing_record(year)
             LawProjectsWriter.write(data)
             year = year - step_size
             if year < 1983:

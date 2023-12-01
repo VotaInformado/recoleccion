@@ -17,11 +17,14 @@ class LawProjectsWriter(Writer):
         if project_id is None:
             return None, None, None
         comps = project_id.split("-")
-        if len(comps) == 3:
-            num, source, year = comps
         if len(comps) == 2:
             num, year = comps
             source = None
+        elif len(comps) == 3:
+            num, source, year = comps
+        else:
+            self.logger.info(f"Invalid project id: {project_id}")
+            return None, None, None
         num = int(num)
         source = source.upper() if source else None
         year = int(year)
@@ -70,7 +73,7 @@ class LawProjectsWriter(Writer):
 
     @classmethod
     def update_or_create_element(cls, row: pd.Series, update_existing: bool):
-        row = row.dropna()
+        row = row.dropna()  # Important, because the writer will try to update or create with null values
         deputies_project_id = row.get("deputies_project_id", None)
         senate_project_id = row.get("senate_project_id", None)
         senate_project_id = senate_project_id.replace("/", "-") if senate_project_id else None
@@ -80,6 +83,9 @@ class LawProjectsWriter(Writer):
         deputies_number, deputies_source, deputies_year = cls.split_id(deputies_project_id)
         deputies_year = cls.format_year(deputies_project_id)
         senate_number, senate_source, senate_year = cls.split_id(senate_project_id)
+        if not deputies_number and not senate_number:
+            # We skip
+            return None, False
         senate_year = cls.format_year(senate_project_id)
         row.update(
             {
@@ -98,23 +104,12 @@ class LawProjectsWriter(Writer):
         try:
             source = row.get("source", "")
             if "senado" in source.lower():
-                if update_existing:
-                    law_project, was_created = LawProject.objects.update_or_create(
-                        senate_year=senate_year,
-                        senate_source=senate_source,
-                        senate_number=senate_number,
-                        defaults=row.to_dict(),
-                    )
-                else:
-                    law_project = LawProject.objects.filter(
-                        senate_number=senate_number, senate_source=senate_source, senate_year=senate_year
-                    ).first()
-                    if law_project:
-                        cls.logger.info(f"Law project {law_project.project_id} already exists, skipping...")
-                        return law_project, False
-                    else:
-                        law_project = LawProject.objects.create(**row.to_dict())
-                        return law_project, True
+                law_project, was_created = LawProject.objects.update_or_create(
+                    senate_year=senate_year,
+                    senate_source=senate_source,
+                    senate_number=senate_number,
+                    defaults=row.to_dict(),
+                )
             else:
                 law_project, was_created = LawProject.objects.update_or_create(
                     deputies_year=deputies_year,
@@ -127,6 +122,7 @@ class LawProjectsWriter(Writer):
         except Exception as e:
             project_id = deputies_project_id or senate_project_id
             cls.logger.warning(f"An error occurred while updating or creating law project with id {project_id}: {e}")
+            law_project, was_created = None, False
         return law_project, was_created
 
     @classmethod
@@ -151,3 +147,26 @@ class LawProjectsWriter(Writer):
                 not_found.append(project_id)
         cls.logger.info(f"Updated {len(updated)} day orders")
         cls.logger.info(f"{len(not_found)} day orders not found")
+
+    @classmethod
+    def update_projects_status(cls, data: pd.DataFrame):
+        cls.logger.info(f"Received {len(data)} status to update...")
+        updated, not_found = [], []
+        for i in data.index:
+            row: pd.Series = data.loc[i]
+            project_id = row.get("project_id")
+            project_status = row.get("project_status")
+            deputies_number, deputies_source, deputies_year = cls.split_id(project_id)
+            project = LawProject.objects.filter(
+                deputies_number=deputies_number, deputies_source=deputies_source, deputies_year=deputies_year
+            ).first()
+            if project:
+                project.status = project_status
+                project.save()
+                cls.logger.info(f"Updated status for project {project_id} to {project_status}")
+                updated.append(project)
+            else:
+                cls.logger.warning(f"Project {project_id} not found, status {project_status} not updated")
+                not_found.append(project_id)
+        cls.logger.info(f"Updated {len(updated)} projects status")
+        cls.logger.info(f"{len(not_found)} projects status not found")

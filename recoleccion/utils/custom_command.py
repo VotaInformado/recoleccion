@@ -1,6 +1,7 @@
+from django.conf import settings
 import argparse
 import inspect
-import threading
+import threading  # TODO: ver si también se pueden usar procesos
 import logging
 
 # Project
@@ -40,21 +41,32 @@ class CustomCommand(BaseCommand):
                 function_params[param_name] = options[param_name]
         return function_params
 
+    def get_current_index(self, *args, **options):
+        raise NotImplementedError
+
     def handle(self, *args, **options):
         threads = []
         if options.get("only_missing"):
-            target_function = self.missing_only_function
+            self.target_function = self.missing_only_function
         else:
-            target_function = self.main_function
-        function_params = self.get_function_params(target_function, options)
+            self.target_function = self.main_function
+        function_params = self.get_function_params(self.target_function, options)
+        if settings.USE_THREADS:
+            self.handle_threaded(function_params, options)
+        else:
+            self.handle_unthreaded(function_params, options)
+
+    def handle_threaded(self, function_params: dict, options: dict):
+        threads = []
         for index in range(self.THREAD_AMOUNT):
             if options.get("only_missing"):
                 function_params["starting_index"] = index
             else:
                 index_name = self.index_name  # starting_page, starting_period or starting_year
-                function_params[index_name] = index
+                pagination_index = self.get_current_index(loop_index=index, options=options)
+                function_params[index_name] = pagination_index
             function_params["step_size"] = self.THREAD_AMOUNT
-            thread = threading.Thread(name=f"Thread {index+1}", target=target_function, kwargs=function_params)
+            thread = threading.Thread(name=f"Thread {index+1}", target=self.target_function, kwargs=function_params)
             threads.append(thread)
             self.logger.info(f"Starting thread {index+1}")
             thread.start()
@@ -66,6 +78,17 @@ class CustomCommand(BaseCommand):
         for thread in threads:
             thread.join()
 
+    def handle_unthreaded(self, function_params: dict, options: dict):
+        INDEX = self.get_current_index(0, options)
+        STEP_SIZE = 1
+        if options.get("only_missing"):
+            function_params["starting_index"] = INDEX
+        else:
+            index_name = self.index_name
+            function_params[index_name] = INDEX
+        function_params["step_size"] = STEP_SIZE
+        self.target_function(**function_params)
+
     def main_function(self):
         raise NotImplementedError
 
@@ -74,6 +97,11 @@ class CustomCommand(BaseCommand):
 
 
 class YearThreadedCommand(CustomCommand):
+    def get_current_index(self, loop_index, options):
+        starting_year = options.get("starting_year")
+        actual_index = starting_year - loop_index
+        return actual_index
+
     def __init__(self):
         super().__init__()
         self.reverse_index = True
@@ -81,6 +109,9 @@ class YearThreadedCommand(CustomCommand):
 
 
 class PageThreadedCommand(CustomCommand):
+    def get_current_index(self, loop_index, _):
+        return loop_index
+
     def __init__(self):
         super().__init__()
         self.reverse_index = False
@@ -88,6 +119,9 @@ class PageThreadedCommand(CustomCommand):
 
 
 class PeriodThreadedCommand(CustomCommand):
+    def get_current_index(self, loop_index, _):
+        return loop_index
+
     def __init__(self):
         super().__init__()
         self.reverse_index = False

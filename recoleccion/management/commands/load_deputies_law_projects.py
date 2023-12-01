@@ -15,7 +15,7 @@ class Command(PageThreadedCommand):
     help = "Load laws from the deputy source"
 
     def add_arguments(self, parser):
-        super().add_arguments(parser)
+        super().add_arguments(parser)  #TODO: se puede sacar?
         parser.add_argument("--starting-page", type=int, default=1)
 
     def handle(self, *args, **options):

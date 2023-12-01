@@ -26,6 +26,12 @@ class DeputiesDayOrderSource(DataSource):
         return projects
 
     @classmethod
+    def is_law_project(cls, row) -> bool:
+        project_type_div = row.find_all("td")[8]
+        project_type = project_type_div.text.strip()
+        return project_type == "ley" or project_type == "Ley"
+
+    @classmethod
     def get_day_orders_data(cls, period: int) -> List[dict]:
         data = []
         url = f"{cls.BASE_URL}?periodo={period}"
@@ -39,7 +45,9 @@ class DeputiesDayOrderSource(DataSource):
         # TODO: filtrar sólo proyectos de ley
         rows = table_element.find_all("tr")[1:]  # Skip the header row
         rows = list(filter(lambda row: len(row) > 5, rows))  # Forros que son con su tabla mal hecha
-        for row in rows:
+        filtered_rows = list(filter(lambda row: cls.is_law_project(row), rows))
+
+        for row in filtered_rows:
             try:
                 day_order = int(row.find_all("td")[1].text.strip())
             except ValueError:  # casos raros, como 442bis

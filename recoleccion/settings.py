@@ -198,3 +198,5 @@ LOGGING = {
         "recoleccion": {"level": "DEBUG", "handlers": ["console", "axiom_handler"], "propagate": True},
     },
 }
+
+USE_THREADS = True

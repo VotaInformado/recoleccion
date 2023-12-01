@@ -527,3 +527,53 @@ class SenateLawProjectsSource(DataSource):
         data["source"] = "Senadores (web)"
         self.logger.info(f"Retrieved {len(data)} projects")
         return data
+
+
+class LawProjectsStatusSource(DataSource):
+    BASE_PROJECTS_URL = "https://datos.hcdn.gob.ar:443/api/3/action/datastore_search?resource_id=22b2d52c-7a0e-426b-ac0a-a3326c388ba6&limit=1000000"
+    PROJECTS_RESULT_URL = "https://datos.hcdn.gob.ar:443/api/3/action/datastore_search?resource_id=daf0e90e-d94f-4186-b7cf-dfad5b6f9369&limit=1000000"
+
+    column_mappings = {
+        "exp_diputados": "project_id",
+        "resultado": "project_status",
+    }
+
+    def __init__(self):
+        self.session = requests.Session()
+
+    def _get_projects_base_data(self):
+        request = self.session.get(self.BASE_PROJECTS_URL)
+        data = request.json()["result"]["records"]
+        df = pd.DataFrame(data)
+        self.logger.info(f"Projects base data size: {len(df)}")
+        df = df[["proyecto_id", "exp_diputados", "tipo_proyecto"]]
+        return df
+
+    def _get_projects_results_data(self):
+        request = self.session.get(self.PROJECTS_RESULT_URL)
+        data = request.json()["result"]["records"]
+        df = pd.DataFrame(data)
+        df = df[["expediente_id", "resultado"]]
+        self.logger.info(f"Projects results data size: {len(df)}")
+        df["resultado"] = df["resultado"].apply(lambda x: self._translate_project_status(x))
+        df = df.loc[df["resultado"].notnull()]
+        self.logger.info(f"Projects results data size (result not null): {len(df)}")
+        return df
+
+    def _translate_project_status(self, raw_status: str):
+        status_translation = {
+            "APROBADO": ProjectStatus.APPROVED,
+            "SANCIONADO": ProjectStatus.APPROVED,
+            "MEDIA SANCION": ProjectStatus.HALF_SANCTION,
+            "RETIRADO": ProjectStatus.WITHDRAWN,
+            "RECHAZADO": ProjectStatus.REJECTED,
+        }
+        return status_translation.get(raw_status)
+
+    def get_data(self):
+        projects_base_data: pd.DataFrame = self._get_projects_base_data()
+        projects_result_data: pd.DataFrame = self._get_projects_results_data()
+        merged_data = projects_base_data.merge(projects_result_data, left_on="proyecto_id", right_on="expediente_id")
+        final_data = self.get_and_rename_relevant_columns(merged_data)
+        self.logger.info(f"Merged data size: {len(final_data)}")
+        return final_data

@@ -3,8 +3,8 @@ from django.core.management import call_command
 # Project
 import recoleccion.tests.test_helpers.utils as ut
 from recoleccion.components.linkers import PartyLinker, PersonLinker
-from recoleccion.models.linking.party_linking import PartyLinking
-from recoleccion.models.linking.person_linking import PersonLinking
+from recoleccion.models.linking.party_linking import PartyLinkingDecision
+from recoleccion.models.linking.person_linking import PersonLinkingDecision
 from recoleccion.models.party import Party, PartyDenomination
 from recoleccion.models.person import Person
 from recoleccion.tests.test_helpers.test_case import LinkingTestCase
@@ -31,8 +31,8 @@ class PersonLinkerTestCase(LinkingTestCase):
 
     def create_person_linking_decision(self, messy_name: str, canonical_name: str, decision: str, person_id=1):
         person_id = person_id if decision != LinkingDecisions.DENIED else None
-        PersonLinking.objects.create(
-            full_name=messy_name, compared_against=canonical_name, decision=decision, person_id=person_id
+        PersonLinkingDecision.objects.create(
+            messy_name=messy_name, compared_against=canonical_name, decision=decision, person_id=person_id
         )
 
     def test_senator_linking_with_repeated_records(self):
@@ -341,11 +341,11 @@ class PartyLinkerTestCase(LinkingTestCase):
         self.assertEqual(row["record_id"].values[0], RECORD_ID)
         self.assertEqual(row["party_id"].values[0], EXPECTED_ID)
 
-    def create_party_linking_decision(self, messy_name: str, canonical_name: str, decision: str, party_id=1):
-        party_id = party_id if decision != LinkingDecisions.DENIED else None
-        PartyLinking.objects.create(
-            denomination=messy_name, compared_against=canonical_name, decision=decision, party_id=party_id
-        )
+    # def create_party_linking_decision(self, messy_name: str, canonical_name: str, decision: str, party_id=1):
+    #     party_id = party_id if decision != LinkingDecisions.DENIED else None
+    #     PartyLinkingDecision.objects.create(
+    #         denomination=messy_name, compared_against=canonical_name, decision=decision, party_id=party_id
+    #     )
 
     def test_party_linking_with_similar_records_and_previous_approved_linking(self):
         """

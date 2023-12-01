@@ -1,6 +1,7 @@
 from django.db import models
 from rest_framework import serializers
 
+
 class ProjectStatus(models.TextChoices):
     # Ongoing status
     ORIGIN_CHAMBER_COMISSION = "ORIGIN_CHAMBER_COMISSION", "En comisiones, cámara de origen"
@@ -15,7 +16,8 @@ class ProjectStatus(models.TextChoices):
 
     def __str__(self):
         return self.value
-    
+
+
 class ProjectStatusSerializer(serializers.Field):
     def to_representation(self, obj):
         return ProjectStatus(obj).label

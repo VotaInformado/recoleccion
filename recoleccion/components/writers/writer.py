@@ -1,5 +1,7 @@
 from abc import ABC
 from pandas import DataFrame
+import pandas as pd
+import numpy as np
 
 # Project
 import logging
@@ -37,9 +39,11 @@ class Writer(ABC):
 
     @classmethod
     def create_element(self, row):
+        row = row.replace({pd.NA: None, np.nan: None})
         # self.model should be defined in the child class
         return self.model.objects.create(**row)
 
     @classmethod
-    def update_element(self, row):
+    def update_element(self, row: pd.Series):
+        row = row.replace({pd.NA: None, np.nan: None})
         return self.model.objects.update(**row)

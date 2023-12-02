@@ -18,7 +18,7 @@ class UpdateVotesParties(LinkingTestCase):
     ):
         party_id = party_id if decision == LinkingDecisionOptions.APPROVED else None
         PartyLinkingDecision.objects.create(
-            denomination=messy_denomination,
+            messy_denomination=messy_denomination,
             decision=decision,
             party_id=party_id,
         )
@@ -213,8 +213,7 @@ class UpdateAuthorsParties(LinkingTestCase):
     ):
         party_id = party_id if decision == LinkingDecisionOptions.APPROVED else None
         PartyLinkingDecision.objects.create(
-            denomination=messy_denomination,
-            compared_against=canonical_denomination,
+            messy_denomination=messy_denomination,
             decision=decision,
             party_id=party_id,
         )

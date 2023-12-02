@@ -66,6 +66,21 @@ class PartyLinker(Linker):
         matched_df = pd.DataFrame.from_dict(matched_data, orient="index")
         return matched_df, unmatched_data
 
+    def create_certain_mapping(self, undefined_df: pd.DataFrame, certain_matches: list) -> list:
+        certain_mapping = [None for x in range(undefined_df.shape[0])]
+        for messy_data_index, canonical_data_index in certain_matches:
+            canonical_data_id = self.canonical_data[canonical_data_index]["party_id"]
+            certain_mapping[messy_data_index] = canonical_data_id
+        self.logger.info(f"Linked {len(certain_matches)} parties")
+        return certain_mapping
+
+    def create_dubious_mapping(self, undefined_df: pd.DataFrame, dubious_matches: list) -> list:
+        dubious_mapping = [None for x in range(undefined_df.shape[0])]
+        for messy_data_index, canonical_data_index, linking_id in dubious_matches:
+            dubious_mapping[messy_data_index] = linking_id
+        self.logger.info(f"Linked {len(dubious_matches)} parties")
+        return dubious_mapping
+
     def link_parties(self, data: pd.DataFrame) -> pd.DataFrame:
         """
         Receives a DF with columns: denomination, record_id
@@ -87,20 +102,12 @@ class PartyLinker(Linker):
                 undefined_df["party_id"] = None
                 return self.merge_dataframes(exactly_matched_data, manually_linked_data, undefined_df)
 
-            certain, dubious, _ = self.classify(undefined_data)
-            certain_mapping = [None for x in range(undefined_df.shape[0])]
-            for messy_data_index, canonical_data_index in certain:
-                canonical_data_id = self.canonical_data[canonical_data_index]["party_id"]
-                certain_mapping[messy_data_index] = canonical_data_id
-                linked_parties += 1
+            certain, dubious, distinct = self.classify(undefined_data)
+            certain_mapping = self.create_certain_mapping(undefined_df, certain)
             undefined_df["party_id"] = certain_mapping
-            self.logger.info(f"Linked {linked_parties} parties")
-            dubious_mapping = [None for x in range(undefined_df.shape[0])]
-            for messy_data_index, canonical_data_index, linking_id in dubious:
-                dubious_mapping[messy_data_index] = linking_id
+            dubious_mapping = self.create_dubious_mapping(undefined_df, dubious)
             undefined_df["linking_id"] = dubious_mapping
-            unlinked_parties = undefined_df["party_id"].isnull().sum()
-            self.logger.info(f"{unlinked_parties} parties remain unlinked")
+            self.logger.info(f"{len(distinct)} parties left will not be linked")
 
         except ValueError as e:
             if "first dataset is empty" in str(e) or "second dataset is empty" in str(e):
@@ -113,16 +120,6 @@ class PartyLinker(Linker):
 
     def are_the_same_record(self, record_1, record_2):
         return record_1["denomination"] == record_2["denomination"]
-
-    def save_linking_decision(self, party_id, denomination, canonical_name):
-        if party_id < 0:
-            decision = LinkingDecisionOptions.DENIED
-        else:
-            decision = LinkingDecisionOptions.APPROVED
-        party_id = party_id if party_id > 0 else None
-        # PartyLinking.objects.create(
-        #     party_id=party_id, denomination=denomination, compared_against=canonical_name, decision=decision
-        # )
 
     def _save_pending_decisions(self, identical_pairs):
         pass

@@ -1,7 +1,9 @@
-from typing import List, Tuple
-from dedupe import Gazetteer
-import pandas as pd
+from collections import OrderedDict
 from datetime import date
+from dedupe import Gazetteer
+from typing import List, Tuple
+import pandas as pd
+from uuid import UUID
 
 # Project
 from recoleccion.models.linking import DENIED_INDICATOR
@@ -26,14 +28,15 @@ class PersonLinker(Linker):
         self.canonical_data = self.get_canonical_data()
 
     def get_canonical_data(self) -> dict:
+        all_persons = Person.objects.all().order_by("id")
         canonical_data = pd.DataFrame(
-            map(lambda x: (x.name, x.last_name, x.id), Person.objects.all()), columns=["name", "last_name", "id"]
+            map(lambda x: (x.name, x.last_name, x.id), all_persons), columns=["name", "last_name", "id"]
         )
         canonical_data[["name", "last_name"]] = canonical_data[["name", "last_name"]].applymap(
             lambda x: unidecode_text(x)
         )
         canonical_data = canonical_data.to_dict(orient="index")
-        return canonical_data
+        return OrderedDict(canonical_data)
 
     def get_messy_data(self, original_data: pd.DataFrame):
         messy_data = original_data.copy()
@@ -69,6 +72,20 @@ class PersonLinker(Linker):
         matched_df = pd.DataFrame.from_dict(matched_data, orient="index")
         return matched_df, unmatched_data
 
+    def create_certain_mapping(self, undefined_df: pd.DataFrame, certain_matches: list) -> List[int]:
+        certain_mapping = [None for x in range(undefined_df.shape[0])]
+        for messy_data_index, canonical_data_index in certain_matches:
+            canonical_data_id = self.canonical_data[canonical_data_index]["id"]
+            certain_mapping[messy_data_index] = canonical_data_id
+        return certain_mapping
+
+    def create_dubious_mapping(self, undefined_df: pd.DataFrame, dubious_matches: list) -> List[UUID]:
+        dubious_mapping = [None for x in range(undefined_df.shape[0])]
+        for messy_data_index, _, linking_id in dubious_matches:
+            dubious_mapping[messy_data_index] = linking_id
+        self.logger.info(f"Linked {len(dubious_matches)} persons")
+        return dubious_mapping
+
     def link_persons(self, data: pd.DataFrame):
         """
         Receives a DF with columns: name, last_name, district, party, start_of_term, end_of_term, is_active
@@ -90,20 +107,12 @@ class PersonLinker(Linker):
             except IncompatibleLinkingDatasets as e:
                 undefined_df["party_id"] = None
                 return self.merge_dataframes(exactly_matched_data, manually_linked_data, undefined_df)
-            certain, undefined, __ = self.classify(undefined_data)
-            certain_mapping = [None for x in range(undefined_df.shape[0])]
-            for messy_data_index, canonical_data_index in certain:
-                canonical_data_id = self.canonical_data[canonical_data_index]["id"]
-                certain_mapping[messy_data_index] = canonical_data_id
-                linked_persons += 1
+            certain, undefined, distinct = self.classify(undefined_data)
+            certain_mapping = self.create_certain_mapping(undefined_df, certain)
             undefined_df["person_id"] = certain_mapping
-            self.logger.info(f"Linked {linked_persons} persons")
-            undefined_mapping = [None for x in range(undefined_df.shape[0])]
-            for messy_data_index, canonical_data_index, linking_id in undefined:
-                undefined_mapping[messy_data_index] = linking_id
-            undefined_df["linking_id"] = undefined_mapping
-            unlinked_persons = undefined_df["person_id"].isnull().sum()
-            self.logger.info(f"{unlinked_persons} persons remain unlinked")
+            dubious_mapping = self.create_dubious_mapping(undefined_df, undefined)
+            undefined_df["linking_id"] = dubious_mapping
+            self.logger.info(f"{len(distinct)} persons will not be linked")
         except ValueError as e:  # TODO: creo que esto se puede sacar
             if "first dataset is empty" in str(e) or "second dataset is empty" in str(e):
                 undefined_df["person_id"] = None
@@ -135,16 +144,6 @@ class PersonLinker(Linker):
 
     def are_the_same_record(self, record_1, record_2):
         return record_1["name"] == record_2["name"] and record_1["last_name"] == record_2["last_name"]
-
-    # def save_linking_decision(self, person_id, messy_name, canonical_name):
-    #     if person_id < 0:
-    #         decision = LinkingDecisions.DENIED
-    #     else:
-    #         decision = LinkingDecisions.APPROVED
-    #     person_id = person_id if person_id > 0 else None
-    #     PersonLinkingDecision.objects.create(
-    #         person_id=person_id, messy_name=messy_name, compared_against=canonical_name, decision=decision
-    #     )
 
     def clean_record(self, record):
         # for any record, returns name, last_name and id (only if it exists)

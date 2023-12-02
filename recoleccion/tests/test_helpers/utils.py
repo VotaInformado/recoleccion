@@ -7,7 +7,7 @@ def create_party_linking_decision(
 ):
     record_id = record_id if decision == LinkingDecisionOptions.APPROVED else None
     PartyLinkingDecision.objects.create(
-        denomination=messy_denomination,
+        messy_denomination=messy_denomination,
         decision=decision,
         party_id=record_id,
     )

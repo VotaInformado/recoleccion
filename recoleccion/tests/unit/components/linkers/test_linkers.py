@@ -32,7 +32,7 @@ class PersonLinkerTestCase(LinkingTestCase):
     def create_person_linking_decision(self, messy_name: str, canonical_name: str, decision: str, person_id=1):
         person_id = person_id if decision != LinkingDecisionOptions.DENIED else None
         PersonLinkingDecision.objects.create(
-            messy_name=messy_name, compared_against=canonical_name, decision=decision, person_id=person_id
+            messy_name=messy_name, decision=decision, person_id=person_id
         )
 
     def test_senator_linking_with_repeated_records(self):
@@ -340,12 +340,6 @@ class PartyLinkerTestCase(LinkingTestCase):
         row = linked_data[linked_data["denomination"] == MESSY_DENOMINATION]
         self.assertEqual(row["record_id"].values[0], RECORD_ID)
         self.assertEqual(row["party_id"].values[0], EXPECTED_ID)
-
-    # def create_party_linking_decision(self, messy_name: str, canonical_name: str, decision: str, party_id=1):
-    #     party_id = party_id if decision != LinkingDecisions.DENIED else None
-    #     PartyLinkingDecision.objects.create(
-    #         denomination=messy_name, compared_against=canonical_name, decision=decision, party_id=party_id
-    #     )
 
     def test_party_linking_with_similar_records_and_previous_approved_linking(self):
         """

@@ -1,5 +1,6 @@
 from django.db.models import Q
 import pandas as pd
+import numpy as np
 
 # Project
 from recoleccion.components.utils import date_to_str
@@ -30,6 +31,7 @@ class SenatorsWriter(LegislatorsWriter):
 
     @classmethod
     def create_element(self, row: pd.Series):
+        row = row.replace({pd.NA: None, np.nan: None})
         row = row.rename(index={"party": "party_name"})
         field_names = [field.name for field in SenateSeat._meta.get_fields()] + ["person_id"]
         fields_to_drop = row.index.difference(field_names)
@@ -42,4 +44,5 @@ class SenatorsWriter(LegislatorsWriter):
         row.pop("name")
         row.pop("last_name")
         row = row.rename(index={"party": "party_name"})
+        row = row.replace({pd.NA: None, np.nan: None})
         return SenateSeat.update_or_raise(**row)

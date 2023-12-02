@@ -1,5 +1,6 @@
 from datetime import datetime as dt
 import pandas as pd
+import numpy as np
 
 # Project
 from recoleccion.components.utils import date_to_str
@@ -30,6 +31,7 @@ class DeputiesWriter(LegislatorsWriter):
 
     @classmethod
     def create_element(self, row: pd.Series):
+        row = row.replace({pd.NA: None, np.nan: None})
         row = row.rename(index={"party": "party_name"})
         field_names = [field.name for field in DeputySeat._meta.get_fields()] + ["person_id"]
         fields_to_drop = row.index.difference(field_names)
@@ -39,6 +41,7 @@ class DeputiesWriter(LegislatorsWriter):
 
     @classmethod
     def update_element(self, row: pd.Series):
+        row = row.replace({pd.NA: None, np.nan: None})
         row.pop("name")
         row.pop("last_name")
         row = row.rename(index={"party": "party_name"})

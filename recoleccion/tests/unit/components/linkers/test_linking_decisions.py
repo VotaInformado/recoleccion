@@ -42,11 +42,11 @@ class PersonLinkingDecisionsTestCase(LinkingTestCase):
             "id": "int",
         }
 
-    # def create_person_linking_decision(self, messy_name: str, canonical_name: str, decision: str, person_id=1):
-    #     person_id = person_id if decision != LinkingDecisions.DENIED else None
-    #     PersonLinkingDecision.objects.create(
-    #         messy_name=messy_name, compared_against=canonical_name, decision=decision, person_id=person_id
-    #     )
+    def create_person_linking_decision(self, messy_name: str, canonical_name: str, decision: str, person_id=1):
+        person_id = person_id if decision != LinkingDecisionOptions.DENIED else None
+        PersonLinkingDecision.objects.create(
+            messy_name=messy_name, decision=decision, person_id=person_id
+        )
 
     def test_saving_person_linking_decision(self):
         MESSY_NAME = "Juan C."
@@ -151,15 +151,12 @@ class PersonLinkingDecisionsTestCase(LinkingTestCase):
         self.assertEqual(len(non_pending_records), len(linked_data) - expected_dubious_matches)
 
     def test_updating_records_person_after_approved_linking_decision(self):
+        call_command("loaddata", "person.json")
+        # We leave only 10 persons
+        ids_to_keep = list(Person.objects.order_by('id')[:10].values_list('id', flat=True))
+        Person.objects.exclude(id__in=ids_to_keep).delete()
         MESSY_NAME = "Juan C."
         MESSY_LAST_NAME = "Perez"
-        CANONICAL_ID = 1
-
-        canonical_record = {
-            "name": "Roberto",
-            "last_name": "Gutiérrez",
-            "id": CANONICAL_ID,
-        }
         updated_record = {
             "name": MESSY_NAME,
             "last_name": MESSY_LAST_NAME,
@@ -169,19 +166,16 @@ class PersonLinkingDecisionsTestCase(LinkingTestCase):
             "party": "Frente de Todos",
         }
 
-        canonical_data: dict = create_fake_df(self.canonical_columns, n=10)
-        canonical_index = len(canonical_data) + 1
-        canonical_data[canonical_index] = canonical_record
+        linker = PersonLinker()
+        canonical_index = 0
         updated_data = create_fake_df(self.messy_columns, n=8, as_dict=False, dates_as_str=False)
         messy_index = len(updated_data)
         updated_data.loc[messy_index] = updated_record
         settings.REAL_METHOD = Gazetteer.search
         settings.MESSY_INDEXES = [messy_index]
         settings.CANONICAL_INDEXES = [canonical_index]
-        with mck.mock_method(PersonLinker, "get_canonical_data", return_value=canonical_data):
-            with mck.mock_method_side_effect(Gazetteer, "search", side_effect=mck.mock_linking_results):
-                linker = PersonLinker()
-                linked_data = linker.link_persons(updated_data)
+        with mck.mock_method_side_effect(Gazetteer, "search", side_effect=mck.mock_linking_results):
+            linked_data = linker.link_persons(updated_data)
         SenatorsWriter.write(linked_data)
         linked_data.rename(columns={"province": "district"}, inplace=True)
         DeputiesWriter.write(linked_data)

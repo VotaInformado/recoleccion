@@ -57,9 +57,6 @@ class Linker:
     def save_linking_decision(self, **kwargs):
         raise NotImplementedError
 
-    def _save_undecided_match(self, canonical_id, messy_record):
-        raise NotImplementedError
-
     def user_approved_linking(self, record_pair: Tuple[dict, dict]) -> bool:
         # Returns True if the user approves the linking, False otherwise
         messy_record, canonical_record = record_pair
@@ -71,40 +68,6 @@ class Linker:
             print("Invalid response")
             response = input("yes (y) / no (n): ").lower()
         return response == "y"
-
-    # def label_pairs(self, pairs, messy_data):
-    #     """
-    #     Recieves:
-    #      - pairs: A list of tuples of the form (messy_data_index, canonical_data_index, linking_decision_id)
-    #      - messy_data: The messy data
-    #     Asks for user input to label the pairs as referring to the same entity or not.
-    #     Returns a tuple with two lists:
-    #      - The first list contains the pairs that were labeled as the same entity
-    #      - The second list contains the pairs that were labeled as different entities
-    #     """
-    #     match_records = []
-    #     distinct_records = []
-    #     match_records_ids = []
-    #     distinct_records_ids = []
-    #     self.logger.info(f"There are {len(pairs)} pairs to label: ")
-    #     for index_pair in pairs:
-    #         messy_data_index, canonical_data_index, _ = index_pair
-    #         messy_record, canonical_record = messy_data[messy_data_index], self.canonical_data[canonical_data_index]
-    #         record_pair = (messy_record, canonical_record)
-    #         # linking_approved = self.user_approved_linking(record_pair)
-
-    #         if linking_approved:
-    #             record_id = self.get_record_id(canonical_record)
-    #             self.save_linking_decision(record_id, messy_record, canonical_record)
-    #             match_records.append(record_pair)
-    #             match_records_ids.append(index_pair)
-    #         else:
-    #             self.save_linking_decision(-1, messy_record, canonical_record)
-    #             distinct_records.append(record_pair)
-    #             distinct_records_ids.append(index_pair)
-
-    #     self.gazetteer.mark_pairs({"match": match_records, "distinct": distinct_records})
-    #     return match_records_ids, distinct_records_ids
 
     def train(self, messy_data):
         # if len(messy_data) > len(self.canonical_data):
@@ -184,13 +147,8 @@ class Linker:
             elif confidence_score < dubious_lower_limit:
                 distinct_matches.append((messy_data_index, canonical_data_index, confidence_score))
 
-        # certain, distinct = self.label_pairs(dubious_matches, messy_data)
-        # self._save_undefined_matches(dubious_matches, messy_data)
         self._save_training(self.gazetteer)
         self.gazetteer.cleanup_training()
-        # certain_matches.extend(certain)
-        # distinct_matches.extend(distinct)
-
         return certain_matches, dubious_matches, distinct_matches
 
     def confidence(self, match):

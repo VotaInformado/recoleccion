@@ -6,6 +6,35 @@ fake = Faker()
 
 provinces = ["Buenos Aires", "CABA", "Córdoba", "Mendoza", "Santa Fe"]
 
+parties = [
+    "Partido Justicialista (PJ)",
+    "Propuesta Republicana (PRO)",
+    "Unión Cívica Radical (UCR)",
+    "Frente de Todos",
+    "Coalición Cívica ARI (CC-ARI)",
+    "Partido Socialista (PS)",
+    "Partido Obrero (PO)",
+    "Movimiento Socialista de los Trabajadores (MST)",
+    "Nuevo MAS (Movimiento al Socialismo)",
+    "Partido de los Trabajadores Socialistas (PTS)",
+    "Movimiento Evita",
+    "Frente Renovador",
+    "Partido Comunista (PC)",
+    "Partido de la Victoria",
+    "Partido Autonomista Nacional (PAN)",
+    "Partido Intransigente (PI)",
+    "Partido Conservador Popular",
+    "Partido Demócrata Cristiano (PDC)",
+    "Acción por la República (AR)",
+    "Partido Federal",
+    "Frente de Izquierda y de Trabajadores (FIT)",
+    "Movimiento Libres del Sur",
+    "Partido Humanista (PH)",
+    "Partido de la Concertación Forja",
+    "Partido Vecinalista"
+]
+
+
 def create_fake_df(df_columns: dict, n=100, as_dict: bool = True, **kwargs):
     column_names = list(df_columns.keys())
     column_types = list(df_columns.values())
@@ -36,5 +65,7 @@ def create_fake_value(column_type: str, n: int, **kwargs):
         return fake.date_of_birth(minimum_age=18, maximum_age=80).strftime("%Y-%m-%d")
     elif column_type == "int":
         return fake.random_int(min=1, max=n)
+    elif column_type == "party":
+        return random.choice(parties)
     else:
         raise ValueError(f"Column type {column_type} not supported")

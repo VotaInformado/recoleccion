@@ -10,7 +10,7 @@ from recoleccion.models.person import Person
 from recoleccion.tests.test_helpers.test_case import LinkingTestCase
 from recoleccion.tests.test_helpers.faker import create_fake_df
 import recoleccion.tests.test_helpers.mocks as mck
-from recoleccion.utils.enums.linking_decisions import LinkingDecisions
+from recoleccion.utils.enums.linking_decision_options import LinkingDecisionOptions
 
 
 class PersonLinkerTestCase(LinkingTestCase):
@@ -30,7 +30,7 @@ class PersonLinkerTestCase(LinkingTestCase):
         }
 
     def create_person_linking_decision(self, messy_name: str, canonical_name: str, decision: str, person_id=1):
-        person_id = person_id if decision != LinkingDecisions.DENIED else None
+        person_id = person_id if decision != LinkingDecisionOptions.DENIED else None
         PersonLinkingDecision.objects.create(
             messy_name=messy_name, compared_against=canonical_name, decision=decision, person_id=person_id
         )
@@ -214,7 +214,7 @@ class PersonLinkerTestCase(LinkingTestCase):
         EXPECTED_ID = person.pk
         WRONG_ID = person.pk + 1
         MESSY_FULL_NAME = CANONICAL_FULL_NAME = "Juan Perez"
-        self.create_person_linking_decision(MESSY_FULL_NAME, CANONICAL_FULL_NAME, LinkingDecisions.DENIED)
+        self.create_person_linking_decision(MESSY_FULL_NAME, CANONICAL_FULL_NAME, LinkingDecisionOptions.DENIED)
 
         canonical_record = {
             "name": "Juan",
@@ -250,7 +250,7 @@ class PersonLinkerTestCase(LinkingTestCase):
         EXPECTED_ID = person.pk
 
         self.create_person_linking_decision(
-            MESSY_FULL_NAME, CANONICAL_FULL_NAME, LinkingDecisions.APPROVED, person_id=person.pk
+            MESSY_FULL_NAME, CANONICAL_FULL_NAME, LinkingDecisionOptions.APPROVED, person_id=person.pk
         )
 
         canonical_record = {
@@ -361,7 +361,7 @@ class PartyLinkerTestCase(LinkingTestCase):
         party = Party.objects.create(main_denomination=CANONICAL_DENOMINATION)
         EXPECTED_ID = party.pk
         ut.create_party_linking_decision(
-            MESSY_DENOMINATION, CANONICAL_DENOMINATION, LinkingDecisions.APPROVED, party.pk
+            MESSY_DENOMINATION, CANONICAL_DENOMINATION, LinkingDecisionOptions.APPROVED, party.pk
         )
 
         canonical_record = {
@@ -393,7 +393,7 @@ class PartyLinkerTestCase(LinkingTestCase):
         """
         RECORD_ID = 2
         DENOMINATION = "Partido Justicialista"
-        ut.create_party_linking_decision(DENOMINATION, DENOMINATION, LinkingDecisions.DENIED)
+        ut.create_party_linking_decision(DENOMINATION, DENOMINATION, LinkingDecisionOptions.DENIED)
         party = Party.objects.create(main_denomination=DENOMINATION)
         PARTY_ID = party.pk
 
@@ -431,7 +431,7 @@ class PartyLinkerTestCase(LinkingTestCase):
         party = Party.objects.create(main_denomination=CANONICAL_DENOMINATION)
         EXPECTED_ID = party.pk
         ut.create_party_linking_decision(
-            MESSY_DENOMINATION, CANONICAL_DENOMINATION, LinkingDecisions.APPROVED, party.pk
+            MESSY_DENOMINATION, CANONICAL_DENOMINATION, LinkingDecisionOptions.APPROVED, party.pk
         )
 
         canonical_record = {

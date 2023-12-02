@@ -30,13 +30,11 @@ class SenatorsWriter(LegislatorsWriter):
 
     @classmethod
     def create_element(self, row: pd.Series):
-        senator_seat = SenateSeat.objects.create(
-            person_id=int(row.get("person_id")),
-            province=row.get("province"),
-            party_name=row.get("party"),
-            start_of_term=row.get("start_of_term"),
-            end_of_term=row.get("end_of_term"),
-        )
+        row = row.rename(index={"party": "party_name"})
+        field_names = [field.name for field in SenateSeat._meta.get_fields()] + ["person_id"]
+        fields_to_drop = row.index.difference(field_names)
+        row = row.drop(fields_to_drop)
+        senator_seat = SenateSeat.objects.create(**row)
         return senator_seat
 
     @classmethod

@@ -29,14 +29,12 @@ class DeputiesWriter(LegislatorsWriter):
         }
 
     @classmethod
-    def create_element(self, row):
-        senator_seat = DeputySeat.objects.create(
-            person_id=int(row.get("person_id")),
-            district=row.get("district"),
-            party_name=row.get("party"),
-            start_of_term=row.get("start_of_term"),
-            end_of_term=row.get("end_of_term"),
-        )
+    def create_element(self, row: pd.Series):
+        row = row.rename(index={"party": "party_name"})
+        field_names = [field.name for field in DeputySeat._meta.get_fields()] + ["person_id"]
+        fields_to_drop = row.index.difference(field_names)
+        row = row.drop(fields_to_drop)
+        senator_seat = DeputySeat.objects.create(**row)
         return senator_seat
 
     @classmethod

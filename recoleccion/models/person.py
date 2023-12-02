@@ -4,6 +4,7 @@ from django.core.validators import MinLengthValidator
 
 # Base model
 from recoleccion.models.base import BaseModel
+from recoleccion.models.law_project import LawProject
 
 # Project
 from recoleccion.utils.enums.legislator_seats import LegislatorSeats
@@ -34,6 +35,8 @@ class Person(BaseModel):
 
     @property
     def law_projects(self):
-        from recoleccion.models import LawProject
-
         return LawProject.objects.filter(authorships__person=self)
+
+    @property
+    def full_name(self):
+        return f"{self.name} {self.last_name}"

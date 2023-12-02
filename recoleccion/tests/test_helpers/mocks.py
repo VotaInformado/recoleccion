@@ -112,13 +112,19 @@ def mock_linking_results(instance, *args, **kwargs):
     dubious_lower_limit = max(dubious_lower_limit, Linker.MIN_ACCEPTABLE_LOWER_LIMIT)
     dubious_upper_limit = max_confidence * Linker.DUBIOUS_UPPER_LIMIT
     dubious_upper_limit = max(dubious_upper_limit, Linker.MIN_ACCEPTABLE_UPPER_LIMIT)
-    dubious_score = random.uniform(dubious_lower_limit, dubious_upper_limit)
+    dubious_score = (dubious_lower_limit + dubious_upper_limit) / 2
+    canonical_pointer = 0
     for i, original_result in enumerate(real_results):
         messy_index = original_result[0]
         if messy_index not in settings.MESSY_INDEXES:
             continue
         # we change only the score of the index that we want to be dubious
         new_list = tuple_of_tuples_to_list_of_lists(original_result)
+        if not new_list[1]:
+            new_list[1].append([0, 0])
+        canonical_index = settings.CANONICAL_INDEXES[canonical_pointer]
+        new_list[1][0][0] = canonical_index
+        canonical_pointer += 1
         new_list[1][0][1] = dubious_score
         real_results[i] = list_of_lists_to_tuple_of_tuples(new_list)
     return real_results

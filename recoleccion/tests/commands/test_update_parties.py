@@ -9,14 +9,14 @@ from recoleccion.components.linkers.party_linker import PartyLinker
 from recoleccion.components.writers.votes_writer import VotesWriter
 from recoleccion.models import Authorship, LawProject, Party, PartyDenomination, PartyLinkingDecision, Person, Vote
 from recoleccion.tests.test_helpers.test_case import LinkingTestCase
-from recoleccion.utils.enums.linking_decisions import LinkingDecisions
+from recoleccion.utils.enums.linking_decision_options import LinkingDecisionOptions
 
 
 class UpdateVotesParties(LinkingTestCase):
     def create_party_linking_decision(
         self, messy_denomination: str, canonical_denomination: str, decision: str, party_id: int = None
     ):
-        party_id = party_id if decision == LinkingDecisions.APPROVED else None
+        party_id = party_id if decision == LinkingDecisionOptions.APPROVED else None
         PartyLinkingDecision.objects.create(
             denomination=messy_denomination,
             decision=decision,
@@ -89,7 +89,7 @@ class UpdateVotesParties(LinkingTestCase):
         PARTY_NAME = "PARTIDO JUSTICIALISTA"
         SIMILAR_NAME = "SOCIEDAD JUSTICIALISTA"
         party = Party.objects.create(main_denomination=PARTY_NAME)
-        ut.create_party_linking_decision(SIMILAR_NAME, PARTY_NAME, LinkingDecisions.DENIED)
+        ut.create_party_linking_decision(SIMILAR_NAME, PARTY_NAME, LinkingDecisionOptions.DENIED)
 
         original_vote = Vote.objects.create(
             person_name="Nombre", person_last_name="Apellido", party_name=SIMILAR_NAME, reference="Project"
@@ -115,7 +115,7 @@ class UpdateVotesParties(LinkingTestCase):
         PARTY_NAME = "PARTIDO JUSTICIALISTA"
         SIMILAR_NAME = "FRENTE PARA LA VICTORIA"
         party = Party.objects.create(main_denomination=PARTY_NAME)
-        ut.create_party_linking_decision(SIMILAR_NAME, PARTY_NAME, LinkingDecisions.DENIED)
+        ut.create_party_linking_decision(SIMILAR_NAME, PARTY_NAME, LinkingDecisionOptions.DENIED)
 
         original_vote = Vote.objects.create(
             person_name="Nombre", person_last_name="Apellido", party_name=SIMILAR_NAME, reference="Project"
@@ -141,7 +141,7 @@ class UpdateVotesParties(LinkingTestCase):
         CANONICAL_NAME = "PARTIDO JUSTICIALISTA"
         MESSY_NAME = "PART. JUSTICIALISTA"
         party = Party.objects.create(main_denomination=CANONICAL_NAME)
-        ut.create_party_linking_decision(MESSY_NAME, CANONICAL_NAME, LinkingDecisions.APPROVED, party.pk)
+        ut.create_party_linking_decision(MESSY_NAME, CANONICAL_NAME, LinkingDecisionOptions.APPROVED, party.pk)
 
         vote = Vote.objects.create(
             person_name="Nombre", person_last_name="Apellido", party_name=MESSY_NAME, reference="Project"
@@ -162,7 +162,7 @@ class UpdateVotesParties(LinkingTestCase):
         CANONICAL_NAME = "Partido Justicialista"
         MESSY_NAME = "Part. Justicialista"
         party = Party.objects.create(main_denomination=CANONICAL_NAME)
-        ut.create_party_linking_decision(MESSY_NAME, CANONICAL_NAME, LinkingDecisions.DENIED)
+        ut.create_party_linking_decision(MESSY_NAME, CANONICAL_NAME, LinkingDecisionOptions.DENIED)
         vote = Vote.objects.create(
             person_name="Nombre", person_last_name="Apellido", party_name=MESSY_NAME, reference="Project"
         )
@@ -211,7 +211,7 @@ class UpdateAuthorsParties(LinkingTestCase):
     def create_party_linking_decision(
         self, messy_denomination: str, canonical_denomination: str, decision: str, party_id: int = None
     ):
-        party_id = party_id if decision == LinkingDecisions.APPROVED else None
+        party_id = party_id if decision == LinkingDecisionOptions.APPROVED else None
         PartyLinkingDecision.objects.create(
             denomination=messy_denomination,
             compared_against=canonical_denomination,
@@ -230,7 +230,7 @@ class UpdateAuthorsParties(LinkingTestCase):
         CANONICAL_NAME = "Partido Justicialista"
         MESSY_NAME = "Part. Justicialista"
         party = Party.objects.create(main_denomination=CANONICAL_NAME)
-        ut.create_party_linking_decision(MESSY_NAME, CANONICAL_NAME, LinkingDecisions.APPROVED, party.pk)
+        ut.create_party_linking_decision(MESSY_NAME, CANONICAL_NAME, LinkingDecisionOptions.APPROVED, party.pk)
         person = Person.objects.first()
         project = LawProject.objects.first()
         author = Authorship.objects.create(
@@ -252,7 +252,7 @@ class UpdateAuthorsParties(LinkingTestCase):
         CANONICAL_NAME = "Partido Justicialista"
         MESSY_NAME = "Part. Justicialista"
         party = Party.objects.create(main_denomination=CANONICAL_NAME)
-        ut.create_party_linking_decision(MESSY_NAME, CANONICAL_NAME, LinkingDecisions.DENIED)
+        ut.create_party_linking_decision(MESSY_NAME, CANONICAL_NAME, LinkingDecisionOptions.DENIED)
         person = Person.objects.first()
         project = LawProject.objects.first()
         author = Authorship.objects.create(

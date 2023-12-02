@@ -1,7 +1,7 @@
 from django.db import models
 
 
-class LinkingDecisions(models.TextChoices):
+class LinkingDecisionOptions(models.TextChoices):
     APPROVED = "APPROVED", "Aprobado"
     DENIED = "DENIED", "Denegado"
     PENDING = "PENDING", "Pendiente"

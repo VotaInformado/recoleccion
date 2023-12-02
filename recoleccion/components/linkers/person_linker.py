@@ -11,7 +11,7 @@ from recoleccion.components.utils import unidecode_text
 from recoleccion.models import Person
 import logging
 from recoleccion.models import PersonLinkingDecision
-from recoleccion.utils.enums.linking_decisions import LinkingDecisions
+from recoleccion.utils.enums.linking_decision_options import LinkingDecisionOptions
 
 
 class PersonLinker(Linker):
@@ -161,14 +161,14 @@ class PersonLinker(Linker):
     def approved_linking(self, canonical_id: int, messy_name: str) -> Tuple[bool, int]:
         person_link = PersonLinkingDecision.objects.filter(messy_name=messy_name, person_id=canonical_id).first()
         if person_link:
-            if person_link.decision == LinkingDecisions.APPROVED:
+            if person_link.decision == LinkingDecisionOptions.APPROVED:
                 return True, person_link.person_id
         return False, None
 
     def rejected_linking(self, canonical_id: int, messy_name: str) -> bool:
         person_link = PersonLinkingDecision.objects.filter(messy_name=messy_name, person_id=canonical_id).first()
         if person_link:
-            if person_link.decision == LinkingDecisions.DENIED:
+            if person_link.decision == LinkingDecisionOptions.DENIED:
                 return True
         return False
 
@@ -210,7 +210,7 @@ class PersonLinker(Linker):
         person_id = canonical_record["id"]
         messy_name = messy_record["name"] + " " + messy_record["last_name"]
         decision = PersonLinkingDecision.objects.create(person_id=person_id, messy_name=messy_name)
-        return decision.pk
+        return decision.uuid
 
     def get_linking_key(self, canonical_data_index: int, messy_record: dict):
         messy_full_name = self.get_record_full_name(messy_record)

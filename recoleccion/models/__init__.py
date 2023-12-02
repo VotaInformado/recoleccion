@@ -3,8 +3,9 @@ from .base import BaseModel
 from .deputy_seat import DeputySeat
 from .law import Law
 from .law_project import LawProject
-from .linking.person_linking import PersonLinking
-from .linking.party_linking import PartyLinking
+from .linking.linking_decision import LinkingDecision
+from .linking.person_linking import PersonLinkingDecision
+from .linking.party_linking import PartyLinkingDecision
 from .missing_record import MissingRecord
 from .party import Party, PartyDenomination, PartyRelationTypes
 from .person import Person, PersonSex

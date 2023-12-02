@@ -10,6 +10,6 @@
             "decision": "DENIED",
             "party": null
         },
-        "model": "recoleccion.partylinking"
+        "model": "recoleccion.partylinkingdecision"
     }
 ]

@@ -1,0 +1,58 @@
+# Base command
+from django.core.management.base import BaseCommand
+import logging
+from pprint import pprint
+
+# Project
+from recoleccion.models import LinkingDecision, PartyLinkingDecision, PersonLinkingDecision
+from recoleccion.utils.enums.linking_decision_options import LinkingDecisionOptions
+
+logger = logging.getLogger(__name__)
+
+
+class Command(BaseCommand):
+    def print_comparison(self, pending_decision: LinkingDecision):
+        messy_data: dict = pending_decision.get_messy_record()
+        canonical_data: dict = pending_decision.get_canonical_record()
+        print("Messy data:")
+        pprint(messy_data)
+        print("Canonical data:")
+        pprint(canonical_data)
+
+    def ask_for_user_decision(self, pending_decision: LinkingDecision) -> str:
+        logger.info(f"Pending decision: {pending_decision}")
+        self.print_comparison(pending_decision)
+        while True:
+            user_response = input("Make your decision: y(yes), n(no), s(skip): ")
+            if user_response == "y":
+                return LinkingDecisionOptions.APPROVED
+            elif user_response == "n":
+                return LinkingDecisionOptions.DENIED
+            elif user_response == "s":
+                return LinkingDecisionOptions.PENDING
+            else:
+                user_response = input("Invalid response. Please try again.")
+
+    def save_accepted_decision(self, pending_decision: LinkingDecision):
+        pending_decision.decision = LinkingDecisionOptions.APPROVED
+        pending_decision.save()
+        pending_decision.update_related_records()
+
+    def save_rejected_decision(self, pending_decision: LinkingDecision):
+        pending_decision.decision = LinkingDecisionOptions.DENIED
+        pending_decision.save()
+        pending_decision.unlink_related_records()
+
+    def handle(self, *args, **options):
+        pending_party_decisions = PartyLinkingDecision.objects.filter(decision=LinkingDecisionOptions.PENDING).all()
+        pending_person_decisions = PersonLinkingDecision.objects.filter(decision=LinkingDecisionOptions.PENDING).all()
+        total_decisions = list(pending_party_decisions) + list(pending_person_decisions)
+        logger.info(f"Pending decisions: {len(total_decisions)}")
+        for pending_decision in total_decisions:
+            user_response = self.ask_for_user_decision(pending_decision)
+            if user_response == LinkingDecisionOptions.APPROVED:
+                self.save_accepted_decision(pending_decision)
+            elif user_response == LinkingDecisionOptions.DENIED:
+                self.save_rejected_decision(pending_decision)
+            else:
+                logger.info("Skipping decision...")

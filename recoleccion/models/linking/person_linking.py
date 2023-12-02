@@ -1,20 +1,24 @@
 # Django
 from django.db import models
-from django.core.validators import MinLengthValidator
 
-# Base model
-from recoleccion.models.base import BaseModel
-from recoleccion.utils.enums.linking_decisions import LinkingDecisions
+# Project
+from recoleccion.models.linking.linking_decision import LinkingDecision
 
 
-class PersonLinking(BaseModel):
-    full_name = models.CharField(max_length=200)
-    compared_against = models.CharField(max_length=200, null=True)
-    decision = models.CharField(choices=LinkingDecisions.choices, max_length=10, null=True)
+class PersonLinkingDecision(LinkingDecision):
     person = models.ForeignKey("Person", on_delete=models.CASCADE, related_name="linking", null=True)
+    messy_name = models.CharField(max_length=255, null=True, help_text="Messy full name")
 
-    def is_approved(self):
-        return self.decision == LinkingDecisions.APPROVED
+    def get_messy_record(self):
+        return {"messy_name": self.messy_name}
 
-    def is_denied(self):
-        return self.decision == LinkingDecisions.DENIED
+    def get_canonical_record(self):
+        return {"canonical_name": self.person.full_name}
+
+    def _update_records(self, records):
+        if records:
+            try:
+                records.update(person=self.person)
+            except Exception as e:
+                import pdb; pdb.set_trace()
+                pass

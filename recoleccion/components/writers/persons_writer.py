@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 
 # Project
 from recoleccion.models import Person, SocialData
@@ -74,6 +75,7 @@ class PersonsWriter(Writer):
 
     @classmethod
     def create_element(self, row: pd.Series, update_active: bool):
+        row = row.replace({pd.NA: None, np.nan: None})
         info = {
             "name": row.get("name"),
             "last_name": row.get("last_name"),
@@ -91,6 +93,7 @@ class PersonsWriter(Writer):
 
     @classmethod
     def update_element(self, row: pd.Series, update_active: bool):
+        row = row.replace({pd.NA: None, np.nan: None})
         info = {
             "id": row.get("person_id"),
             "name": row.get("name"),

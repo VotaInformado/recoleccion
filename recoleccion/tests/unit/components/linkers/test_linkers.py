@@ -3,14 +3,14 @@ from django.core.management import call_command
 # Project
 import recoleccion.tests.test_helpers.utils as ut
 from recoleccion.components.linkers import PartyLinker, PersonLinker
-from recoleccion.models.linking.party_linking import PartyLinking
-from recoleccion.models.linking.person_linking import PersonLinking
+from recoleccion.models.linking.party_linking import PartyLinkingDecision
+from recoleccion.models.linking.person_linking import PersonLinkingDecision
 from recoleccion.models.party import Party, PartyDenomination
 from recoleccion.models.person import Person
 from recoleccion.tests.test_helpers.test_case import LinkingTestCase
 from recoleccion.tests.test_helpers.faker import create_fake_df
 import recoleccion.tests.test_helpers.mocks as mck
-from recoleccion.utils.enums.linking_decisions import LinkingDecisions
+from recoleccion.utils.enums.linking_decision_options import LinkingDecisionOptions
 
 
 class PersonLinkerTestCase(LinkingTestCase):
@@ -30,9 +30,9 @@ class PersonLinkerTestCase(LinkingTestCase):
         }
 
     def create_person_linking_decision(self, messy_name: str, canonical_name: str, decision: str, person_id=1):
-        person_id = person_id if decision != LinkingDecisions.DENIED else None
-        PersonLinking.objects.create(
-            full_name=messy_name, compared_against=canonical_name, decision=decision, person_id=person_id
+        person_id = person_id if decision != LinkingDecisionOptions.DENIED else None
+        PersonLinkingDecision.objects.create(
+            messy_name=messy_name, decision=decision, person_id=person_id
         )
 
     def test_senator_linking_with_repeated_records(self):
@@ -214,7 +214,7 @@ class PersonLinkerTestCase(LinkingTestCase):
         EXPECTED_ID = person.pk
         WRONG_ID = person.pk + 1
         MESSY_FULL_NAME = CANONICAL_FULL_NAME = "Juan Perez"
-        self.create_person_linking_decision(MESSY_FULL_NAME, CANONICAL_FULL_NAME, LinkingDecisions.DENIED)
+        self.create_person_linking_decision(MESSY_FULL_NAME, CANONICAL_FULL_NAME, LinkingDecisionOptions.DENIED)
 
         canonical_record = {
             "name": "Juan",
@@ -250,7 +250,7 @@ class PersonLinkerTestCase(LinkingTestCase):
         EXPECTED_ID = person.pk
 
         self.create_person_linking_decision(
-            MESSY_FULL_NAME, CANONICAL_FULL_NAME, LinkingDecisions.APPROVED, person_id=person.pk
+            MESSY_FULL_NAME, CANONICAL_FULL_NAME, LinkingDecisionOptions.APPROVED, person_id=person.pk
         )
 
         canonical_record = {
@@ -341,12 +341,6 @@ class PartyLinkerTestCase(LinkingTestCase):
         self.assertEqual(row["record_id"].values[0], RECORD_ID)
         self.assertEqual(row["party_id"].values[0], EXPECTED_ID)
 
-    def create_party_linking_decision(self, messy_name: str, canonical_name: str, decision: str, party_id=1):
-        party_id = party_id if decision != LinkingDecisions.DENIED else None
-        PartyLinking.objects.create(
-            denomination=messy_name, compared_against=canonical_name, decision=decision, party_id=party_id
-        )
-
     def test_party_linking_with_similar_records_and_previous_approved_linking(self):
         """
         Hierarchy:
@@ -361,7 +355,7 @@ class PartyLinkerTestCase(LinkingTestCase):
         party = Party.objects.create(main_denomination=CANONICAL_DENOMINATION)
         EXPECTED_ID = party.pk
         ut.create_party_linking_decision(
-            MESSY_DENOMINATION, CANONICAL_DENOMINATION, LinkingDecisions.APPROVED, party.pk
+            MESSY_DENOMINATION, CANONICAL_DENOMINATION, LinkingDecisionOptions.APPROVED, party.pk
         )
 
         canonical_record = {
@@ -393,7 +387,7 @@ class PartyLinkerTestCase(LinkingTestCase):
         """
         RECORD_ID = 2
         DENOMINATION = "Partido Justicialista"
-        ut.create_party_linking_decision(DENOMINATION, DENOMINATION, LinkingDecisions.DENIED)
+        ut.create_party_linking_decision(DENOMINATION, DENOMINATION, LinkingDecisionOptions.DENIED)
         party = Party.objects.create(main_denomination=DENOMINATION)
         PARTY_ID = party.pk
 
@@ -431,7 +425,7 @@ class PartyLinkerTestCase(LinkingTestCase):
         party = Party.objects.create(main_denomination=CANONICAL_DENOMINATION)
         EXPECTED_ID = party.pk
         ut.create_party_linking_decision(
-            MESSY_DENOMINATION, CANONICAL_DENOMINATION, LinkingDecisions.APPROVED, party.pk
+            MESSY_DENOMINATION, CANONICAL_DENOMINATION, LinkingDecisionOptions.APPROVED, party.pk
         )
 
         canonical_record = {

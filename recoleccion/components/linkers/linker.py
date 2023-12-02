@@ -69,41 +69,6 @@ class Linker:
             response = input("yes (y) / no (n): ").lower()
         return response == "y"
 
-    def label_pairs(self, pairs, messy_data):
-        """
-        Recieves:
-         - pairs: A list of tuples of the form (messy_data_index, canonical_data_index)
-         - messy_data: The messy data
-        Asks for user input to label the pairs as referring to the same entity or not.
-        Returns a tuple with two lists:
-         - The first list contains the pairs that were labeled as the same entity
-         - The second list contains the pairs that were labeled as different entities
-        """
-        match_records = []
-        distinct_records = []
-        match_records_ids = []
-        distinct_records_ids = []
-        self.logger.info(f"There are {len(pairs)} pairs to label: ")
-
-        for index_pair in pairs:
-            messy_data_index, canonical_data_index = index_pair
-            messy_record, canonical_record = messy_data[messy_data_index], self.canonical_data[canonical_data_index]
-            record_pair = (messy_record, canonical_record)
-            linking_approved = self.user_approved_linking(record_pair)
-
-            if linking_approved:
-                record_id = self.get_record_id(canonical_record)
-                self.save_linking_decision(record_id, messy_record, canonical_record)
-                match_records.append(record_pair)
-                match_records_ids.append(index_pair)
-            else:
-                self.save_linking_decision(-1, messy_record, canonical_record)
-                distinct_records.append(record_pair)
-                distinct_records_ids.append(index_pair)
-
-        self.gazetteer.mark_pairs({"match": match_records, "distinct": distinct_records})
-        return match_records_ids, distinct_records_ids
-
     def train(self, messy_data):
         # if len(messy_data) > len(self.canonical_data):
         #     raise LinkingException(
@@ -130,12 +95,22 @@ class Linker:
         # If there is at least one match, then one of the tuples has, in its second element, a list with at least one
         return not any([len(x[1]) > 0 for x in possible_mappings])
 
+    def save_pending_linking_decision(self, canonical_record, messy_record):
+        raise NotImplementedError
+
+    def get_linking_key(self, canonical_data_index: int, messy_record: dict):
+        raise NotImplementedError
+
     def classify(self, messy_data: dict):
+        """
+        Receives a dict with the messy data
+        Returns 3 lists: certain_matches, undefined_matches, distinct_matches
+        """
         if not messy_data:
-            return [], []  # this means no linking, see the usage of this function
+            return [], [], []  # this means no linking, see the usage of this function
         possible_mappings = self.gazetteer.search(messy_data, n_matches=1)
         if self.no_real_matches(possible_mappings):
-            return [], []  # this means no linking, see the usage of this function
+            return [], [], []  # this means no linking, see the usage of this function
         max_conf_pair = max(possible_mappings, key=lambda x: self.confidence(x))
         min_conf_pair = min(possible_mappings, key=lambda x: self.confidence(x))
         max_confidence = max_conf_pair[1][0][1]
@@ -148,6 +123,7 @@ class Linker:
         certain_matches = []
         dubious_matches = []
         distinct_matches = []
+        pending_decisions = {}
 
         for messy_data_index, possible_maps in possible_mappings:
             if len(possible_maps) == 0:
@@ -161,17 +137,19 @@ class Linker:
             elif confidence_score > dubious_upper_limit:
                 certain_matches.append((messy_data_index, canonical_data_index))
             elif dubious_lower_limit < confidence_score < dubious_upper_limit:
-                dubious_matches.append((messy_data_index, canonical_data_index))
+                key = self.get_linking_key(canonical_data_index, messy_record)
+                if key in pending_decisions:
+                    decision_id = pending_decisions[key]
+                else:
+                    decision_id = self.save_pending_linking_decision(canonical_record, messy_record)
+                pending_decisions[key] = decision_id
+                dubious_matches.append((messy_data_index, canonical_data_index, decision_id))
             elif confidence_score < dubious_lower_limit:
                 distinct_matches.append((messy_data_index, canonical_data_index, confidence_score))
 
-        certain, distinct = self.label_pairs(dubious_matches, messy_data)
         self._save_training(self.gazetteer)
         self.gazetteer.cleanup_training()
-        certain_matches.extend(certain)
-        distinct_matches.extend(distinct)
-
-        return certain_matches, distinct_matches
+        return certain_matches, dubious_matches, distinct_matches
 
     def confidence(self, match):
         return match[1][0][1] if len(match[1]) > 0 else -1

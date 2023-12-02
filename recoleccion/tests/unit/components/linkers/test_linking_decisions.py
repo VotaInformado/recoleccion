@@ -12,6 +12,7 @@ from recoleccion.models.senate_seat import SenateSeat
 from recoleccion.models.vote import Vote
 
 # Project
+from recoleccion.management.commands.define_dubious_records import Command
 import recoleccion.tests.test_helpers.utils as ut
 from recoleccion.components.linkers import PartyLinker, PersonLinker
 from recoleccion.models.linking.party_linking import PartyLinkingDecision
@@ -187,7 +188,8 @@ class PersonLinkingDecisionsTestCase(LinkingTestCase):
         pending_decision = PersonLinkingDecision.objects.filter(decision=LinkingDecisionOptions.PENDING).first()
         canonical_id = pending_decision.person_id
         self.assertEqual(pending_decision.messy_name, f"{MESSY_NAME} {MESSY_LAST_NAME}")
-        call_command("define_dubious_records")
+        with mck.mock_method(Command, "ask_for_user_decision", return_value=LinkingDecisionOptions.APPROVED):
+            call_command("define_dubious_records")
         pending_decision.refresh_from_db()
         self.assertEqual(pending_decision.decision, LinkingDecisionOptions.APPROVED)
         senator = SenateSeat.objects.filter(linking_id=pending_decision.uuid).first()
@@ -268,7 +270,7 @@ class PartyLinkingDecisionsTestCase(LinkingTestCase):
         TOTAL_MESSY_RECORDS = 10
         projects = LawProject.objects.all()[:TOTAL_MESSY_RECORDS]
         messy_parties = create_fake_df({"party_name": "party"}, n=TOTAL_MESSY_RECORDS, as_dict=False)
-        messy_parties.at[1, 'party_name'] = messy_parties.at[0, 'party_name']
+        messy_parties.at[1, "party_name"] = messy_parties.at[0, "party_name"]
         messy_parties = messy_parties.to_dict(orient="records")
         for i in range(TOTAL_MESSY_RECORDS):
             Vote.objects.create(
@@ -288,3 +290,45 @@ class PartyLinkingDecisionsTestCase(LinkingTestCase):
         pending_decision = PartyLinkingDecision.objects.get(uuid=uuid)
         pending_decision_party = pending_decision.party
         self.assertEqual(pending_decision_party.pk, canonical_party_id)
+
+    def test_updating_votes_party_after_approved_linking_decision(self):
+        settings.REAL_METHOD = Gazetteer.search
+        settings.MESSY_INDEXES = [0, 1]  # these are the indexes of the pending decisions messy records
+        canonical_index = 0
+        settings.CANONICAL_INDEXES = [0, 0]  # these are the indexes of the pending decisions canonical records
+        PARTY_NAME = "PARTIDO JUSTICIALISTA"
+        party = Party.objects.create(main_denomination=PARTY_NAME)
+        self.create_party_denominations(25, party)  # hay que hacer esto xq rompe con 1 canonical record
+        linker = PartyLinker()
+        canonical_party_id = linker.get_canonical_data()[canonical_index]["party_id"]
+        # id of the canonical record's party
+        TOTAL_MESSY_RECORDS = 10
+        projects = LawProject.objects.all()[:TOTAL_MESSY_RECORDS]
+        messy_parties = create_fake_df({"party_name": "party"}, n=TOTAL_MESSY_RECORDS, as_dict=False)
+        messy_parties.at[1, "party_name"] = messy_parties.at[0, "party_name"]
+        messy_parties = messy_parties.to_dict(orient="records")
+        for i in range(TOTAL_MESSY_RECORDS):
+            Vote.objects.create(
+                person_name="Nombre", person_last_name="Apellido", party_name=messy_parties[i], project=projects[i]
+            )
+        queryset = Vote.objects.values("party_name", "id")
+        messy_data = pd.DataFrame(list(queryset))
+        with mck.mock_method_side_effect(Gazetteer, "search", side_effect=mck.mock_linking_results):
+            linked_data = linker.link_parties(messy_data)
+        non_linked_rows = linked_data[pd.isna(linked_data["linking_id"])]
+        expected_linking_decisions = len(settings.MESSY_INDEXES)
+        self.assertEqual(len(non_linked_rows), len(linked_data) - expected_linking_decisions)
+        messy_index = random.choice(settings.MESSY_INDEXES)
+        uuid = linked_data.iloc[messy_index]["linking_id"]
+        total_pending_decisions = PartyLinkingDecision.objects.filter(decision=LinkingDecisionOptions.PENDING).count()
+        self.assertEqual(total_pending_decisions, 1)  # only one decision is created, used for both messy records
+        pending_decision = PartyLinkingDecision.objects.get(uuid=uuid)
+        pending_decision_party = pending_decision.party
+        self.assertEqual(pending_decision_party.pk, canonical_party_id)
+        with mck.mock_method(Command, "ask_for_user_decision", return_value=LinkingDecisionOptions.APPROVED):
+            call_command("define_dubious_records")
+        pending_decision.refresh_from_db()
+        self.assertEqual(pending_decision.decision, LinkingDecisionOptions.APPROVED)
+        votes = Vote.objects.filter(linking_id=pending_decision.uuid)
+        for vote in votes:
+            self.assertEqual(vote.party.pk, canonical_party_id)

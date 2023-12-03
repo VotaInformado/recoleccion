@@ -9,6 +9,9 @@ class PersonLinkingDecision(LinkingDecision):
     person = models.ForeignKey("Person", on_delete=models.CASCADE, related_name="linking", null=True)
     messy_name = models.CharField(max_length=255, null=True, help_text="Messy full name")
 
+    class Meta:
+        unique_together = ("person", "messy_name")
+
     def get_messy_record(self):
         return {"messy_name": self.messy_name}
 
@@ -17,8 +20,4 @@ class PersonLinkingDecision(LinkingDecision):
 
     def _update_records(self, records):
         if records:
-            try:
-                records.update(person=self.person)
-            except Exception as e:
-                import pdb; pdb.set_trace()
-                pass
+            records.update(person=self.person)

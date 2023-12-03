@@ -418,7 +418,6 @@ class PartyLinkerTestCase(LinkingTestCase):
         2. Previous decisions  X -> This should be the final decision (same record)
         3. Gazetteer
         """
-
         RECORD_ID = 2
         CANONICAL_DENOMINATION = "DIFFERENT_PARTY"
         MESSY_DENOMINATION = "Partido Justicialista"

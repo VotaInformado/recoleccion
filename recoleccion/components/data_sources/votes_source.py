@@ -122,7 +122,7 @@ class DeputyVotesSource(DataSource):
     column_mappings = {
         "expediente": "project_id",
         "diputado_nombre": "diputado_nombre",  # igual después se divide en name y last_name
-        "bloque": "party",
+        "bloque": "party_name",
         "distrito_nombre": "province",
         "voto": "vote",
         "titulo": "reference_description",
@@ -163,7 +163,7 @@ class DeputyVotesSource(DataSource):
         vote_info = {
             "name": name,
             "last_name": last_name,
-            "party": party,
+            "party_name": party,
             "province": province,
             "vote": vote,
         }
@@ -359,11 +359,9 @@ class DeputyVotesSource(DataSource):
         if "day_order" in data.columns:
             day_order_grouped = data.groupby("day_order")["vote"].count()
             assert (day_order_grouped % 257 == 0).all()
-            print(f"Most common day_order: {max(day_order_grouped)}")
         if "project_id" in data.columns:
             project_id_grouped = data.groupby("project_id")["vote"].count()
             assert (project_id_grouped % 257 == 0).all()
-
         return data
 
 
@@ -374,7 +372,7 @@ class SenateVotesSource(DataSource):
     column_mappings = {
         "expediente": "project_id",
         "diputado_nombre": "diputado_nombre",  # igual después se divide en name y last_name
-        "bloque": "party",
+        "bloque": "party_name",
         "distrito_nombre": "province",
         "voto": "vote",
         "titulo": "reference_description",
@@ -501,7 +499,7 @@ class SenateVotesSource(DataSource):
         info = {
             "name": name,
             "last_name": last_name,
-            "party": party,
+            "party_name": party,
             "province": province,
             "vote": vote,
             "date": vote_date,

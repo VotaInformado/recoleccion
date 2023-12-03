@@ -2,13 +2,14 @@ from django.db.models import Q
 import pandas as pd
 from datetime import datetime as dt
 import numpy as np
+import logging
 
 # Project
 from recoleccion.models.linking import DENIED_INDICATOR
-import logging
 from recoleccion.models import Law, LawProject, Party, Person, Vote
 from recoleccion.components.writers import Writer
 from recoleccion.utils.enums.project_chambers import ProjectChambers
+from recoleccion.utils.enums.vote_choices import VOTE_CHOICE_TRANSLATION
 from recoleccion.utils.enums.vote_types import VoteTypes
 
 
@@ -165,14 +166,12 @@ class VotesWriter(Writer):
     def format_vote(self, vote: str) -> str:
         if not vote or vote.title() == "Sin votar":
             return ""
-        vote = vote.title()
-        if vote == "Positivo":
-            return "Afirmativo"
-        return vote
+        vote = vote.title().upper()
+        return VOTE_CHOICE_TRANSLATION.get(vote, vote)
 
     def write_vote(self, row: pd.Series, person, law_project, law, reference):
         existing_vote = self.get_existing_vote(row, person, law_project, law, reference)
-        row.update({vote: self.format_vote(row.vote)})
+        row.update({"vote": self.format_vote(row.vote)})
         if existing_vote:
             this_vote_type = row.get("vote_type", None)
             if this_vote_type == VoteTypes.GENERAL:
@@ -187,6 +186,7 @@ class VotesWriter(Writer):
                 self.logger.info("General vote already exists, not updating")
                 vote, was_created = None, False
         else:
+            row = row.drop(["index"], errors="ignore")
             vote = Vote.objects.create(**row.to_dict())
             was_created = True
         return vote, was_created

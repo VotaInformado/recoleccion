@@ -95,6 +95,7 @@ class PartyLinker(Linker):
             self.logger.info(f"Exactly matched {exactly_matched_data.shape[0]} parties")
             manually_linked_data, undefined_data = self.apply_manual_linking(unmatched_data)
             self.logger.info(f"Manually decided on {manually_linked_data.shape[0]} parties")
+            undefined_data = self.reset_index(undefined_data)
             undefined_df = pd.DataFrame.from_dict(undefined_data, orient="index")
             try:
                 self.train(undefined_data)
@@ -204,8 +205,13 @@ class PartyLinker(Linker):
     def save_pending_linking_decision(self, canonical_record: dict, messy_record: dict) -> int:
         party_id = self.get_record_id(canonical_record)
         messy_denomination = messy_record["denomination"]
-        decision = PartyLinkingDecision.objects.create(party_id=party_id, messy_denomination=messy_denomination)
-        return decision.uuid
+        existing_decision = PartyLinkingDecision.objects.filter(
+            party_id=party_id, messy_denomination=messy_denomination
+        ).first()
+        if existing_decision:
+            return existing_decision.uuid
+        new_decision = PartyLinkingDecision.objects.create(party_id=party_id, messy_denomination=messy_denomination)
+        return new_decision.uuid
 
     def get_linking_key(self, canonical_data_index: int, messy_record: dict):
         messy_denomination = messy_record["denomination"]

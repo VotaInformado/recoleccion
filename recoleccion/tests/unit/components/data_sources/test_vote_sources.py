@@ -39,7 +39,7 @@ class DeputyVotesSourceTestCase(TestCase):
         self.assertEqual(vote["vote"], VoteChoices.POSITIVE)
         self.assertEqual(vote["name"], "Hilda Clelia")
         self.assertEqual(vote["last_name"], "Aguirre")
-        self.assertEqual(vote["party"], "Frente De Todos")
+        self.assertEqual(vote["party_name"], "Frente De Todos")
         self.assertEqual(vote["province"].label, "La Rioja")
 
     def test_get_vote_info_parses_vote_correctly_for_negative_vote(self):
@@ -72,7 +72,7 @@ class DeputyVotesSourceTestCase(TestCase):
         self.assertEqual(vote["vote"], VoteChoices.NEGATIVE)
         self.assertEqual(vote["name"], "Hilda Clelia")
         self.assertEqual(vote["last_name"], "Aguirre")
-        self.assertEqual(vote["party"], "Frente De Todos")
+        self.assertEqual(vote["party_name"], "Frente De Todos")
         self.assertEqual(vote["province"].label, "La Rioja")
 
     def test_get_vote_info_parses_vote_correctly_for_absent_vote(self):
@@ -105,7 +105,7 @@ class DeputyVotesSourceTestCase(TestCase):
         self.assertEqual(vote["vote"], VoteChoices.ABSENT)
         self.assertEqual(vote["name"], "Hilda Clelia")
         self.assertEqual(vote["last_name"], "Aguirre")
-        self.assertEqual(vote["party"], "Frente De Todos")
+        self.assertEqual(vote["party_name"], "Frente De Todos")
         self.assertEqual(vote["province"].label, "La Rioja")
 
     def test_get_vote_info_parses_vote_correctly_for_absention_vote(self):
@@ -138,7 +138,7 @@ class DeputyVotesSourceTestCase(TestCase):
         self.assertEqual(vote["vote"], VoteChoices.ABSTENTION)
         self.assertEqual(vote["name"], "Hilda Clelia")
         self.assertEqual(vote["last_name"], "Aguirre")
-        self.assertEqual(vote["party"], "Frente De Todos")
+        self.assertEqual(vote["party_name"], "Frente De Todos")
         self.assertEqual(vote["province"].label, "La Rioja")
 
 
@@ -175,7 +175,7 @@ class SenateVotesSourceTestCase(TestCase):
         self.assertEqual(vote["date"], vote_date)
         self.assertEqual(vote["name"], "Claudio Javier")
         self.assertEqual(vote["last_name"], "Poggi")
-        self.assertEqual(vote["party"], "AVANZAR SAN LUIS")
+        self.assertEqual(vote["party_name"], "AVANZAR SAN LUIS")
         self.assertEqual(vote["province"].label, "San Luis")
 
     def test_get_vote_info_parses_vote_correctly_for_abstent_vote(self):
@@ -210,7 +210,7 @@ class SenateVotesSourceTestCase(TestCase):
         self.assertEqual(vote["date"], vote_date)
         self.assertEqual(vote["name"], "Claudio Javier")
         self.assertEqual(vote["last_name"], "Poggi")
-        self.assertEqual(vote["party"], "AVANZAR SAN LUIS")
+        self.assertEqual(vote["party_name"], "AVANZAR SAN LUIS")
         self.assertEqual(vote["province"].label, "San Luis")
 
     def test_get_vote_info_parses_vote_correctly_for_negative_vote(self):
@@ -245,5 +245,5 @@ class SenateVotesSourceTestCase(TestCase):
         self.assertEqual(vote["date"], vote_date)
         self.assertEqual(vote["name"], "Claudio Javier")
         self.assertEqual(vote["last_name"], "Poggi")
-        self.assertEqual(vote["party"], "AVANZAR SAN LUIS")
+        self.assertEqual(vote["party_name"], "AVANZAR SAN LUIS")
         self.assertEqual(vote["province"].label, "San Luis")

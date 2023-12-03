@@ -9,6 +9,9 @@ class PartyLinkingDecision(LinkingDecision):
     party = models.ForeignKey("Party", on_delete=models.CASCADE, related_name="linking", null=True)
     messy_denomination = models.CharField(max_length=255, null=True, help_text="Messy denomination")
 
+    class Meta:
+        unique_together = ("party", "messy_denomination")
+
     def get_messy_record(self):
         return {"messy_denomination": self.messy_denomination}
 

@@ -54,21 +54,6 @@ class Linker:
         """Gets the record id"""
         raise NotImplementedError
 
-    def save_linking_decision(self, **kwargs):
-        raise NotImplementedError
-
-    def user_approved_linking(self, record_pair: Tuple[dict, dict]) -> bool:
-        # Returns True if the user approves the linking, False otherwise
-        messy_record, canonical_record = record_pair
-        print("Are these the same records?: \n")
-        pp(messy_record, sort_dicts=True, width=35)
-        pp(canonical_record, sort_dicts=True, width=35)
-        response = input("yes (y) / no (n): ").lower()
-        while response not in ["y", "n"]:
-            print("Invalid response")
-            response = input("yes (y) / no (n): ").lower()
-        return response == "y"
-
     def train(self, messy_data):
         # if len(messy_data) > len(self.canonical_data):
         #     raise LinkingException(
@@ -100,6 +85,12 @@ class Linker:
 
     def get_linking_key(self, canonical_data_index: int, messy_record: dict):
         raise NotImplementedError
+
+    def reset_index(self, data_as_dict: dict) -> dict:
+        df = pd.DataFrame.from_dict(data_as_dict, orient="index")
+        df = df.reset_index(drop=False)
+        result_dict = df.to_dict(orient='index')
+        return result_dict
 
     def classify(self, messy_data: dict):
         """
@@ -139,9 +130,12 @@ class Linker:
             elif dubious_lower_limit < confidence_score < dubious_upper_limit:
                 key = self.get_linking_key(canonical_data_index, messy_record)
                 if key in pending_decisions:
-                    decision_id = pending_decisions[key]
+                    existing_id = pending_decisions[key]
+                    self.logger.info(f"Using existing pending linking decision (id {existing_id}) for key {key}")
+                    decision_id = existing_id
                 else:
                     decision_id = self.save_pending_linking_decision(canonical_record, messy_record)
+                    self.logger.info(f"Pending linking decision created (id {decision_id}) for key {key}")
                 pending_decisions[key] = decision_id
                 dubious_matches.append((messy_data_index, canonical_data_index, decision_id))
             elif confidence_score < dubious_lower_limit:

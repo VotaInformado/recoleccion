@@ -25,5 +25,4 @@ class Command(YearThreadedCommand):
             linker = PersonLinker()
             linked_data = linker.link_persons(votes)
             writer.write(linked_data)
-            import pdb; pdb.set_trace()
             year -= step_size

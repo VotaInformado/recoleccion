@@ -12,6 +12,7 @@ services:
       context: .
       dockerfile: ./compose/local/django/Dockerfile
     image: vi-recoleccion
+    hostname: recoleccion
     depends_on:
       - postgres.recoleccion
     volumes:
@@ -40,7 +41,7 @@ services:
 
 networks:
   default:
-      name: local_network
+      name: vi-network
 
 secrets:
   ssh_private_key:

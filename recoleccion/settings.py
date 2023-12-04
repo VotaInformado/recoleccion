@@ -35,6 +35,7 @@ ALLOWED_HOSTS = [
     "0.0.0.0",
     "127.0.0.0",
     "127.0.0.1",
+    "recoleccion",
 ]
 
 # CORS
@@ -170,7 +171,10 @@ LOGGING = {
     "disable_existing_loggers": False,
     "filters": {"require_debug_false": {"()": "django.utils.log.RequireDebugFalse"}},
     "formatters": {
-        "verbose": {"format": "%(levelname)s %(asctime)s %(module)s " "%(process)d %(thread)d %(message)s"},
+        "verbose": {
+            "format": "%(levelname)s %(asctime)s %(module)s "
+            "%(process)d %(thread)d %(message)s"
+        },
         "colored_formatter": {
             "()": "colorlog.ColoredFormatter",
             "format": "\n%(log_color)s%(levelname)-8s%(white)s(%(threadName)s) %(message)s",
@@ -195,7 +199,11 @@ LOGGING = {
         },
     },
     "loggers": {
-        "recoleccion": {"level": "DEBUG", "handlers": ["console", "axiom_handler"], "propagate": True},
+        "recoleccion": {
+            "level": "DEBUG",
+            "handlers": ["console", "axiom_handler"],
+            "propagate": True,
+        },
     },
 }
 

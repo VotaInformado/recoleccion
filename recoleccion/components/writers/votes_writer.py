@@ -23,6 +23,8 @@ class VotesWriter(Writer):
         self.last_deputies_project = None
         self.last_senate_project = None
         self.logger = logging.getLogger(__name__)
+        self.votes_to_be_updated = []
+        self.votes_to_be_created = []
 
     def write(self, data: pd.DataFrame):
         self.logger.info(f"Received {len(data)} law projects to write...")

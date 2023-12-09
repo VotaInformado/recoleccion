@@ -1,10 +1,8 @@
 import re
 import datetime as dt
-import time
-from typing import List, Tuple
+from typing import List
 import requests
 import pandas as pd
-import datetime as dt
 from bs4 import BeautifulSoup
 import logging
 
@@ -12,7 +10,6 @@ import logging
 from recoleccion.components.utils import capitalize_text, digitize_text, trim_extra_spaces
 from recoleccion.components.data_sources import DataSource
 from recoleccion.models.law_project import LawProject
-import logging
 from recoleccion.utils.enums.legislator_seats import LegislatorSeats
 from recoleccion.utils.enums.project_chambers import ProjectChambers
 from recoleccion.utils.enums.project_status import ProjectStatus
@@ -23,12 +20,12 @@ logger = logging.getLogger(__name__)
 
 class DeputiesAuthorsSource(DataSource):
     session = requests.Session()
-    BASE_URL = "https://www.diputados.gov.ar/proyectos/resultados.html"
+    BASE_URL = "https://www.hcdn.gob.ar/proyectos/resultado.html"
     POST_HEADERS = {
         "Referer": "https://www.diputados.gov.ar/proyectos/index.html",
     }
     GET_HEADERS = {
-        "Referer": "https://www.diputados.gov.ar/proyectos/resultados.html",
+        "Referer": "https://www.hcdn.gob.ar/proyectos/resultado.html",
     }
 
     QUERY_DATA = {
@@ -93,6 +90,7 @@ class DeputiesAuthorsSource(DataSource):
         url = self.BASE_URL
         logger.info(f"Sending POST request to {url}...")
         response = self.session.post(url, data=self.QUERY_DATA, headers=self.POST_HEADERS)
+        return response
 
     def get_project_id_info(self, metadata) -> dict:
         spans = metadata.find_all("span")
@@ -127,14 +125,17 @@ class DeputiesAuthorsSource(DataSource):
 
         page_info = []
         soup = BeautifulSoup(page_content, "html.parser")
-        projects = soup.find_all(class_="detalle-proyecto")
+        # projects = soup.find_all(class_="detalle-proyecto")
+        projects_metadata = soup.find_all(class_="dp-metadata")
+        projects_detail = soup.find_all(class_="detalle-proyecto")
+        projects = zip(projects_metadata, projects_detail)
 
-        for project in projects:
-            project_id_info: dict = self.get_project_id_info(project)
+        for project_metada, project_detail in projects:
+            project_id_info: dict = self.get_project_id_info(project_metada)
             if not project_id_info:
                 logger.info("No deputies_project_id or senate_project_id info found, skipping...")
                 continue
-            signers_table = project.find(class_="dp-firmantes")
+            signers_table = project_detail.find('table', class_='table-striped')
             table_rows = signers_table.find_all("tr")
             author_type = self.get_author_type(project_id_info)
             project_id_info["author_type"] = author_type
@@ -145,7 +146,7 @@ class DeputiesAuthorsSource(DataSource):
                     logger.info("No signers info found, skipping...")
                 signers_info = {
                     "raw_name": cells[0].text.strip(),
-                    "party": cells[2].text.strip(),
+                    "party_name": cells[2].text.strip(),
                     "author_type": LegislatorSeats.DEPUTY,
                 }
                 signers_info.update(project_id_info)
@@ -174,7 +175,7 @@ class DeputiesAuthorsSource(DataSource):
         page_data = page_data.reset_index(drop=True)
         page_data["name"] = page_data["name"].apply(self.clean_name)
         page_data["last_name"] = page_data["last_name"].apply(self.clean_name)
-        page_data["source"] = "deputies_authors"
+        page_data["source"] = f"diputados_{page}"
         return page_data
 
 
@@ -334,6 +335,6 @@ class SenateAuthorsSource(DataSource):
     def get_data(self, year: int):
         projects_info = self.get_year_info(year)
         data = pd.DataFrame(projects_info)
-        data["source"] = "Autores Senado"
+        data["source"] = f"senado_{year}"
         self.logger.info(f"Retrieved {len(data)} projects")
         return data

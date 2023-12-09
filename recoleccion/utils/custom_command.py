@@ -79,13 +79,13 @@ class CustomCommand(BaseCommand):
             thread.join()
 
     def handle_unthreaded(self, function_params: dict, options: dict):
-        INDEX = self.get_current_index(0, options)
         STEP_SIZE = 1
         if options.get("only_missing"):
-            function_params["starting_index"] = INDEX
+            index = 0
+            function_params["starting_index"] = index
         else:
-            index_name = self.index_name
-            function_params[index_name] = INDEX
+            index = self.get_current_index(0, options)
+            function_params[self.index_name] = index
         function_params["step_size"] = STEP_SIZE
         self.target_function(**function_params)
 
@@ -109,7 +109,7 @@ class YearThreadedCommand(CustomCommand):
 
 
 class PageThreadedCommand(CustomCommand):
-    def get_current_index(self, loop_index, _):
+    def get_current_index(self, loop_index, options):
         return loop_index
 
     def __init__(self):
@@ -119,7 +119,7 @@ class PageThreadedCommand(CustomCommand):
 
 
 class PeriodThreadedCommand(CustomCommand):
-    def get_current_index(self, loop_index, _):
+    def get_current_index(self, loop_index, options):
         return loop_index
 
     def __init__(self):

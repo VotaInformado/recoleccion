@@ -162,9 +162,18 @@ class LawProject(BaseModel):
     def get_project_year_and_number(cls, project_id: str):
         project_id = project_id.replace("/", "-")
         splitted_id = project_id.split("-")
-        number = splitted_id[0]
-        year = splitted_id[-1]
-        return int(number), int(year)
+        number = int(splitted_id[0])
+        year = int(splitted_id[-1])
+        if year > 100:
+            # ya tiene formato 19XX o 20XX
+            year = year
+        elif year > 30:
+            # Tiene que ser 19XX
+            year += 1900
+        else:
+            # Tiene que ser 20XX
+            year += 2000
+        return number, year
 
     @property
     def authors(self):

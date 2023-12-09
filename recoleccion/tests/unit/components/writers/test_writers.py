@@ -97,3 +97,8 @@ class LawsProjectWriter(TestCase):
             year_str = str(year)
             year_formatted = LawProjectsWriter.format_year(year_str)
             self.assertEqual(year_formatted, year)
+
+
+class AuthorsWriter(TestCase):
+    def test_bulk_creation_when_no_authors_are_present(self):
+        pass

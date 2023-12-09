@@ -1,10 +1,13 @@
 import uuid
+import logging
 
 # Django
 from django.db import models
 
 
 class BaseModel(models.Model):
+    logger = logging.getLogger(__name__)
+
     class Meta:
         abstract = True
         app_label = "recoleccion"

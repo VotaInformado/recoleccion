@@ -6,6 +6,7 @@ import pandas as pd
 from recoleccion.components.writers.deputies_writer import DeputiesWriter
 from recoleccion.components.writers.senators_writer import SenatorsWriter
 from recoleccion.components.writers.votes_writer import VotesWriter
+from recoleccion.models.authorship import Authorship
 from recoleccion.models.deputy_seat import DeputySeat
 from recoleccion.models.law_project import LawProject
 from recoleccion.models.senate_seat import SenateSeat
@@ -191,6 +192,24 @@ class PersonLinkingDecisionsTestCase(LinkingTestCase):
         deputy = DeputySeat.objects.filter(linking_id=pending_decision.uuid).first()
         self.assertEqual(deputy.person.pk, canonical_id)
 
+    def test_updating_person_linking_decision_records_individually(self):
+        person = Person.objects.create(name="Juan", last_name="Perez")
+        vote = Vote.objects.create(person_name="Juan", person_last_name="Perez")
+        linking_decision = PersonLinkingDecision.objects.create(
+            messy_name="Juan Perez", decision=LinkingDecisionOptions.PENDING, person=person
+        )
+        authorship = Authorship.objects.create(person_name="Juan", person_last_name="Perez")
+        vote.linking_id = linking_decision.uuid
+        vote.save()
+        authorship.linking_id = linking_decision.uuid
+        authorship.save()
+        records = linking_decision._get_related_records()
+        linking_decision._update_records_individually(records)
+        vote.refresh_from_db()
+        authorship.refresh_from_db()
+        self.assertEqual(vote.person.pk, person.pk)
+        self.assertEqual(authorship.person.pk, person.pk)
+
 
 class PartyLinkingDecisionsTestCase(LinkingTestCase):
     fixtures = ["law_project.json"]
@@ -326,3 +345,21 @@ class PartyLinkingDecisionsTestCase(LinkingTestCase):
         votes = Vote.objects.filter(linking_id=pending_decision.uuid)
         for vote in votes:
             self.assertEqual(vote.party.pk, canonical_party_id)
+
+    def test_updating_party_linking_decision_records_individually(self):
+        party = Party.objects.create(main_denomination="Partido Justicialista")
+        vote = Vote.objects.create(party_name="Partido Justicialista")
+        linking_decision = PartyLinkingDecision.objects.create(
+            messy_denomination="Juan Perez", decision=LinkingDecisionOptions.PENDING, party=party
+        )
+        authorship = Authorship.objects.create(party_name="Partido Justicialista")
+        vote.linking_id = linking_decision.uuid
+        vote.save()
+        authorship.linking_id = linking_decision.uuid
+        authorship.save()
+        records = linking_decision._get_related_records()
+        linking_decision._update_records_individually(records)
+        vote.refresh_from_db()
+        authorship.refresh_from_db()
+        self.assertEqual(vote.party.pk, party.pk)
+        self.assertEqual(authorship.party.pk, party.pk)

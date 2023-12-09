@@ -7,11 +7,9 @@ volumes:
 services:
   django.recoleccion:
     build:
-      secrets:
-        - ssh_private_key
       context: .
       dockerfile: ./compose/local/django/Dockerfile
-    image: vi-recoleccion
+    image: vi-recoleccion-django
     hostname: recoleccion
     depends_on:
       - postgres.recoleccion
@@ -30,7 +28,7 @@ services:
     build:
       context: .
       dockerfile: ./compose/local/postgres/Dockerfile
-    image: recoleccion_postgres_local
+    image: vi-recoleccion-postgres
     volumes:
       - local_postgres_data:/var/lib/postgresql/data
       - local_postgres_data_backups:/backups
@@ -42,7 +40,3 @@ services:
 networks:
   default:
       name: vi-network
-
-secrets:
-  ssh_private_key:
-    file: ~/.ssh/id_ed25519

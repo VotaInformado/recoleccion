@@ -36,19 +36,22 @@ class Command(BaseCommand):
     def save_accepted_decision(self, pending_decision: LinkingDecision):
         pending_decision.decision = LinkingDecisionOptions.APPROVED
         pending_decision.save()
-        pending_decision.update_related_records()
+        updated_records = pending_decision.update_related_records()
+        logger.info(f"Updated {updated_records} records")
 
     def save_rejected_decision(self, pending_decision: LinkingDecision):
         pending_decision.decision = LinkingDecisionOptions.DENIED
         pending_decision.save()
-        pending_decision.unlink_related_records()
+        unlinked_records = pending_decision.unlink_related_records()
+        logger.info(f"Unlinked {unlinked_records} records")
 
     def handle(self, *args, **options):
         pending_party_decisions = PartyLinkingDecision.objects.filter(decision=LinkingDecisionOptions.PENDING).all()
         pending_person_decisions = PersonLinkingDecision.objects.filter(decision=LinkingDecisionOptions.PENDING).all()
         total_decisions = list(pending_party_decisions) + list(pending_person_decisions)
         logger.info(f"Pending decisions: {len(total_decisions)}")
-        for pending_decision in total_decisions:
+        sorted_decisions = sorted(total_decisions, key=lambda x: x.id)
+        for pending_decision in sorted_decisions:
             user_response = self.ask_for_user_decision(pending_decision)
             if user_response == LinkingDecisionOptions.APPROVED:
                 self.save_accepted_decision(pending_decision)

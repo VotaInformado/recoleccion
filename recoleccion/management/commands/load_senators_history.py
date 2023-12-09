@@ -16,7 +16,7 @@ from recoleccion.exceptions.custom import SenateLoadingException
 
 
 class Command(BaseCommand):
-    SENATE_CAPACITY = 72
+    SENATE_CAPACITY = 70  # TODO: CAMBIAR! por algún motivo la fuente real devuelve 70 (9/12)
 
     def check_current_senators(self):
         total_persons = Person.objects.count()

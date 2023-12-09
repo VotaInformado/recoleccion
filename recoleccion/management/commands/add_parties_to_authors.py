@@ -38,8 +38,6 @@ class Command(BaseCommand):
     def load_party_to_authors(self, party_name, party):
         authors = Authorship.objects.filter(party_name=party_name)
         authors.update(party=party)
-        for author in authors:
-            author.save()
         updated_authors = authors.count()
         if party:
             self.logger.info(f"{updated_authors} authors have been updated to party {party_name} with id {party.id}")

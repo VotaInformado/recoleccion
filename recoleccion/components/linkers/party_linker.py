@@ -25,6 +25,7 @@ class PartyLinker(Linker):
         self.logger = logging.getLogger(__name__)
         self.gazetteer = Gazetteer(self.fields)
         self.canonical_data = self.get_canonical_data()
+        self.denomination_mapping = {}
 
     def get_canonical_data(self) -> dict:
         denominations = PartyDenomination.objects.all().order_by("id")
@@ -36,10 +37,22 @@ class PartyLinker(Linker):
         canonical_data = canonical_data.to_dict(orient="index")
         return OrderedDict(canonical_data)
 
-    def get_messy_data(self, original_data: pd.DataFrame) -> dict:
+    def convert_denomination(self, original_denomination: str) -> str:
+        new_denomination = unidecode_text(original_denomination)
+        self.denomination_mapping[new_denomination] = original_denomination
+        return new_denomination
+
+    def restore_denomination(self, new_denomination: str) -> str:
+        return self.denomination_mapping[new_denomination]
+
+    def get_messy_data(self, original_data: pd.DataFrame, save_original_denominations) -> dict:
         messy_data = original_data.copy()
         messy_data = messy_data.rename(columns={"party_name": "denomination", "id": "record_id"})
-        messy_data[["denomination"]] = messy_data[["denomination"]].applymap(lambda x: unidecode_text(x))
+        if save_original_denominations:
+            messy_data[["denomination"]] = messy_data[["denomination"]].applymap(lambda x: self.convert_denomination(x))
+            self.logger.info(f"Converted {len(self.denomination_mapping)} denominations")
+        else:
+            messy_data[["denomination"]] = messy_data[["denomination"]].applymap(lambda x: unidecode_text(x))
         messy_data = messy_data.to_dict(orient="index")
         return messy_data
 
@@ -81,7 +94,7 @@ class PartyLinker(Linker):
         self.logger.info(f"Linked {len(dubious_matches)} parties")
         return dubious_mapping
 
-    def link_parties(self, data: pd.DataFrame) -> pd.DataFrame:
+    def link_parties(self, data: pd.DataFrame, save_original_denominations=False) -> pd.DataFrame:
         """
         Receives a DF with columns: denomination, record_id
         Returns a DF with columns: denomination, record_id, party_id
@@ -90,7 +103,7 @@ class PartyLinker(Linker):
         data = data.rename(columns={"id": "record_id"})
         try:
             linked_parties = 0
-            messy_data: dict = self.get_messy_data(data)
+            messy_data: dict = self.get_messy_data(data, save_original_denominations)
             exactly_matched_data, unmatched_data = self.load_exact_matches(messy_data)
             self.logger.info(f"Exactly matched {exactly_matched_data.shape[0]} parties")
             manually_linked_data, undefined_data = self.apply_manual_linking(unmatched_data)
@@ -101,7 +114,10 @@ class PartyLinker(Linker):
                 self.train(undefined_data)
             except IncompatibleLinkingDatasets as e:
                 undefined_df["party_id"] = None
-                return self.merge_dataframes(exactly_matched_data, manually_linked_data, undefined_df)
+                merged_df = self.merge_dataframes(exactly_matched_data, manually_linked_data, undefined_df)
+                if save_original_denominations:
+                    merged_df["denomination"] = merged_df["denomination"].apply(lambda x: self.restore_denomination(x))
+                return merged_df
 
             certain, dubious, distinct = self.classify(undefined_data)
             certain_mapping = self.create_certain_mapping(undefined_df, certain)
@@ -117,7 +133,10 @@ class PartyLinker(Linker):
                 self.logger.info("Linked 0 parties")
             else:
                 raise e
-        return self.merge_dataframes(exactly_matched_data, manually_linked_data, undefined_df)
+        merged_df = self.merge_dataframes(exactly_matched_data, manually_linked_data, undefined_df)
+        if save_original_denominations:
+            merged_df["denomination"] = merged_df["denomination"].apply(lambda x: self.restore_denomination(x))
+        return merged_df
 
     def are_the_same_record(self, record_1, record_2):
         return record_1["denomination"] == record_2["denomination"]

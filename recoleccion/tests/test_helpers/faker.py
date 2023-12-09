@@ -36,6 +36,9 @@ parties = [
 
 
 def create_fake_df(df_columns: dict, n=100, as_dict: bool = True, **kwargs):
+    if "party_unique" in df_columns.values():
+        parties_copy = parties.copy()
+        kwargs["parties_copy"] = parties_copy
     column_names = list(df_columns.keys())
     column_types = list(df_columns.values())
     fake_data = {}
@@ -67,5 +70,8 @@ def create_fake_value(column_type: str, n: int, **kwargs):
         return fake.random_int(min=1, max=n)
     elif column_type == "party":
         return random.choice(parties)
+    elif column_type == "party_unique":
+        parties_copy = kwargs.get("parties_copy")
+        return parties_copy.pop(0)
     else:
         raise ValueError(f"Column type {column_type} not supported")

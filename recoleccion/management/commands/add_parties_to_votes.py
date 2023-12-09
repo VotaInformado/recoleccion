@@ -38,8 +38,6 @@ class Command(BaseCommand):
     def load_party_to_votes(self, party_name, party):
         votes = Vote.objects.filter(party_name=party_name)
         votes.update(party=party)
-        for vote in votes:
-            vote.save()
         updated_votes = votes.count()
         if party:
             self.logger.info(f"{updated_votes} votes have been updated to party {party_name} with id {party.id}")

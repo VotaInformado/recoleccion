@@ -3,6 +3,7 @@ from django.core.management import call_command
 from dedupe import Gazetteer
 from django.conf import settings
 import pandas as pd
+from recoleccion.components.linkers.linker import Linker
 from recoleccion.components.writers.deputies_writer import DeputiesWriter
 from recoleccion.components.writers.senators_writer import SenatorsWriter
 from recoleccion.components.writers.votes_writer import VotesWriter
@@ -45,9 +46,7 @@ class PersonLinkingDecisionsTestCase(LinkingTestCase):
 
     def create_person_linking_decision(self, messy_name: str, canonical_name: str, decision: str, person_id=1):
         person_id = person_id if decision != LinkingDecisionOptions.DENIED else None
-        PersonLinkingDecision.objects.create(
-            messy_name=messy_name, decision=decision, person_id=person_id
-        )
+        PersonLinkingDecision.objects.create(messy_name=messy_name, decision=decision, person_id=person_id)
 
     def test_saving_person_linking_decision(self):
         MESSY_NAME = "Juan C."
@@ -154,7 +153,7 @@ class PersonLinkingDecisionsTestCase(LinkingTestCase):
     def test_updating_records_person_after_approved_linking_decision(self):
         call_command("loaddata", "person.json")
         # We leave only 10 persons
-        ids_to_keep = list(Person.objects.order_by('id')[:10].values_list('id', flat=True))
+        ids_to_keep = list(Person.objects.order_by("id")[:10].values_list("id", flat=True))
         Person.objects.exclude(id__in=ids_to_keep).delete()
         MESSY_NAME = "Juan C."
         MESSY_LAST_NAME = "Perez"
@@ -176,7 +175,8 @@ class PersonLinkingDecisionsTestCase(LinkingTestCase):
         settings.MESSY_INDEXES = [messy_index]
         settings.CANONICAL_INDEXES = [canonical_index]
         with mck.mock_method_side_effect(Gazetteer, "search", side_effect=mck.mock_linking_results):
-            linked_data = linker.link_persons(updated_data)
+            with mck.mock_method_side_effect(PersonLinker, "load_exact_matches", mck.mock_load_exact_matches):
+                linked_data = linker.link_persons(updated_data)
         SenatorsWriter.write(linked_data)
         linked_data.rename(columns={"province": "district"}, inplace=True)
         DeputiesWriter.write(linked_data)
@@ -317,17 +317,18 @@ class PartyLinkingDecisionsTestCase(LinkingTestCase):
         # id of the canonical record's party
         TOTAL_MESSY_RECORDS = 10
         projects = LawProject.objects.all()[:TOTAL_MESSY_RECORDS]
-        messy_parties = create_fake_df({"party_name": "party"}, n=TOTAL_MESSY_RECORDS, as_dict=False)
+        messy_parties = create_fake_df({"party_name": "party_unique"}, n=TOTAL_MESSY_RECORDS, as_dict=False)
         messy_parties.at[1, "party_name"] = messy_parties.at[0, "party_name"]
         messy_parties = messy_parties.to_dict(orient="records")
         for i in range(TOTAL_MESSY_RECORDS):
             Vote.objects.create(
-                person_name="Nombre", person_last_name="Apellido", party_name=messy_parties[i], project=projects[i]
+                person_name="Nombre", person_last_name="Apellido", party_name=messy_parties[i]["party_name"], project=projects[i]
             )
         queryset = Vote.objects.values("party_name", "id")
         messy_data = pd.DataFrame(list(queryset))
         with mck.mock_method_side_effect(Gazetteer, "search", side_effect=mck.mock_linking_results):
-            linked_data = linker.link_parties(messy_data)
+            with mck.mock_method_side_effect(PartyLinker, "load_exact_matches", mck.mock_load_exact_matches):
+                linked_data = linker.link_parties(messy_data)
         non_linked_rows = linked_data[pd.isna(linked_data["linking_id"])]
         expected_linking_decisions = len(settings.MESSY_INDEXES)
         self.assertEqual(len(non_linked_rows), len(linked_data) - expected_linking_decisions)

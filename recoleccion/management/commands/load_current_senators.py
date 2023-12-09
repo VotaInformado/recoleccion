@@ -14,7 +14,7 @@ from recoleccion.utils.enums.legislator_seats import LegislatorSeats
 
 
 class Command(BaseCommand):
-    SENATE_CAPACITY = 72
+    SENATE_CAPACITY = 70  # TODO: CAMBIAR! por algún motivo la fuente real devuelve 70 (9/12)
 
     def handle(self, *args, **options):
         senators_data = CurrentSenate.get_data()

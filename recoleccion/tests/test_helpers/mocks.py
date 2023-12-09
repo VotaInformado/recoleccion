@@ -128,3 +128,7 @@ def mock_linking_results(instance, *args, **kwargs):
         new_list[1][0][1] = dubious_score
         real_results[i] = list_of_lists_to_tuple_of_tuples(new_list)
     return real_results
+
+
+def mock_load_exact_matches(instance, messy_data):
+    return pd.DataFrame(), messy_data

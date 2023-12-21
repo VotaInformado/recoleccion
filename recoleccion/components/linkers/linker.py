@@ -47,7 +47,7 @@ class Linker:
             self.clean_training_pairs(gazetteer)
             gazetteer.write_training(f)
 
-    def get_canonical_data(self):
+    def get_canonical_data(self, alternative_format=False):
         return self.canonical_data
 
     def get_record_id(self, record):
@@ -59,13 +59,14 @@ class Linker:
         #     raise LinkingException(
         #         f"There are more messy records ({len(messy_data)}) than canonical record ({len(self.canonical_data)})"
         #     )
-        file_dir = f"{self.TRAINING_DIR}/{self.__class__.__name__}.json"
+        file_dir = f"{self.TRAINING_DIR}/{self.__class__.__name__}_modified.json"
+        canonical_data = self.get_canonical_data()
 
         if os.path.exists(file_dir):
             with open(file_dir, encoding="utf-8-sig") as f:
-                self.gazetteer.prepare_training(messy_data, self.canonical_data, training_file=f)
+                self.gazetteer.prepare_training(messy_data, canonical_data, training_file=f)
         else:
-            self.gazetteer.prepare_training(messy_data, self.canonical_data)
+            self.gazetteer.prepare_training(messy_data, canonical_data)
             console_label(self.gazetteer)  # Run active learning because no training data exists
         try:
             self.gazetteer.train()
@@ -74,7 +75,7 @@ class Linker:
                 self.logger.info("Not enough data to train the Gazetteer, skipping linking...")
                 raise IncompatibleLinkingDatasets()
             raise e
-        self.gazetteer.index(self.canonical_data)
+        self.gazetteer.index(canonical_data)
 
     def no_real_matches(self, possible_mappings: List[tuple]):
         # If there is at least one match, then one of the tuples has, in its second element, a list with at least one

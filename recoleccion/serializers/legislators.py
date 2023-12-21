@@ -3,6 +3,7 @@ from rest_framework import serializers
 
 # Project
 from recoleccion.models.person import Person
+from recoleccion.serializers.affidavits import AffidavitBasicSerializer
 from recoleccion.serializers.deputies import ReducedDeputySeatSerializer
 from recoleccion.serializers.senate import ReducedSenateSeatSerializer
 from recoleccion.utils.enums.legislator_seats import LegislatorSeatSerializer
@@ -20,7 +21,7 @@ class LegislatorDetailsSerializer(serializers.ModelSerializer):
     last_seat = LegislatorSeatSerializer()
     legislator_seats = serializers.SerializerMethodField()
     votes = serializers.SerializerMethodField()
-    # projects = serializers.SerializerMethodField()
+    affidavits = serializers.SerializerMethodField()
 
     class Meta:
         model = Person
@@ -30,6 +31,7 @@ class LegislatorDetailsSerializer(serializers.ModelSerializer):
     def get_votes(self, obj):
         from django.db.models import Count, Q
         from recoleccion.utils.enums.vote_choices import VoteChoices
+
         votes = obj.votes.all()
         votes_summary = votes.aggregate(
             afirmatives=Count("vote", filter=Q(vote=VoteChoices.POSITIVE.value)),
@@ -47,11 +49,11 @@ class LegislatorDetailsSerializer(serializers.ModelSerializer):
     #     return projects.values("id", "title", "chamber", "origin_chamber")
 
     def get_legislator_seats(self, obj):
-        senate_seats = ReducedSenateSeatSerializer(
-            obj.senate_seats.all(), many=True
-        ).data
-        deputy_seats = ReducedDeputySeatSerializer(
-            obj.deputy_seats.all(), many=True
-        ).data
+        senate_seats = ReducedSenateSeatSerializer(obj.senate_seats.all(), many=True).data
+        deputy_seats = ReducedDeputySeatSerializer(obj.deputy_seats.all(), many=True).data
         all_seats = senate_seats + deputy_seats
         return sorted(all_seats, key=lambda seat: seat["start_of_term"], reverse=True)
+
+    def get_affidavits(self, obj: Person):
+        sorted_affidavits = obj.affidavits.order_by("year")
+        return AffidavitBasicSerializer(sorted_affidavits, many=True).data

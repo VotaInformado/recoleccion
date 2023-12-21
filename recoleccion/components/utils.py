@@ -16,9 +16,7 @@ def clean_text_formatting(text, capitalize=True):
     if isna(text):
         return text
 
-    transform_map = str.maketrans(
-        string.punctuation, " " * len(string.punctuation)
-    )  # remove punctuation
+    transform_map = str.maketrans(string.punctuation, " " * len(string.punctuation))  # remove punctuation
     transform_map.update(
         str.maketrans(string.whitespace, " " * len(string.whitespace))
     )  # replace whitespace with single space
@@ -58,10 +56,9 @@ def trim_extra_spaces(text):
     return " ".join(text.split())
 
 
-def unidecode_text(text):
+def unidecode_text(text: str):
     if isna(text):
         return text
-
     return unidecode(text)  # WARNING: removes "ñ" and accents
 
 
@@ -81,3 +78,13 @@ def len_gt(text, length):
         return True
     except IndexError:
         return False
+
+
+def normalize_name(name):
+    # returns the name with no accents, no punctuation and no extra spaces
+    if isna(name):
+        return name
+    clean_text = clean_text_formatting(name)
+    unidecoded_text = unidecode_text(clean_text)
+    capitalized_text = capitalize_text(unidecoded_text)
+    return capitalized_text

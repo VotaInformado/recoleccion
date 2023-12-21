@@ -40,3 +40,7 @@ class Person(BaseModel):
     @property
     def full_name(self):
         return f"{self.name} {self.last_name}"
+
+    @property
+    def formal_full_name(self):
+        return f"{self.last_name} {self.name}"

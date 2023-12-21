@@ -2,6 +2,7 @@
 from django.db import models
 from typing import List
 from django.db.utils import IntegrityError
+from recoleccion.models.affidavit_entry import AffidavitEntry
 
 # Project
 from recoleccion.models.base import BaseModel
@@ -54,11 +55,14 @@ class LinkingDecision(BaseModel):
         self._update_records(related_senate_seats)
         related_deputy_seats = DeputySeat.objects.filter(linking_id=self.uuid).all()
         self._update_records(related_deputy_seats)
+        related_affidavits = AffidavitEntry.objects.filter(linking_id=self.uuid).all()
+        self._update_records(related_affidavits)
         total_updated = (
             related_votes.count()
             + related_authors.count()
             + related_senate_seats.count()
             + related_deputy_seats.count()
+            + related_affidavits.count()
         )
         return total_updated
 
@@ -71,12 +75,16 @@ class LinkingDecision(BaseModel):
         related_senate_seats.update(linking_id=None)
         related_deputy_seats = DeputySeat.objects.filter(linking_id=self.uuid).all()
         related_deputy_seats.update(linking_id=None)
+        related_affidavits = AffidavitEntry.objects.filter(linking_id=self.uuid).all()
+        related_affidavits.update(linking_id=None)
         total_updated = (
             related_votes.count()
             + related_authors.count()
             + related_senate_seats.count()
             + related_deputy_seats.count()
+            + related_affidavits.count()
         )
+        return total_updated
 
     def _update_records_individually(self, records: models.QuerySet):
         main_attribute = self.main_attribute

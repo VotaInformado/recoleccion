@@ -1,7 +1,7 @@
 import json
 
-ORIGINAL_FILE = "recoleccion/components/linkers/training/PersonLinker.json"
-MODIFIED_FILE = "recoleccion/components/linkers/training/PersonLinker_modified.json"
+ORIGINAL_FILE = "recoleccion/components/linkers/training/tests/PersonLinker.json"
+MODIFIED_FILE = "recoleccion/components/linkers/training/tests/PersonLinker_modified.json"
 
 
 # Load the JSON data

@@ -2,7 +2,7 @@ import random
 import pandas as pd
 from faker import Faker
 
-fake = Faker()
+fake = Faker("es_AR")
 
 provinces = ["Buenos Aires", "CABA", "Córdoba", "Mendoza", "Santa Fe"]
 
@@ -31,7 +31,7 @@ parties = [
     "Movimiento Libres del Sur",
     "Partido Humanista (PH)",
     "Partido de la Concertación Forja",
-    "Partido Vecinalista"
+    "Partido Vecinalista",
 ]
 
 
@@ -54,8 +54,14 @@ def create_fake_df(df_columns: dict, n=100, as_dict: bool = True, **kwargs):
 
 
 def create_fake_value(column_type: str, n: int, **kwargs):
-    if column_type == "str":
+    if column_type == "name":
         return fake.name()
+    elif column_type == "last_name":
+        return fake.last_name()
+    elif column_type == "full_name":
+        return fake.last_name() + " " + fake.name()
+    elif column_type == "str":
+        return fake.text(max_nb_chars=50)
     if column_type == "province":
         return random.choice(provinces)
     elif column_type == "email":

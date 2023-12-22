@@ -55,7 +55,7 @@ class CurrentDeputies(DataSource):
     """There isn't actually a resource for current deputies.
     We get the historic data and filter the ones that are current
     """
-
+    csv_url = "https://www.diputados.gov.ar/system/modules/ar.gob.hcdn.diputados/formatters/generar-lista-diputados.csv"
     file_path = "recoleccion/files/diputados.csv"
 
     column_mappings = {
@@ -69,7 +69,10 @@ class CurrentDeputies(DataSource):
 
     @classmethod
     def get_raw_data(cls):
-        return pd.read_csv(cls.file_path)
+        req = requests.get(cls.csv_url)
+        raw_content = req.content
+        decoded_content = raw_content.decode("utf-8")
+        return pd.read_csv(io.StringIO(decoded_content))
 
     @classmethod
     def get_data(cls):

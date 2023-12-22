@@ -107,7 +107,7 @@ class PartyLinker(Linker):
             exactly_matched_data, unmatched_data = self.load_exact_matches(messy_data)
             self.logger.info(f"Exactly matched {exactly_matched_data.shape[0]} parties")
             manually_linked_data, undefined_data = self.apply_manual_linking(unmatched_data)
-            self.logger.info(f"Manually decided on {manually_linked_data.shape[0]} parties")
+            self.logger.info(f"{len(manually_linked_data)} previously made decisions were applied")
             undefined_data = self.reset_index(undefined_data)
             undefined_df = pd.DataFrame.from_dict(undefined_data, orient="index")
             try:

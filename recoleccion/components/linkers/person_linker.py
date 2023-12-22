@@ -3,6 +3,7 @@ from datetime import date
 from dedupe import Gazetteer
 from typing import List, Tuple
 import pandas as pd
+import datetime as dt
 from uuid import UUID
 
 # Project
@@ -18,8 +19,6 @@ from recoleccion.utils.enums.linking_decision_options import LinkingDecisionOpti
 
 class PersonLinker(Linker):
     fields = [
-        # {"field": "name", "type": "String"},
-        # {"field": "last_name", "type": "String"},
         {"field": "full_name", "type": "String"},
     ]
 
@@ -30,7 +29,7 @@ class PersonLinker(Linker):
         self.canonical_data = self.get_canonical_data()
 
     def get_canonical_data(self) -> dict:
-        if self.use_alternative_names:
+        if self.use_alternative_names or True:
             return self._get_canonical_data_alternative_format()
         return self._get_canonical_data()
 
@@ -59,7 +58,7 @@ class PersonLinker(Linker):
         return OrderedDict(canonical_data)
 
     def get_messy_data(self, original_data: pd.DataFrame):
-        if self.use_alternative_names:
+        if self.use_alternative_names or True:
             return self._get_messy_data_alternative(original_data)
         return self._get_messy_data(original_data)
 
@@ -73,7 +72,11 @@ class PersonLinker(Linker):
     def _get_messy_data_alternative(self, original_data: pd.DataFrame):
         # In this case, we don't have name and last_name because they cannot be splitted (no separator)
         messy_data = original_data.copy()
-        messy_data["full_name"] = messy_data["full_name"].apply(lambda x: normalize_name(x))
+        if "full_name" in messy_data.columns:
+            messy_data["full_name"] = messy_data["full_name"].apply(lambda x: normalize_name(x))
+        else:
+            messy_data[["name", "last_name"]] = messy_data[["name", "last_name"]].applymap(lambda x: normalize_name(x))
+            messy_data["full_name"] = messy_data["last_name"] + " " + messy_data["name"]
         messy_data = self._convert_dates_to_str(messy_data)
         messy_data = messy_data.to_dict(orient="index")
         return messy_data
@@ -150,7 +153,7 @@ class PersonLinker(Linker):
                 undefined_data = unmatched_data
             else:
                 manually_linked_data, undefined_data = self.apply_manual_linking(unmatched_data)
-            self.logger.info(f"Manually decided on {manually_linked_data.shape[0]} persons")
+            self.logger.info(f"{len(manually_linked_data)} previous decisions were applied")
             undefined_data = self.reset_index(undefined_data)
             undefined_df = pd.DataFrame.from_dict(undefined_data, orient="index")
             try:
@@ -175,10 +178,12 @@ class PersonLinker(Linker):
     def _convert_dates_to_str(self, data: pd.DataFrame) -> pd.DataFrame:
         # Convert datetime
         for datetime_column in data.select_dtypes(include=["datetime", "datetimetz"]).columns:
+            data[datetime_column].fillna(dt.datetime.today().date(), inplace=True)  # medida temporal (2023-12-21) porque hay diputados sin fecha de ingreso
             data[datetime_column] = data[datetime_column].dt.strftime("%Y-%m-%d")
 
         # Convert date
         for date_column in self._get_date_cols(data):
+            data[date_column].fillna(dt.datetime.today().date(), inplace=True)
             data[date_column] = data[date_column].map(lambda x: x.strftime("%Y-%m-%d"))
 
         return data

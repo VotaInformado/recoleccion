@@ -14,7 +14,7 @@ class LegislatorsLoadingTestCase(LinkingTestCase):
     This test case is meant to test the combined loading of both deputies and senators.
     """
 
-    SENATE_CAPACITY = 70  # TODO: CAMBIAR! por algún motivo la fuente real devuelve 70 (9/12)
+    SENATE_CAPACITY = 72
     DEPUTIES_CAPACITY = 257
 
     def test_loading_senators_and_then_deputies(self):

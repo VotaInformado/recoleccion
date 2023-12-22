@@ -1,9 +1,7 @@
-from typing import List, Tuple
+from typing import List
 from dedupe import Gazetteer, console_label
 import os
-from uuid import uuid4
 import pandas as pd
-from pprint import pp
 from recoleccion.exceptions.custom import IncompatibleLinkingDatasets
 
 # Project
@@ -59,7 +57,7 @@ class Linker:
         #     raise LinkingException(
         #         f"There are more messy records ({len(messy_data)}) than canonical record ({len(self.canonical_data)})"
         #     )
-        file_dir = f"{self.TRAINING_DIR}/{self.__class__.__name__}_modified.json"
+        file_dir = f"{self.TRAINING_DIR}/{self.__class__.__name__}.json"
         canonical_data = self.get_canonical_data()
 
         if os.path.exists(file_dir):

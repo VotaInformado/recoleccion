@@ -179,7 +179,7 @@ LOGGING = {
             "()": "colorlog.ColoredFormatter",
             "format": "\n%(log_color)s%(levelname)-8s%(white)s(%(threadName)s) %(message)s",
             "log_colors": {
-                "DEBUG": "bold_black",
+                "DEBUG": "blue",
                 "INFO": "green",
                 "WARNING": "yellow",
                 "ERROR": "red",

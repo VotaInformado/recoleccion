@@ -41,12 +41,8 @@ class AffidavitsWriter(Writer):
     def update_or_create_element(cls, row: pd.Series):
         row = row.dropna()  # Important, because the writer will try to update or create with null values
         row = row.drop(["index"], errors="ignore")
-        try:
-            row["year"] = cls._transform_year(row["year"], row["affidavit_type"])
-            row["value"] = cls._clean_affidavit_value(row["value"])
-        except Exception as e:
-            import pdb; pdb.set_trace()
-            pass
+        row["year"] = cls._transform_year(row["year"], row["affidavit_type"])
+        row["value"] = cls._clean_affidavit_value(row["value"])
         affidavit, was_created = AffidavitEntry.objects.update_or_create(
             person_full_name=row["person_full_name"],
             year=row["year"],

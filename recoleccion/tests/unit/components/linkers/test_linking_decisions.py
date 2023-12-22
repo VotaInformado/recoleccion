@@ -30,8 +30,8 @@ from recoleccion.utils.enums.linking_decision_options import LinkingDecisionOpti
 class PersonLinkingDecisionsTestCase(LinkingTestCase):
     def setUp(self):
         self.messy_columns = {
-            "name": "str",
-            "last_name": "str",
+            "name": "name",
+            "last_name": "last_name",
             "person_id": "int",
             "province": "str",
             "start_of_term": "date",
@@ -39,8 +39,7 @@ class PersonLinkingDecisionsTestCase(LinkingTestCase):
             "party": "str",
         }
         self.canonical_columns = {
-            "name": "str",
-            "last_name": "str",
+            "full_name": "full_name",
             "id": "int",
         }
 
@@ -49,13 +48,12 @@ class PersonLinkingDecisionsTestCase(LinkingTestCase):
         PersonLinkingDecision.objects.create(messy_name=messy_name, decision=decision, person_id=person_id)
 
     def test_saving_person_linking_decision(self):
-        MESSY_NAME = "Juan C."
+        MESSY_NAME = "Juan C"
         MESSY_LAST_NAME = "Perez"
         CANONICAL_ID = 1
 
         canonical_record = {
-            "name": "Juan",
-            "last_name": "Perez",
+            "full_name": "Perez Juan",
             "id": CANONICAL_ID,
         }
         updated_record = {
@@ -96,13 +94,12 @@ class PersonLinkingDecisionsTestCase(LinkingTestCase):
         self.assertEqual(len(non_pending_records), len(linked_data) - expected_dubious_matches)
 
     def test_saving_the_same_linking_decision_for_different_persons(self):
-        MESSY_NAME = "Juan C."
+        MESSY_NAME = "Juan C"
         MESSY_LAST_NAME = "Perez"
         CANONICAL_ID = 1
 
         canonical_record = {
-            "name": "Juan",
-            "last_name": "Perez",
+            "full_name": "Perez Juan",
             "id": CANONICAL_ID,
         }
         updated_record_1 = {
@@ -155,7 +152,7 @@ class PersonLinkingDecisionsTestCase(LinkingTestCase):
         # We leave only 10 persons
         ids_to_keep = list(Person.objects.order_by("id")[:10].values_list("id", flat=True))
         Person.objects.exclude(id__in=ids_to_keep).delete()
-        MESSY_NAME = "Juan C."
+        MESSY_NAME = "Juan C"
         MESSY_LAST_NAME = "Perez"
         updated_record = {
             "name": MESSY_NAME,
@@ -216,8 +213,8 @@ class PartyLinkingDecisionsTestCase(LinkingTestCase):
 
     def setUp(self):
         self.messy_columns = {
-            "name": "str",
-            "last_name": "str",
+            "name": "name",
+            "last_name": "last_name",
             "person_id": "int",
             "province": "str",
             "start_of_term": "date",
@@ -225,8 +222,7 @@ class PartyLinkingDecisionsTestCase(LinkingTestCase):
             "party": "str",
         }
         self.canonical_columns = {
-            "name": "str",
-            "last_name": "str",
+            "full_name": "full_name",
             "id": "int",
         }
 
@@ -322,7 +318,10 @@ class PartyLinkingDecisionsTestCase(LinkingTestCase):
         messy_parties = messy_parties.to_dict(orient="records")
         for i in range(TOTAL_MESSY_RECORDS):
             Vote.objects.create(
-                person_name="Nombre", person_last_name="Apellido", party_name=messy_parties[i]["party_name"], project=projects[i]
+                person_name="Nombre",
+                person_last_name="Apellido",
+                party_name=messy_parties[i]["party_name"],
+                project=projects[i],
             )
         queryset = Vote.objects.values("party_name", "id")
         messy_data = pd.DataFrame(list(queryset))

@@ -14,15 +14,15 @@ from recoleccion.utils.enums.linking_decision_options import LinkingDecisionOpti
 class PersonLinkerTestCase(LinkingTestCase):
     def setUp(self):
         self.messy_columns = {
-            "name": "name",
-            "last_name": "last_name",
+            "name": "str",
+            "last_name": "str",
             "person_id": "int",
             "province": "str",
             "start_of_term": "date",
             "end_of_term": "date",
         }
         self.canonical_columns = {
-            "full_name": "full_name",
+            "full_name": "str",
             "id": "int",
         }
 
@@ -111,7 +111,6 @@ class PersonLinkerTestCase(LinkingTestCase):
         id_value = row["person_id"].values[0]
         self.assertIsNone(id_value)
 
-    @allowed_to_fail
     def test_senator_linking_with_different_second_name(self):
         EXPECTED_ID = 2
 
@@ -138,7 +137,6 @@ class PersonLinkerTestCase(LinkingTestCase):
         id_value = row["person_id"].values[0]
         self.assertEqual(id_value, EXPECTED_ID)
 
-    @allowed_to_fail
     def test_senator_linking_special_case_1(self):
         # Different second name and last name has different accentuation
         EXPECTED_ID = 2

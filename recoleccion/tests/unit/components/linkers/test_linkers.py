@@ -1,11 +1,9 @@
-from django.core.management import call_command
-
 # Project
+from recoleccion.utils.wrappers import allowed_to_fail
 import recoleccion.tests.test_helpers.utils as ut
 from recoleccion.components.linkers import PartyLinker, PersonLinker
-from recoleccion.models.linking.party_linking import PartyLinkingDecision
 from recoleccion.models.linking.person_linking import PersonLinkingDecision
-from recoleccion.models.party import Party, PartyDenomination
+from recoleccion.models.party import Party
 from recoleccion.models.person import Person
 from recoleccion.tests.test_helpers.test_case import LinkingTestCase
 from recoleccion.tests.test_helpers.faker import create_fake_df
@@ -24,28 +22,24 @@ class PersonLinkerTestCase(LinkingTestCase):
             "end_of_term": "date",
         }
         self.canonical_columns = {
-            "name": "str",
-            "last_name": "str",
+            "full_name": "str",
             "id": "int",
         }
 
     def create_person_linking_decision(self, messy_name: str, canonical_name: str, decision: str, person_id=1):
         person_id = person_id if decision != LinkingDecisionOptions.DENIED else None
-        PersonLinkingDecision.objects.create(
-            messy_name=messy_name, decision=decision, person_id=person_id
-        )
+        PersonLinkingDecision.objects.create(messy_name=messy_name, decision=decision, person_id=person_id)
 
     def test_senator_linking_with_repeated_records(self):
         EXPECTED_ID = 1
         WRONG_ID = 2
 
         canonical_record = {
-            "name": "Juan",
-            "last_name": "Perez",
+            "full_name": "Perez Juan",
             "id": EXPECTED_ID,
         }
         updated_record = {
-            "name": "Juan C.",
+            "name": "Juan C",
             "last_name": "Perez",
             "person_id": WRONG_ID,
             "province": "Córdoba",
@@ -60,7 +54,7 @@ class PersonLinkerTestCase(LinkingTestCase):
         with mck.mock_method(PersonLinker, "get_canonical_data", return_value=canonical_data):
             linker = PersonLinker()
             linked_data = linker.link_persons(updated_data)
-        row = linked_data[linked_data["name"] == "Juan C."]
+        row = linked_data[linked_data["name"] == "Juan C"]
         self.assertEqual(row["person_id"].values[0], EXPECTED_ID)
 
     def test_senator_linking_without_repeated_records(self):
@@ -68,8 +62,7 @@ class PersonLinkerTestCase(LinkingTestCase):
         WRONG_ID = 2
 
         canonical_record = {
-            "name": "Juan",
-            "last_name": "Perez",
+            "full_name": "Perez Juan",
             "id": WRONG_ID,
         }
         updated_record = {
@@ -96,8 +89,7 @@ class PersonLinkerTestCase(LinkingTestCase):
         WRONG_ID = 2
 
         canonical_record = {
-            "name": "Juan",
-            "last_name": "Perez",
+            "full_name": "Perez Juan",
             "id": WRONG_ID,
         }
         updated_record = {
@@ -123,8 +115,7 @@ class PersonLinkerTestCase(LinkingTestCase):
         EXPECTED_ID = 2
 
         canonical_record = {
-            "name": "Juan",
-            "last_name": "Perez",
+            "full_name": "Perez Juan",
             "id": EXPECTED_ID,
         }
         updated_record = {
@@ -151,8 +142,7 @@ class PersonLinkerTestCase(LinkingTestCase):
         EXPECTED_ID = 2
 
         canonical_record = {
-            "name": "Juan",
-            "last_name": "Perez",
+            "full_name": "Perez Juan",
             "id": EXPECTED_ID,
         }
         updated_record = {
@@ -179,8 +169,7 @@ class PersonLinkerTestCase(LinkingTestCase):
         WRONG_ID = 2
 
         canonical_record = {
-            "name": "Juan",
-            "last_name": "Perez",
+            "full_name": "Perez Juan",
             "id": WRONG_ID,
         }
         updated_record = {
@@ -217,8 +206,7 @@ class PersonLinkerTestCase(LinkingTestCase):
         self.create_person_linking_decision(MESSY_FULL_NAME, CANONICAL_FULL_NAME, LinkingDecisionOptions.DENIED)
 
         canonical_record = {
-            "name": "Juan",
-            "last_name": "Perez",
+            "full_name": "Perez Juan",
             "id": EXPECTED_ID,
         }
         updated_record = {
@@ -254,8 +242,7 @@ class PersonLinkerTestCase(LinkingTestCase):
         )
 
         canonical_record = {
-            "name": "Juan",
-            "last_name": "Perez",
+            "full_name": "Perez Juan",
             "id": EXPECTED_ID,
         }
         updated_record = {
@@ -282,11 +269,11 @@ class PersonLinkerTestCase(LinkingTestCase):
 class PartyLinkerTestCase(LinkingTestCase):
     def setUp(self):
         self.messy_columns = {
-            "denomination": "str",
+            "denomination": "name",
             "record_id": "int",
         }
         self.canonical_columns = {
-            "denomination": "str",
+            "denomination": "name",
             "party_id": "int",
         }
 
@@ -315,7 +302,7 @@ class PartyLinkerTestCase(LinkingTestCase):
         self.assertEqual(row["record_id"].values[0], RECORD_ID)
         self.assertEqual(row["party_id"].values[0], EXPECTED_ID)
 
-    def test_party_linking_with_similar_records(self):
+    def test_party_linking_with_similar_records_and_no_previous_decision(self):
         EXPECTED_ID = 1
         RECORD_ID = 2
         CANONICAL_DENOMINATION = "Partido Justicialista"

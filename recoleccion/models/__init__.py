@@ -1,3 +1,4 @@
+from .affidavit_entry import AffidavitEntry
 from .authorship import Authorship
 from .base import BaseModel
 from .deputy_seat import DeputySeat

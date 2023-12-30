@@ -1,0 +1,512 @@
+﻿{
+    "distinct": [
+        {
+            "__class__": "tuple",
+            "__value__": [
+                {
+                    "name": "JOSE ANTONIO",
+                    "last_name": "ROMERO FERIS"
+                },
+                {
+                    "name": "JORGE ANTONIO",
+                    "last_name": "ROMERO",
+                    "id": 625
+                }
+            ]
+        },
+        {
+            "__class__": "tuple",
+            "__value__": [
+                {
+                    "name": "LUIS",
+                    "last_name": "GARCIA"
+                },
+                {
+                    "name": "AURELIA MARCELA",
+                    "last_name": "GARCIA",
+                    "id": 788
+                }
+            ]
+        },
+        {
+            "__class__": "tuple",
+            "__value__": [
+                {
+                    "name": "EDGARDO R",
+                    "last_name": "GROSSO"
+                },
+                {
+                    "name": "GERARDO JOSE",
+                    "last_name": "GROSSO",
+                    "id": 500
+                }
+            ]
+        },
+        {
+            "__class__": "tuple",
+            "__value__": [
+                {
+                    "name": "MIGUEL S",
+                    "last_name": "ORTIZ"
+                },
+                {
+                    "name": "MICAELA SOLEDAD",
+                    "last_name": "ORTIZ",
+                    "id": 1204
+                }
+            ]
+        },
+        {
+            "__class__": "tuple",
+            "__value__": [
+                {
+                    "name": "LUIS",
+                    "last_name": "LINARES"
+                },
+                {
+                    "name": "GRACIELA ERMELINDA",
+                    "last_name": "LINARES",
+                    "id": 1113
+                }
+            ]
+        },
+        {
+            "__class__": "tuple",
+            "__value__": [
+                {
+                    "name": "MARIANO  H",
+                    "last_name": "FERNANDEZ"
+                },
+                {
+                    "name": "MARCELO HERMINIO",
+                    "last_name": "FERNANDEZ",
+                    "id": 105
+                }
+            ]
+        },
+        {
+            "__class__": "tuple",
+            "__value__": [
+                {
+                    "name": "JOAQUIN  VICTOR",
+                    "last_name": "GONZALEZ"
+                },
+                {
+                    "name": "JOSEFINA VICTORIA",
+                    "last_name": "GONZALEZ",
+                    "id": 1180
+                }
+            ]
+        },
+        {
+            "__class__": "tuple",
+            "__value__": [
+                {
+                    "name": "DAVID",
+                    "last_name": "LUNA"
+                },
+                {
+                    "name": "DANIEL FERNANDO",
+                    "last_name": "LUNA",
+                    "id": 190
+                }
+            ]
+        },
+        {
+            "__class__": "tuple",
+            "__value__": [
+                {
+                    "name": "JOSE",
+                    "last_name": "GODOY"
+                },
+                {
+                    "name": "ROSA BEATRIZ",
+                    "last_name": "GODOY",
+                    "id": 1214
+                }
+            ]
+        },
+        {
+            "__class__": "tuple",
+            "__value__": [
+                {
+                    "name": "JUAN CARLOS EDUARDO",
+                    "last_name": "BENI"
+                },
+                {
+                    "name": "JUAN CARLOS",
+                    "last_name": "BACILEFF IVANOFF",
+                    "id": 346
+                }
+            ]
+        },
+        {
+            "__class__": "tuple",
+            "__value__": [
+                {
+                    "name": "LUCAS",
+                    "last_name": "GONZALEZ"
+                },
+                {
+                    "name": "GUSTAVO CARLOS MIGUEL",
+                    "last_name": "GONZALEZ",
+                    "id": 1106
+                }
+            ]
+        },
+        {
+            "__class__": "tuple",
+            "__value__": [
+                {
+                    "name": "JOSE V",
+                    "last_name": "ZAPATA"
+                },
+                {
+                    "name": "ANABELLA ROSA DEL VALLE",
+                    "last_name": "ZAPATA",
+                    "id": 279
+                }
+            ]
+        },
+        {
+            "__class__": "tuple",
+            "__value__": [
+                {
+                    "name": "JACINTO",
+                    "last_name": "ALVAREZ"
+                },
+                {
+                    "name": "MARINA ELISABET",
+                    "last_name": "ALVAREZ",
+                    "id": 780
+                }
+            ]
+        },
+        {
+            "__class__": "tuple",
+            "__value__": [
+                {
+                    "name": "CRUZ",
+                    "last_name": "VERA"
+                },
+                {
+                    "name": "GABRIELA ALEJANDRA",
+                    "last_name": "VERA",
+                    "id": 919
+                }
+            ]
+        },
+        {
+            "__class__": "tuple",
+            "__value__": [
+                {
+                    "name": "ANTENOR",
+                    "last_name": "ALVAREZ"
+                },
+                {
+                    "name": "ANTONELLA MAGALI",
+                    "last_name": "ALVAREZ",
+                    "id": 126
+                }
+            ]
+        },
+        {
+            "__class__": "tuple",
+            "__value__": [
+                {
+                    "name": "CARLOS SAÚL",
+                    "last_name": "MENEM"
+                },
+                {
+                    "name": "CARLOS ALBERTO",
+                    "last_name": "MENEM",
+                    "id": 813
+                }
+            ]
+        },
+        {
+            "__class__": "tuple",
+            "__value__": [
+                {
+                    "name": "CARLOS ALBERTO",
+                    "last_name": "VERNA"
+                },
+                {
+                    "name": "CARLOS ALBERTO",
+                    "last_name": "FERNANDEZ",
+                    "id": 920
+                }
+            ]
+        },
+        {
+            "__class__": "tuple",
+            "__value__": [
+                {
+                    "name": "RUPERTO EDUARDO",
+                    "last_name": "GODOY"
+                },
+                {
+                    "name": "RAUL",
+                    "last_name": "GODOY",
+                    "id": 944
+                }
+            ]
+        },
+        {
+            "__class__": "tuple",
+            "__value__": [
+                {
+                    "name": "RAMON BAUTISTA",
+                    "last_name": "ORTEGA"
+                },
+                {
+                    "name": "RAMIRO",
+                    "last_name": "ORTEGA",
+                    "id": 1401
+                }
+            ]
+        },
+        {
+            "__class__": "tuple",
+            "__value__": [
+                {
+                    "name": "CARLOS ALFONSO",
+                    "last_name": "PRADES"
+                },
+                {
+                    "name": "CARLOS FACUNDO",
+                    "last_name": "PRADES",
+                    "id": 1122
+                }
+            ]
+        },
+        {
+            "__class__": "tuple",
+            "__value__": [
+                {
+                    "name": "MARIA TERESA MARGARITA",
+                    "last_name": "GONZALEZ"
+                },
+                {
+                    "name": "MARIA JOSE",
+                    "last_name": "GONZALEZ",
+                    "id": 795
+                }
+            ]
+        },
+        {
+            "__class__": "tuple",
+            "__value__": [
+                {
+                    "name": "OSCAR ANSELMO",
+                    "last_name": "MARTINEZ",
+                    "id": "HCDN1408"
+                },
+                {
+                    "name": "OSCAR ARIEL",
+                    "last_name": "MARTINEZ",
+                    "id": 1166
+                }
+            ]
+        },
+        {
+            "__class__": "tuple",
+            "__value__": [
+                {
+                    "name": "MANUEL F",
+                    "last_name": "RODRIGUEZ"
+                },
+                {
+                    "name": "MANUEL AUGUSTO",
+                    "last_name": "RODRIGUEZ",
+                    "id": 1889
+                }
+            ]
+        },
+        {
+            "__class__": "tuple",
+            "__value__": [
+                {
+                    "name": "JOSE LUIS",
+                    "last_name": "MARTIARENA",
+                    "id": "HCDN2403"
+                },
+                {
+                    "name": "JOSE H",
+                    "last_name": "MARTIARENA",
+                    "id": 1535
+                }
+            ]
+        },
+        {
+            "__class__": "tuple",
+            "__value__": [
+                {
+                    "name": "Francisco Alberto",
+                    "last_name": "Garcia"
+                },
+                {
+                    "name": "Francisco L",
+                    "last_name": "Garcia",
+                    "id": 14009
+                }
+            ]
+        }
+    ],
+    "match": [
+        {
+            "__class__": "tuple",
+            "__value__": [
+                {
+                    "name": "MARIANA",
+                    "last_name": "JURI"
+                },
+                {
+                    "name": "MARIANA",
+                    "last_name": "JURI",
+                    "id": 828
+                }
+            ]
+        },
+        {
+            "__class__": "tuple",
+            "__value__": [
+                {
+                    "name": "ALBERTO",
+                    "last_name": "ARANCIBIA RODRIGUEZ"
+                },
+                {
+                    "name": "ALBERTO GUSTAVO",
+                    "last_name": "ARANCIBIA RODRIGUEZ",
+                    "id": 1080
+                }
+            ]
+        },
+        {
+            "__class__": "tuple",
+            "__value__": [
+                {
+                    "name": "JULIO CÉSAR CLETO",
+                    "last_name": "COBOS"
+                },
+                {
+                    "name": "JULIO CESAR CLETO",
+                    "last_name": "COBOS",
+                    "id": 819
+                }
+            ]
+        },
+        {
+            "__class__": "tuple",
+            "__value__": [
+                {
+                    "name": "ALEJANDRA MARÍA",
+                    "last_name": "VIGO"
+                },
+                {
+                    "name": "ALEJANDRA MARIA",
+                    "last_name": "VIGO",
+                    "id": 570
+                }
+            ]
+        },
+        {
+            "__class__": "tuple",
+            "__value__": [
+                {
+                    "name": "DANIEL PABLO",
+                    "last_name": "BENSUSÁN"
+                },
+                {
+                    "name": "DANIEL PABLO",
+                    "last_name": "BENSUSAN",
+                    "id": 767
+                }
+            ]
+        },
+        {
+            "__class__": "tuple",
+            "__value__": [
+                {
+                    "name": "MARÍA DE LOS ÁNGELES",
+                    "last_name": "SACNUN"
+                },
+                {
+                    "name": "MARIA DE LOS ANGELES",
+                    "last_name": "SACNUN",
+                    "id": 1178
+                }
+            ]
+        },
+        {
+            "__class__": "tuple",
+            "__value__": [
+                {
+                    "name": "BEATRIZ LUISA",
+                    "last_name": "ÁVILA"
+                },
+                {
+                    "name": "BEATRIZ LUISA",
+                    "last_name": "AVILA",
+                    "id": 1411
+                }
+            ]
+        },
+        {
+            "__class__": "tuple",
+            "__value__": [
+                {
+                    "name": "CARLOS MAURICIO",
+                    "last_name": "ESPÍNOLA"
+                },
+                {
+                    "name": "CARLOS MAURICIO",
+                    "last_name": "ESPINOLA",
+                    "id": 631
+                }
+            ]
+        },
+        {
+            "__class__": "tuple",
+            "__value__": [
+                {
+                    "name": "ANA CLAUDIA",
+                    "last_name": "ALMIRÓN"
+                },
+                {
+                    "name": "ANA CLAUDIA",
+                    "last_name": "ALMIRON",
+                    "id": 632
+                }
+            ]
+        },
+        {
+            "__class__": "tuple",
+            "__value__": [
+                {
+                    "name": "Miriam Belen",
+                    "last_name": "Curletti"
+                },
+                {
+                    "name": "Mirian Belen",
+                    "last_name": "Curletti",
+                    "id": 14255
+                }
+            ]
+        },
+        {
+            "__class__": "tuple",
+            "__value__": [
+                {
+                    "name": "Jorge Alfreso",
+                    "last_name": "Agundez"
+                },
+                {
+                    "name": "Jorge Alfredo",
+                    "last_name": "Agundez",
+                    "id": 14293
+                }
+            ]
+        }
+    ]
+}

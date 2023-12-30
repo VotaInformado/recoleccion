@@ -12,12 +12,7 @@ logger = logging.getLogger(__name__)
 
 class Command(BaseCommand):
     def print_comparison(self, pending_decision: LinkingDecision):
-        messy_data: dict = pending_decision.get_messy_record()
-        canonical_data: dict = pending_decision.get_canonical_record()
-        print("Messy data:")
-        pprint(messy_data)
-        print("Canonical data:")
-        pprint(canonical_data)
+        pass
 
     def ask_for_user_decision(self, pending_decision: LinkingDecision) -> str:
         logger.info(f"Pending decision: {pending_decision}")
@@ -31,7 +26,7 @@ class Command(BaseCommand):
             elif user_response == "s":
                 return LinkingDecisionOptions.PENDING
             else:
-                user_response = input("Invalid response. Please try again.")
+                print("Invalid response. Please try again.")
 
     def save_accepted_decision(self, pending_decision: LinkingDecision):
         pending_decision.decision = LinkingDecisionOptions.APPROVED

@@ -79,7 +79,7 @@ class CustomCommand(BaseCommand):
             thread.join()
 
     def handle_unthreaded(self, function_params: dict, options: dict):
-        STEP_SIZE = 1
+        STEP_SIZE = -1 if self.reverse_index else 1
         if options.get("only_missing"):
             index = 0
             function_params["starting_index"] = index

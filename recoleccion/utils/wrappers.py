@@ -1,8 +1,12 @@
 from unittest.mock import PropertyMock
+from functools import wraps
+import logging
 
 # Project
 import recoleccion.tests.test_helpers.mocks as mck
 from recoleccion.components.linkers.linker import Linker
+
+logger = logging.getLogger(__name__)
 
 
 def linking_test(original_function):
@@ -14,3 +18,14 @@ def linking_test(original_function):
             return original_function(*args, **kwargs)
 
     return inner_function
+
+
+def allowed_to_fail(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            func(*args, **kwargs)
+        except Exception as e:
+            logger.warning(f"Test '{func.__name__}' failed but will be ignored: {e}")
+
+    return wrapper

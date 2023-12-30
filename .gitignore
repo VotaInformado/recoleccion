@@ -160,3 +160,5 @@ deploy.zip
 .python-version
 
 .envs/.local/
+
+*.zip

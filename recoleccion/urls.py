@@ -11,7 +11,11 @@ from rest_framework import permissions
 # Views
 from recoleccion.views import PersonViewSet
 from recoleccion.views.deputies import DeputiesViewSet
-from recoleccion.views.legislators import LegislatorsViewSet, LegislatorVotesViewSet
+from recoleccion.views.legislators import (
+    LegislatorsViewSet,
+    LegislatorVotesViewSet,
+    NeuralNetworkLegislatorViewSet,
+)
 from recoleccion.views.prediction import PredictionViewSet
 from recoleccion.views.senate import SenateViewSet
 from recoleccion.views.laws import LawsViewSet
@@ -25,7 +29,7 @@ from recoleccion.views.parties import (
     PartiesAuthorsProjectsCountViewSet,
     PartiesLawProjectsViewSet,
     PartiesLegislatorsViewSet,
-    PartiesLawProjectVotesViewSet
+    PartiesLawProjectVotesViewSet,
 )
 from recoleccion.views.votes import NeuralNetworkVotesViewSet
 from recoleccion.views.authors import NeuralNetworkAuthorsViewSet
@@ -94,6 +98,10 @@ network_router.register(r"authors", NeuralNetworkAuthorsViewSet, basename="autho
 network_router.register(
     r"law-projects", NeuralNetworkProjectsViewSet, basename="law-projects"
 )
+network_router.register(
+    r"legislators", NeuralNetworkLegislatorViewSet, basename="legislators"
+)
+network_router.register(r"parties", PartiesViewSet, basename="parties")
 network_router.register(r"", PredictionViewSet, basename="predictions")
 
 

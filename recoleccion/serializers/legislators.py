@@ -21,6 +21,7 @@ class LegislatorDetailsSerializer(serializers.ModelSerializer):
     last_seat = LegislatorSeatSerializer()
     legislator_seats = serializers.SerializerMethodField()
     votes = serializers.SerializerMethodField()
+    projects = serializers.SerializerMethodField()
     affidavits = serializers.SerializerMethodField()
 
     class Meta:
@@ -41,12 +42,12 @@ class LegislatorDetailsSerializer(serializers.ModelSerializer):
         )
         return votes_summary
 
-    # def get_projects(self, obj):
-    #     from recoleccion.models import LawProject
+    def get_projects(self, obj):
+        from recoleccion.models import LawProject, Authorship
 
-    #     obj.authorships.
-    #     projects = LawProject.objects.filter(authorships__person=obj)
-    #     return projects.values("id", "title", "chamber", "origin_chamber")
+        law_projects_ids = Authorship.objects.filter(person_id=obj.id).values_list("project_id", flat=True)
+        return LawProject.objects.filter(id__in=law_projects_ids)
+
 
     def get_legislator_seats(self, obj):
         senate_seats = ReducedSenateSeatSerializer(obj.senate_seats.all(), many=True).data
@@ -57,3 +58,9 @@ class LegislatorDetailsSerializer(serializers.ModelSerializer):
     def get_affidavits(self, obj: Person):
         sorted_affidavits = obj.affidavits.order_by("year")
         return AffidavitBasicSerializer(sorted_affidavits, many=True).data
+
+
+class NeuralNetworkLegislatorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Person
+        fields = ["id", "name", "last_name"]

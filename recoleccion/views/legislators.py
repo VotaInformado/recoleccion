@@ -11,14 +11,19 @@ from recoleccion.models.authorship import Authorship
 from recoleccion.serializers.legislators import (
     LegislatorDetailsSerializer,
     LegislatorInfoSerializer,
+    NeuralNetworkLegislatorSerializer,
 )
 from recoleccion.models.person import Person
 from recoleccion.models.vote import Vote
+from recoleccion.models.law_project import LawProject
 from recoleccion.serializers.votes import VoteModelSerializer
+from recoleccion.serializers.law_projects import LawProjectBasicInfoSerializer
 from django_filters.rest_framework import DjangoFilterBackend
 
 
-class LegislatorsViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
+class LegislatorsViewSet(
+    viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin
+):
     def get_serializer_class(self):
         if self.action == "list":
             return LegislatorInfoSerializer
@@ -42,7 +47,11 @@ class LegislatorsViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.
 
         person = self.get_object()
         authorships = Authorship.objects.filter(person=person)
-        law_projects = [authorship.law_project for authorship in authorships if authorship.law_project]
+        law_projects = [
+            authorship.law_project
+            for authorship in authorships
+            if authorship.law_project
+        ]
         # TODO: ver esto, qué hacemos con las authorships con referencias en lugar de law_projects
         response = LawProjectBasicInfoSerializer(law_projects, many=True).data
         return Response(response, status=status.HTTP_200_OK)
@@ -66,3 +75,32 @@ class LegislatorVotesViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
         if legislator_id is not None:
             return Vote.objects.filter(person_id=legislator_id)
         return Vote.objects.none()  # for swagger only
+
+
+class NeuralNetworkLegislatorViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
+    serializer_class = NeuralNetworkLegislatorSerializer
+    queryset = Person.objects.all().order_by("-id")
+    filterset_fields = {
+        "created_at": ["gte", "lte"],
+    }
+
+
+class LegislatorLawProjectsViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
+    serializer_class = LawProjectBasicInfoSerializer
+
+    filterset_fields = {
+        "chamber": ["exact"],
+        "date": ["exact"],
+        "vote": ["exact", "in"],
+        "party_name": ["icontains"],
+        "project__title": ["icontains"],
+    }
+    ordering_fields = ["vote", "party_name", "project__title", "date"]
+    search_fields = ["project__title", "vote"]
+
+    def get_queryset(self):
+        legislator_id = self.kwargs.get("legislator_id")
+        law_projects_ids = Authorship.objects.filter(
+            person_id=legislator_id
+        ).values_list("project_id", flat=True)
+        return LawProject.objects.filter(id__in=law_projects_ids)

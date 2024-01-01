@@ -7,7 +7,11 @@ from bs4 import BeautifulSoup
 import logging
 
 # Project
-from recoleccion.components.utils import capitalize_text, digitize_text, trim_extra_spaces
+from recoleccion.components.utils import (
+    capitalize_text,
+    digitize_text,
+    trim_extra_spaces,
+)
 from recoleccion.components.data_sources import DataSource
 from recoleccion.models.law_project import LawProject
 from recoleccion.utils.enums.legislator_seats import LegislatorSeats
@@ -133,7 +137,9 @@ class DeputiesAuthorsSource(DataSource):
         for project_metada, project_detail in projects:
             project_id_info: dict = self.get_project_id_info(project_metada)
             if not project_id_info:
-                logger.info("No deputies_project_id or senate_project_id info found, skipping...")
+                logger.info(
+                    "No deputies_project_id or senate_project_id info found, skipping..."
+                )
                 continue
             signers_table = project_detail.find('table', class_='table-striped')
             table_rows = signers_table.find_all("tr")
@@ -169,7 +175,9 @@ class DeputiesAuthorsSource(DataSource):
         page_data = pd.DataFrame(projects_info)
         if page_data.empty:
             return page_data
-        page_data[["last_name", "name"]] = page_data["raw_name"].str.split(",", expand=True)
+        page_data[["last_name", "name"]] = page_data["raw_name"].str.split(
+            ",", expand=True
+        )
         page_data = page_data.drop(columns=["raw_name"])
         page_data = page_data.dropna(subset=["name", "last_name"])
         page_data = page_data.reset_index(drop=True)
@@ -273,7 +281,9 @@ class SenateAuthorsSource(DataSource):
     def send_base_request(self, year: int):
         url = self.BASE_URL
         self.logger.info(f"Sending base POST request to {url}...")
-        response = self.session.post(url, data=self.get_payload(year), headers=self.POST_HEADERS)
+        response = self.session.post(
+            url, data=self.get_payload(year), headers=self.POST_HEADERS
+        )
         return response
 
     def send_page_request(self, page_number):

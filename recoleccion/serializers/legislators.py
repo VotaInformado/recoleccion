@@ -6,6 +6,7 @@ from recoleccion.models.person import Person
 from recoleccion.serializers.affidavits import AffidavitBasicSerializer
 from recoleccion.serializers.deputies import ReducedDeputySeatSerializer
 from recoleccion.serializers.senate import ReducedSenateSeatSerializer
+from recoleccion.serializers.law_projects import LawProjectBasicInfoSerializer
 from recoleccion.utils.enums.legislator_seats import LegislatorSeatSerializer
 
 
@@ -46,7 +47,8 @@ class LegislatorDetailsSerializer(serializers.ModelSerializer):
         from recoleccion.models import LawProject, Authorship
 
         law_projects_ids = Authorship.objects.filter(person_id=obj.id).values_list("project_id", flat=True)
-        return LawProject.objects.filter(id__in=law_projects_ids)
+        law_projects = LawProject.objects.filter(id__in=law_projects_ids)
+        return LawProjectBasicInfoSerializer(law_projects, many=True).data
 
 
     def get_legislator_seats(self, obj):

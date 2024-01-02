@@ -15,6 +15,7 @@ from recoleccion.views.legislators import (
     LegislatorsViewSet,
     LegislatorVotesViewSet,
     NeuralNetworkLegislatorViewSet,
+    LegislatorLawProjectsViewSet,
 )
 from recoleccion.views.prediction import PredictionViewSet
 from recoleccion.views.senate import SenateViewSet
@@ -66,6 +67,11 @@ router.register(
     r"legislators/(?P<legislator_id>[^/.]+)/votes",
     LegislatorVotesViewSet,
     basename="legislator-votes",
+)
+router.register(
+    r"legislators/(?P<legislator_id>[^/.]+)/law-projects",
+    LegislatorLawProjectsViewSet,
+    basename="legislator-law-projects",
 )
 router.register(r"parties", PartiesViewSet, basename="parties")
 router.register(

@@ -269,11 +269,11 @@ class PersonLinkerTestCase(LinkingTestCase):
 class PartyLinkerTestCase(LinkingTestCase):
     def setUp(self):
         self.messy_columns = {
-            "denomination": "name",
+            "denomination": "str",
             "record_id": "int",
         }
         self.canonical_columns = {
-            "denomination": "name",
+            "denomination": "str",
             "party_id": "int",
         }
 

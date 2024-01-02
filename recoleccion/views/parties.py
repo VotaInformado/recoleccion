@@ -1,16 +1,9 @@
 # Django rest framework
 from rest_framework import viewsets, mixins
-from rest_framework.decorators import action
-from drf_yasg.utils import swagger_auto_schema
-from rest_framework import status
-from rest_framework.response import Response
 from django.db.models import Q, Count, Max
-
-from recoleccion.views.paginator import StandardResultsSetPagination
 
 # Serializers
 from recoleccion.serializers.authors import (
-    AuthorshipModelSerializer,
     AuthorsProjectsCountSerializer,
 )
 from recoleccion.serializers.law_projects import LawProjectListSerializer
@@ -26,9 +19,7 @@ from recoleccion.models import Party, Authorship, LawProject, Person
 from recoleccion.utils.enums.vote_choices import VoteChoices
 
 
-class PartiesViewSet(
-    viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin
-):
+class PartiesViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
     queryset = Party.objects.all()
 
     ordering_fields = ["main_denomination"]
@@ -75,9 +66,7 @@ class PartiesLawProjectVotesViewSet(viewsets.GenericViewSet, mixins.ListModelMix
         return party_projects
 
 
-class PartiesAuthorsProjectsCountViewSet(
-    viewsets.GenericViewSet, mixins.ListModelMixin
-):
+class PartiesAuthorsProjectsCountViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
     serializer_class = AuthorsProjectsCountSerializer
 
     # ordering_fields = [""]
@@ -117,7 +106,6 @@ class PartiesLawProjectsViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
         "status": ["in"],
         "publication_date": ["gte", "lte"],
     }
-
 
     def get_queryset(self):
         party_id = self.kwargs["party_id"]

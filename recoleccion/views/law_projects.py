@@ -1,6 +1,8 @@
 # Django rest framework
-from rest_framework import viewsets, mixins
+from rest_framework import mixins, status, viewsets
+from rest_framework.response import Response
 from rest_framework.decorators import action
+from drf_yasg.utils import swagger_auto_schema
 
 
 # Project
@@ -8,10 +10,12 @@ from recoleccion.serializers.law_projects import (
     LawProjectListSerializer,
     LawProjectRetrieveSerializer,
     NeuralNetworkProjectSerializer,
+    TextSummaryResponseSerializer,
 )
 from recoleccion.serializers.votes import VoteModelSerializer
 
 from recoleccion.models import LawProject, Vote
+from recoleccion.utils.documentation import TEXT_SUMMARIZATION_DESCRIPTION
 
 
 class LawProjectsViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
@@ -29,6 +33,18 @@ class LawProjectsViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.
         "publication_date": ["gte", "lte"],
     }
     ordering_fields = ["title", "publication_date", "status"]
+
+    @swagger_auto_schema(
+        methods=["get"],
+        responses={status.HTTP_200_OK: TextSummaryResponseSerializer},
+        operation_description=TEXT_SUMMARIZATION_DESCRIPTION,
+    )
+    @action(detail=True, methods=["get"], url_path="summary")
+    def summarize_project_text(self, request, pk=None):
+        law_project: LawProject = self.get_object()
+        project_summary = law_project.get_summary()
+        serializer = TextSummaryResponseSerializer({"summary": project_summary})
+        return Response(serializer.data)
 
 
 class LawProjectVotesViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):

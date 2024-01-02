@@ -171,10 +171,7 @@ LOGGING = {
     "disable_existing_loggers": False,
     "filters": {"require_debug_false": {"()": "django.utils.log.RequireDebugFalse"}},
     "formatters": {
-        "verbose": {
-            "format": "%(levelname)s %(asctime)s %(module)s "
-            "%(process)d %(thread)d %(message)s"
-        },
+        "verbose": {"format": "%(levelname)s %(asctime)s %(module)s " "%(process)d %(thread)d %(message)s"},
         "colored_formatter": {
             "()": "colorlog.ColoredFormatter",
             "format": "\n%(log_color)s%(levelname)-8s%(white)s(%(threadName)s) %(message)s",
@@ -208,3 +205,7 @@ LOGGING = {
 }
 
 USE_THREADS = True
+
+# Project Summarizer
+SUMMARIZER_API_KEY = config.get("SUMMARIZER_API_KEY")
+SUMMARIZER_URL = config.get("SUMMARIZER_URL")

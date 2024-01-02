@@ -1,12 +1,7 @@
 # Django rest framework
-from rest_framework.decorators import action
-from rest_framework import status
-from rest_framework.response import Response
-from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets, mixins
 
 # Project
-from recoleccion.views.responses.legislators import law_project_author_responses
 from recoleccion.models.authorship import Authorship
 from recoleccion.serializers.legislators import (
     LegislatorDetailsSerializer,
@@ -18,12 +13,9 @@ from recoleccion.models.vote import Vote
 from recoleccion.models.law_project import LawProject
 from recoleccion.serializers.votes import VoteModelSerializer
 from recoleccion.serializers.law_projects import LawProjectListSerializer
-from django_filters.rest_framework import DjangoFilterBackend
 
 
-class LegislatorsViewSet(
-    viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin
-):
+class LegislatorsViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
     def get_serializer_class(self):
         if self.action == "list":
             return LegislatorInfoSerializer
@@ -98,7 +90,5 @@ class LegislatorLawProjectsViewSet(viewsets.GenericViewSet, mixins.ListModelMixi
 
     def get_queryset(self):
         legislator_id = self.kwargs.get("legislator_id")
-        law_projects_ids = Authorship.objects.filter(
-            person_id=legislator_id
-        ).values_list("project_id", flat=True)
+        law_projects_ids = Authorship.objects.filter(person_id=legislator_id).values_list("project_id", flat=True)
         return LawProject.objects.filter(id__in=law_projects_ids)

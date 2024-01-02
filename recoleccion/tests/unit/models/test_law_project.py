@@ -1,7 +1,10 @@
 import random
 from django.test import TestCase
 from django.core.management import call_command
-from recoleccion.components.data_sources.senate_source import SenateHistory, CurrentSenate
+from recoleccion.components.services.text_summarizer import TextSummarizer
+
+# Project
+import recoleccion.tests.test_helpers.mocks as mck
 from recoleccion.models.authorship import Authorship
 from recoleccion.models.law_project import LawProject
 from recoleccion.models.person import Person
@@ -102,3 +105,48 @@ class LawProjectAuthorsTestCase(TestCase):
         person_projects = person.law_projects.all()
         for project in person_projects:
             self.assertIn(project, person_projects)
+
+
+class LawProjectSummarizationTestCase(TestCase):
+    fixtures = ["law_project"]
+
+    def test_correct_first_time_summarization(self):
+        project = LawProject.objects.first()
+        project.text = "Sólo necesitamos que no sea NULL"
+        project.save()
+
+        url = f"/law-projects/{project.id}/summary/"
+        mocked_summary = "Resumen del proyecto"
+
+        with mck.mock_method(TextSummarizer, "summarize_text", return_value=mocked_summary):
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.data["summary"], mocked_summary)
+
+    def test_correct_summary_retrieval_from_db(self):
+        project = LawProject.objects.first()
+        project.text = "Sólo necesitamos que no sea NULL"
+        project.save()
+
+        url = f"/law-projects/{project.id}/summary/"
+        original_summary = "Resumen del proyecto"
+
+        with mck.mock_method(TextSummarizer, "summarize_text", return_value=original_summary):
+            response = self.client.get(url)
+
+        different_summary = "Otro resumen"  # Should not be used
+
+        with mck.mock_method(TextSummarizer, "summarize_text", return_value=different_summary) as mock:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.data["summary"], original_summary)
+            mock.assert_not_called()
+
+    def test_project_summary_cannot_be_done_when_project_has_no_text(self):
+        project = LawProject.objects.first()
+        project.text = random.choice([None, ""])
+        project.save()
+
+        url = f"/law-projects/{project.id}/summary/"
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 400)

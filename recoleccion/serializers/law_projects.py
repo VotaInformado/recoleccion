@@ -60,13 +60,9 @@ class LawProjectRetrieveSerializer(serializers.ModelSerializer):
         from recoleccion.serializers.authors import LawProjectAuthorsSerializer
 
         if obj.origin_chamber == ProjectChambers.SENATORS:
-            authors = Authorship.objects.filter(
-                project=obj, author_type=LegislatorSeats.SENATOR
-            )
+            authors = Authorship.objects.filter(project=obj, author_type=LegislatorSeats.SENATOR)
         else:
-            authors = Authorship.objects.filter(
-                project=obj, author_type=LegislatorSeats.DEPUTY
-            )
+            authors = Authorship.objects.filter(project=obj, author_type=LegislatorSeats.DEPUTY)
         return LawProjectAuthorsSerializer(authors, many=True).data
 
 
@@ -92,3 +88,7 @@ class NeuralNetworkProjectSerializer(serializers.ModelSerializer):
 
 class FittingDataValidationSerializer(serializers.Serializer):
     last_fetch_date = serializers.DateField()
+
+
+class TextSummaryResponseSerializer(serializers.Serializer):
+    summary = serializers.CharField()

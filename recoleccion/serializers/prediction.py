@@ -2,8 +2,8 @@ from rest_framework import serializers
 
 
 class PredictionRequestSerializer(serializers.Serializer):
-    person = serializers.IntegerField(required=False)
-    law_project = serializers.IntegerField()
+    person_id = serializers.IntegerField(required=False)
+    law_project_id = serializers.IntegerField()
 
 class PredictionResponseSerializer(serializers.Serializer):
     legislator = serializers.IntegerField()

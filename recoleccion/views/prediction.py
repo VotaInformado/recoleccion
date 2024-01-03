@@ -2,6 +2,8 @@
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from drf_yasg.utils import swagger_auto_schema
+from rest_framework.response import Response
+
 
 # Project
 from recoleccion.components.services.neural_network import NeuralNetworkService
@@ -23,4 +25,4 @@ class PredictionViewSet(viewsets.GenericViewSet):
         serializer.is_valid(raise_exception=True)
         prediction = network_service.get_prediction(serializer.data)
         response = PredictionResponseSerializer(prediction).data
-        return response
+        return Response(response)

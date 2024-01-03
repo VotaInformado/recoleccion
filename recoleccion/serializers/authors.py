@@ -66,4 +66,4 @@ class ReducedAuthorSerializer(serializers.ModelSerializer):
     # Used for prediction only, we just need the party
     class Meta:
         model = Authorship
-        fields = ["party"]
+        fields = ["party_id"]

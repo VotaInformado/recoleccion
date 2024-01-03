@@ -18,34 +18,34 @@ class NeuralNetworkService:
 
     def get_party_authors(self, project: LawProject):
         authors = Authorship.objects.filter(project=project)
-        party_authors = [author.party for author in authors]
-        authors_data = ReducedAuthorSerializer(party_authors, many=True).data
-        return authors_data
+        party_authors = {author.party_id: True for author in authors}
+        return [{"party": k} for k in party_authors.keys()]
 
     def get_legislators_data(self, legislator_id):
         if legislator_id:
-            legislators = [Person.objects.get(id=legislator_id)]
+            legislators = Person.objects.get(id=legislator_id)
         else:
             legislators = self.get_active_legislators()
-        legislators_data = ReducedPersonSerializer(legislators, many=True).data
+        legislators_data = ReducedPersonSerializer(
+            legislators, many=not bool(legislator_id)
+        ).data
         return legislators_data
 
     def get_request_data(self, prediction_options: dict):
-        project_id = prediction_options.get("project_id")
-        legislator_id = prediction_options.get("legislator_id")
+        project_id = prediction_options.get("law_project_id")
+        legislator_id = prediction_options.get("person_id")
         project = LawProject.objects.get(id=project_id)
         legislators_data = self.get_legislators_data(legislator_id)
         authors_data = self.get_party_authors(project)
         project_data = NeuralNetworkProjectSerializer(project).data
-
         return {
             "authors": authors_data,
-            "legislators": legislators_data,
+            "legislator": legislators_data,
             "project": project_data,
         }
 
     def get_url(self, prediction_options: dict):
-        specific_legislator = prediction_options.get("legislator_id") is not None
+        specific_legislator = prediction_options.get("person_id") is not None
         if specific_legislator:
             return f"{self.base_url}/predict-legislator-vote/"
         return f"{self.base_url}/predict-project-votes/"

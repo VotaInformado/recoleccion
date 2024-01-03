@@ -80,11 +80,11 @@ class NeuralNetworkProjectSerializer(serializers.ModelSerializer):
     project_year = serializers.SerializerMethodField()
     project_text = serializers.CharField(source="text", read_only=True)
     project_title = serializers.CharField(source="title", read_only=True)
-    project_id = serializers.CharField(source="id", read_only=True)
+    project = serializers.CharField(source="id", read_only=True)
 
     class Meta:
         model = LawProject
-        fields = ["project_id", "project_text", "project_title", "project_year"]
+        fields = ["project", "project_text", "project_title", "project_year"]
 
     def get_project_year(self, obj: LawProject):
         return obj.publication_date.year

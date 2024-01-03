@@ -208,3 +208,7 @@ LOGGING = {
 }
 
 USE_THREADS = True
+
+# Neural network
+
+NEURAL_NETWORK_URL = config.get("NEURAL_NETWORK_URL")

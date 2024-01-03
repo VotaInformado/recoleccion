@@ -36,27 +36,6 @@ class LegislatorsViewSet(
     filterset_fields = ["is_active", "last_seat"]
     ordering_fields = ["name", "last_name", "last_seat", "is_active"]
 
-    # @swagger_auto_schema(
-    #     methods=["get"],
-    #     responses=law_project_author_responses,
-    #     operation_description="Retrieves the law projects of a legislator",
-    # )
-    # @action(detail=True, methods=["get"], url_path="law-projects")
-    # def get_law_projects(self, request, pk=None):
-    #     from recoleccion.serializers.law_projects import LawProjectBasicInfoSerializer
-
-    #     person = self.get_object()
-    #     authorships = Authorship.objects.filter(person=person)
-    #     law_projects = [
-    #         authorship.law_project
-    #         for authorship in authorships
-    #         if authorship.law_project
-    #     ]
-    #     # TODO: ver esto, qué hacemos con las authorships con referencias en lugar de law_projects
-    #     response = LawProjectBasicInfoSerializer(law_projects, many=True).data
-    #     return Response(response, status=status.HTTP_200_OK)
-
-
 class LegislatorVotesViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
     serializer_class = VoteModelSerializer
 

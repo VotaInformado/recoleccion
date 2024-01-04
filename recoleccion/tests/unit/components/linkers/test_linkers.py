@@ -269,11 +269,11 @@ class PersonLinkerTestCase(LinkingTestCase):
 class PartyLinkerTestCase(LinkingTestCase):
     def setUp(self):
         self.messy_columns = {
-            "denomination": "str",
+            "denomination": "party",
             "record_id": "int",
         }
         self.canonical_columns = {
-            "denomination": "str",
+            "denomination": "party",
             "party_id": "int",
         }
 
@@ -302,7 +302,6 @@ class PartyLinkerTestCase(LinkingTestCase):
         self.assertEqual(row["record_id"].values[0], RECORD_ID)
         self.assertEqual(row["party_id"].values[0], EXPECTED_ID)
 
-    @allowed_to_fail
     def test_party_linking_with_similar_records_and_no_previous_decision(self):
         EXPECTED_ID = 1
         RECORD_ID = 2

@@ -78,7 +78,7 @@ class LawProjectBasicInfoSerializer(serializers.ModelSerializer):
 
 class NeuralNetworkProjectSerializer(serializers.ModelSerializer):
     project_year = serializers.SerializerMethodField()
-    project_text = serializers.CharField(source="text", read_only=True)
+    project_text = serializers.SerializerMethodField()
     project_title = serializers.CharField(source="title", read_only=True)
     project = serializers.CharField(source="id", read_only=True)
 
@@ -89,6 +89,10 @@ class NeuralNetworkProjectSerializer(serializers.ModelSerializer):
     def get_project_year(self, obj: LawProject):
         return obj.publication_date.year
 
+    def get_project_text(self, obj: LawProject):
+        # If the project has no text, return a dot because the neural network
+        # can't predict without text
+        return obj.text or "."
 
 class FittingDataValidationSerializer(serializers.Serializer):
     last_fetch_date = serializers.DateField()

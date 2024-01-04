@@ -21,3 +21,4 @@ class Law(BaseModel):
         help_text="Proyecto de ley asociado",
     )
     project_id = models.CharField(max_length=30, null=True)  # in case the project is not found
+    text = models.TextField(null=True)

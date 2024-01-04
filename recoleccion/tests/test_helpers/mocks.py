@@ -24,9 +24,12 @@ class FakeClass:
 
 
 class FakeResponse:
-    def __init__(self, status_code, content):
-        self.status_code = status_code
+    def __init__(self, content: dict, status_code=200):
         self.content = content
+        self.status_code = status_code
+
+    def json(self):
+        return self.content
 
 
 def is_internal_mock_enabled():
@@ -132,3 +135,23 @@ def mock_linking_results(instance, *args, **kwargs):
 
 def mock_load_exact_matches(instance, messy_data):
     return pd.DataFrame(), messy_data
+
+
+def mock_legislator_response(legislator_id):
+    response_data = {
+        "legislator": legislator_id,
+        "vote": "Aprobado",
+    }
+    return FakeResponse(content=response_data)
+
+
+def mock_chamber_response():
+    response_data = []
+    for i in range(10):
+        response_data.append(
+            {
+                "legislator": i,
+                "vote": "Aprobado",
+            }
+        )
+    return FakeResponse(content=response_data)

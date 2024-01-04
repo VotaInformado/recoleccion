@@ -94,6 +94,7 @@ router.register(
     PartiesLawProjectVotesViewSet,
     basename="party-legislators",
 )
+router.register(r"predictions", PredictionViewSet, basename="predictions")
 
 # Neural network data endpoints
 
@@ -108,7 +109,6 @@ network_router.register(
     r"legislators", NeuralNetworkLegislatorViewSet, basename="legislators"
 )
 network_router.register(r"parties", PartiesViewSet, basename="parties")
-network_router.register(r"", PredictionViewSet, basename="predictions")
 
 
 def redirect_to_health(request):

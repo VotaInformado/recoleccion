@@ -110,7 +110,9 @@ class YearThreadedCommand(CustomCommand):
 
 class PageThreadedCommand(CustomCommand):
     def get_current_index(self, loop_index, options):
-        return loop_index
+        starting_page = options.get("starting_page")
+        actual_index = starting_page + loop_index
+        return actual_index
 
     def __init__(self):
         super().__init__()

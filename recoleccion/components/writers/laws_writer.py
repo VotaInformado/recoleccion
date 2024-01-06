@@ -48,9 +48,10 @@ class LawsWriter(Writer):
 
     def update_or_create_element(self, row: pd.Series):
         row = row.dropna()
-        row["vetoed"] = True if row["veto"] != "NULL" else False
         self.associate_project(row)
-        row.pop("veto")
+        if "veto" in row:
+            row["vetoed"] = True if row["veto"] != "NULL" else False
+            row.pop("veto")
         if row["publication_date"] == "NUL":
             row["publication_date"] = None
         return Law.objects.update_or_create(

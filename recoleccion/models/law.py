@@ -22,3 +22,4 @@ class Law(BaseModel):
     )
     project_id = models.CharField(max_length=30, null=True)  # in case the project is not found
     text = models.TextField(null=True)
+    link = models.CharField(max_length=250, null=True)

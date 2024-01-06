@@ -7,7 +7,7 @@ fake = Faker("es_AR")
 provinces = ["Buenos Aires", "CABA", "Córdoba", "Mendoza", "Santa Fe"]
 
 parties = [
-    "Partido Justicialista (PJ)",
+    "Partido De la Derecha",
     "Propuesta Republicana (PRO)",
     "Unión Cívica Radical (UCR)",
     "Frente de Todos",

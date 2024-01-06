@@ -4,8 +4,8 @@ from django.conf import settings
 # Project
 from recoleccion.models import LawProject, Person, Authorship
 from recoleccion.serializers.law_projects import NeuralNetworkProjectSerializer
-from recoleccion.serializers.authors import ReducedAuthorSerializer
 from recoleccion.serializers.persons import ReducedPersonSerializer
+
 
 
 class NeuralNetworkService:
@@ -14,7 +14,9 @@ class NeuralNetworkService:
         self.session = requests.Session()
 
     def get_active_legislators(self, chamber: str):
-        return Person.objects.filter(is_active=True, last_seat=chamber)
+        if chamber:
+            return Person.objects.filter(is_active=True, last_seat=chamber)
+        return Person.objects.filter(is_active=True)
 
     def get_party_authors(self, project: LawProject):
         authors = Authorship.objects.filter(project=project)

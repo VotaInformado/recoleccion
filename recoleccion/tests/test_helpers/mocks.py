@@ -1,18 +1,10 @@
-# External libraries
-from datetime import datetime
 import pandas as pd
-import random
-import string
-import time
-
-# Unittest mock
 from unittest.mock import patch
-
-# Env variables
 from django.conf import settings
 
 # Project
 from recoleccion.components.linkers import Linker
+from recoleccion.models.person import Person
 
 
 BASE_URL = "http://localhost:8000"
@@ -146,11 +138,12 @@ def mock_legislator_response(legislator_id):
 
 
 def mock_chamber_response():
+    legislator_ids = Person.objects.filter(last_seat__isnull=False).values_list("id", flat=True)
     response_data = []
     for i in range(10):
         response_data.append(
             {
-                "legislator": i,
+                "legislator": legislator_ids[i],
                 "vote": "Aprobado",
             }
         )

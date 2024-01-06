@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('recoleccion', '0037_affidavitentry'),
+        ('recoleccion', '0038_lawproject_summary'),
     ]
 
     operations = [

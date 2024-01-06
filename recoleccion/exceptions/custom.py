@@ -26,7 +26,7 @@ class CustomException(APIException):
 
 class LinkingException(CustomException):
     CODE = "LINKING_EXCEPTION"
-    STATUS_CODE = 500
+    STATUS_CODE = 400
     DESCRIPTION = "Error linking data"
 
     def __init__(self, description=None):
@@ -35,7 +35,7 @@ class LinkingException(CustomException):
 
 class IncompatibleLinkingDatasets(LinkingException):
     CODE = "INCOMPATIBLE_LINKING_DATASETS"
-    STATUS_CODE = 500
+    STATUS_CODE = 400
     DESCRIPTION = "The datasets seem to be too different to be linked"
 
 
@@ -50,7 +50,7 @@ class SenateLoadingException(CustomException):
 
 class DeputiesLoadingException(CustomException):
     CODE = "DEPUTIES_LOADING_EXCEPTION"
-    STATUS_CODE = 500
+    STATUS_CODE = 400
     DESCRIPTION = "Error loading deputies data"
 
     def __init__(self, description=None):
@@ -64,3 +64,22 @@ class PageNotFound(CustomException):
 
     def __init__(self, description=None):
         super().__init__(self.CODE, self.STATUS_CODE, description or self.DESCRIPTION)
+
+
+class TextSummarizerException(CustomException):
+    CODE = "TEXT_SUMMARIZER_EXCEPTION"
+    STATUS_CODE = 400
+    DESCRIPTION = "Error summarizing text"
+
+    def __init__(self, description=None):
+        super().__init__(self.CODE, self.STATUS_CODE, description or self.DESCRIPTION)
+
+
+class EmptyProjectText(CustomException):
+    CODE = "EMPTY_PROJECT_TEXT"
+    STATUS_CODE = 400
+    DESCRIPTION = "The project text is empty"
+
+    def __init__(self, project_id: int):
+        description = f"The project with id {project_id} has no text"
+        super().__init__(self.CODE, self.STATUS_CODE, description)

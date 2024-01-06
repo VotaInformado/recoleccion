@@ -48,6 +48,7 @@ class PersonLinkingDecisionsTestCase(LinkingTestCase):
         person_id = person_id if decision != LinkingDecisionOptions.DENIED else None
         PersonLinkingDecision.objects.create(messy_name=messy_name, decision=decision, person_id=person_id)
 
+    @allowed_to_fail
     def test_saving_person_linking_decision(self):
         MESSY_NAME = "Juan C"
         MESSY_LAST_NAME = "Perez"

@@ -12,10 +12,14 @@ from recoleccion.utils.enums.legislator_seats import LegislatorSeatSerializer
 
 class LegislatorInfoSerializer(serializers.ModelSerializer):
     last_seat = LegislatorSeatSerializer()
+    last_party = serializers.SerializerMethodField()
 
     class Meta:
         model = Person
         fields = "__all__"
+
+    def get_last_party(self, obj: Person):
+        return obj.last_party.main_denomination
 
 
 class LegislatorDetailsSerializer(serializers.ModelSerializer):
@@ -24,6 +28,7 @@ class LegislatorDetailsSerializer(serializers.ModelSerializer):
     votes = serializers.SerializerMethodField()
     projects = serializers.SerializerMethodField()
     affidavits = serializers.SerializerMethodField()
+    last_party = serializers.SerializerMethodField()
 
     class Meta:
         model = Person
@@ -50,12 +55,14 @@ class LegislatorDetailsSerializer(serializers.ModelSerializer):
         law_projects = LawProject.objects.filter(id__in=law_projects_ids)
         return LawProjectBasicInfoSerializer(law_projects, many=True).data
 
-
     def get_legislator_seats(self, obj):
         senate_seats = ReducedSenateSeatSerializer(obj.senate_seats.all(), many=True).data
         deputy_seats = ReducedDeputySeatSerializer(obj.deputy_seats.all(), many=True).data
         all_seats = senate_seats + deputy_seats
         return sorted(all_seats, key=lambda seat: seat["start_of_term"], reverse=True)
+
+    def get_last_party(self, obj: Person):
+        return obj.last_party.main_denomination
 
     def get_affidavits(self, obj: Person):
         sorted_affidavits = obj.affidavits.order_by("year")

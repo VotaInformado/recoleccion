@@ -1,6 +1,8 @@
 from django.db import models
 
-# Base model
+# Project
+from recoleccion.exceptions.custom import EmptyText
+from recoleccion.components.services.text_summarizer import TextSummarizer
 from recoleccion.models.base import BaseModel
 
 
@@ -23,3 +25,15 @@ class Law(BaseModel):
     project_id = models.CharField(max_length=30, null=True)  # in case the project is not found
     text = models.TextField(null=True)
     link = models.CharField(max_length=250, null=True)
+    formatted = models.BooleanField(default=False)
+    ai_generated_summary = models.TextField(null=True)
+
+    def get_ai_summary(self):
+        if self.ai_generated_summary:
+            return self.ai_generated_summary
+        if not self.text:
+            raise EmptyText(self.id)
+        summary = TextSummarizer.summarize_text(self.text)
+        self.ai_generated_summary = summary
+        self.save()
+        return summary

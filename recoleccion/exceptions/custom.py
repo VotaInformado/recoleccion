@@ -75,7 +75,7 @@ class TextSummarizerException(CustomException):
         super().__init__(self.CODE, self.STATUS_CODE, description or self.DESCRIPTION)
 
 
-class EmptyProjectText(CustomException):
+class EmptyText(CustomException):
     CODE = "EMPTY_PROJECT_TEXT"
     STATUS_CODE = 400
     DESCRIPTION = "The project text is empty"

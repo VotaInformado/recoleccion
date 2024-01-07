@@ -8,7 +8,7 @@ from recoleccion.models.base import BaseModel
 from recoleccion.utils.enums.project_chambers import ProjectChambers
 from recoleccion.utils.enums.project_status import ProjectStatus
 from recoleccion.components.services.text_summarizer import TextSummarizer
-from recoleccion.exceptions.custom import EmptyProjectText
+from recoleccion.exceptions.custom import EmptyText
 
 
 class LawProject(BaseModel):
@@ -32,6 +32,7 @@ class LawProject(BaseModel):
     text = models.TextField(null=True)
     link = models.CharField(max_length=250, null=True)
     summary = models.TextField(null=True)
+    formatted = models.BooleanField(default=False)
 
     FORMAT_1 = r"\d{1,4}-[A-Z]{1,3}-\d{2}$"  # 70-S-21, 3042-D-21
     FORMAT_2 = r"\d{1,4}-[A-Z]{1,3}-\d{4}$"  # 70-S-2021, 3042-D-2021
@@ -206,7 +207,7 @@ class LawProject(BaseModel):
         if self.summary:
             return self.summary
         if not self.text:
-            raise EmptyProjectText(self.id)
+            raise EmptyText(self.id)
         project_summary = TextSummarizer.summarize_text(self.text)
         self.summary = project_summary
         self.save()

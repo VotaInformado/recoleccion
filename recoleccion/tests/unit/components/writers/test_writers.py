@@ -7,9 +7,7 @@ class LawsProjectWriter(TestCase):
     def test_update_or_create_when_field_is_not_updated(self):
         PROJECT_ID = "2345-D-2019"
         ORIGINAL_PUBLICATION_DATE = "2020-12-30"
-        deputies_number, deputies_source, deputies_year = LawProjectsWriter.split_id(
-            PROJECT_ID
-        )
+        deputies_number, deputies_source, deputies_year = LawProject.split_id(PROJECT_ID)
         existing_project = LawProject.objects.create(
             deputies_project_id=PROJECT_ID,
             title="Ley de presupuesto 2021",
@@ -35,9 +33,7 @@ class LawsProjectWriter(TestCase):
 
     def test_update_or_create_when_field_updated_with_null_value(self):
         PROJECT_ID = "2345-D-2019"
-        deputies_number, deputies_source, deputies_year = LawProjectsWriter.split_id(
-            PROJECT_ID
-        )
+        deputies_number, deputies_source, deputies_year = LawProject.split_id(PROJECT_ID)
         ORIGINAL_PUBLICATION_DATE = "2020-12-30"
         existing_project = LawProject.objects.create(
             deputies_project_id=PROJECT_ID,

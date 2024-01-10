@@ -25,6 +25,7 @@ class LawProjectRetrieveSerializer(serializers.ModelSerializer):
     deputies_vote_session = serializers.SerializerMethodField()
     votings = serializers.SerializerMethodField()
     authors = serializers.SerializerMethodField()
+    origin_chamber = serializers.SerializerMethodField()
 
     class Meta:
         model = LawProject
@@ -59,11 +60,14 @@ class LawProjectRetrieveSerializer(serializers.ModelSerializer):
     def get_authors(self, obj: LawProject):
         from recoleccion.serializers.authors import LawProjectAuthorsSerializer
 
-        if obj.origin_chamber == ProjectChambers.SENATORS:
+        if obj.get_origin_chamber() == ProjectChambers.SENATORS:
             authors = Authorship.objects.filter(project=obj, author_type=LegislatorSeats.SENATOR)
         else:
             authors = Authorship.objects.filter(project=obj, author_type=LegislatorSeats.DEPUTY)
         return LawProjectAuthorsSerializer(authors, many=True).data
+
+    def get_origin_chamber(self, obj: LawProject):
+        return obj.get_origin_chamber()
 
 
 class LawProjectBasicInfoSerializer(serializers.ModelSerializer):
@@ -89,6 +93,7 @@ class NeuralNetworkProjectSerializer(serializers.ModelSerializer):
         # If the project has no text, return a dot because the neural network
         # can't predict without text
         return obj.text or "."
+
 
 class FittingDataValidationSerializer(serializers.Serializer):
     last_fetch_date = serializers.DateField()

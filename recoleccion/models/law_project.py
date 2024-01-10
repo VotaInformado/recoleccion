@@ -8,7 +8,7 @@ from recoleccion.models.base import BaseModel
 from recoleccion.utils.enums.project_chambers import ProjectChambers
 from recoleccion.utils.enums.project_status import ProjectStatus
 from recoleccion.components.services.text_summarizer import TextSummarizer
-from recoleccion.exceptions.custom import EmptyText
+from recoleccion.exceptions.custom import EmptyText, ProjectOriginFileConflict
 
 
 class LawProject(BaseModel):
@@ -64,105 +64,6 @@ class LawProject(BaseModel):
         return year
 
     @classmethod
-    def recognize_format(cls, project_id):
-        if re.match(cls.FORMAT_3, project_id):  # FORMAT_3 is the most restrictive
-            return cls.FORMAT_3
-        elif re.match(cls.FORMAT_1, project_id):
-            return cls.FORMAT_1
-        elif re.match(cls.FORMAT_2, project_id):
-            return cls.FORMAT_2
-        elif re.match(cls.FORMAT_4, project_id):
-            return cls.FORMAT_4
-        return None  # raise Exception
-
-    @classmethod
-    def get_all_alternative_ids(cls, original_id: str, include_all_chambers=False):
-        original_format = cls.recognize_format(original_id)
-        if original_format == cls.FORMAT_1:
-            return cls._get_alternative_names_format_1(original_id)
-        elif original_format == cls.FORMAT_2:
-            return cls._get_alternative_names_format_2(original_id)
-        elif original_format == cls.FORMAT_3:
-            return cls._get_alternative_names_format_3(original_id)
-        elif original_format == cls.FORMAT_4:
-            return cls._get_alternative_names_format_4(original_id)
-
-    @classmethod
-    def _get_alternative_names_format_1(cls, original_id: str):
-        # original format is 70-S-21, 3042-D-21
-        id, chamber, year = original_id.split("-")
-        full_year = f"20{year}"
-        format_2 = f"{id}-{chamber}-{full_year}"
-        format_3 = f"{id.zfill(4)}-{chamber}-{full_year}"
-        format_4 = f"{id}-{year}"
-        result = [original_id, format_2, format_3, format_4]
-        if chamber == "D":
-            extra_format_2 = f"{id}-CD-{full_year}"
-            extra_format_3 = f"{id.zfill(4)}-CD-{full_year}"
-            result.extend([extra_format_2, extra_format_3])
-        elif chamber == "CD":
-            extra_format_2 = f"{id}-D-{full_year}"
-            extra_format_3 = f"{id.zfill(4)}-D-{full_year}"
-            result.extend([extra_format_2, extra_format_3])
-        return result
-
-    @classmethod
-    def _get_alternative_names_format_2(cls, original_id: str):
-        # original format is 70-S-2021, 3042-D-2021
-        id, chamber, year = original_id.split("-")
-        format_1 = f"{id}-{chamber}-{year[2:]}"
-        format_3 = f"{id.zfill(4)}-{chamber}-{year}"
-        format_4 = f"{id}-{year[2:]}"
-        result = [original_id, format_1, format_3, format_4]
-        if chamber == "D":
-            extra_format_1 = f"{id}-CD-{year[2:]}"
-            extra_format_3 = f"{id.zfill(4)}-CD-{year}"
-            result.extend([extra_format_1, extra_format_3])
-        elif chamber == "CD":
-            extra_format_1 = f"{id}-D-{year[2:]}"
-            extra_format_3 = f"{id.zfill(4)}-D-{year}"
-            result.extend([extra_format_1, extra_format_3])
-        return result
-
-    @classmethod
-    def _get_alternative_names_format_3(cls, original_id: str):
-        # original format is 0070-S-2021, 0070-D-2021, 070-S-2021
-        def extract_non_zero(id):
-            match = re.search(r"0*([1-9]\d*)", id)
-            if match:
-                return match.group(1)
-            return id
-
-        id, chamber, year = original_id.split("-")
-        non_zero_id = extract_non_zero(id)
-        format_1 = f"{non_zero_id}-{chamber}-{year[2:]}"
-        format_2 = f"{non_zero_id}-{chamber}-{year}"
-        format_4 = f"{non_zero_id}-{year[2:]}"
-        result = [original_id, format_1, format_2, format_4]
-        if chamber == "D":
-            extra_format_1 = f"{non_zero_id}-CD-{year[2:]}"
-            extra_format_2 = f"{non_zero_id}-CD-{year}"
-            result.extend([extra_format_1, extra_format_2])
-        elif chamber == "CD":
-            extra_format_1 = f"{non_zero_id}-D-{year[2:]}"
-            extra_format_2 = f"{non_zero_id}-D-{year}"
-            result.extend([extra_format_1, extra_format_2])
-        return result
-
-    @classmethod
-    def _get_alternative_names_format_4(cls, original_id: str):
-        # original format is 70-21, 3042-21
-        id, year = original_id.split("-")
-        possible_results = [original_id]
-        full_year = f"20{year}"
-        for chamber_id in cls.CHAMBER_IDS:
-            format_1 = f"{id}-{chamber_id}-{full_year}"
-            format_2 = f"{id.zfill(4)}-{chamber_id}-{full_year}"
-            format_3 = f"{id}-{chamber_id}-{year}"
-            possible_results.extend([format_1, format_2, format_3])
-        return possible_results
-
-    @classmethod
     def get_project_year_and_number(cls, project_id: str):
         project_id = project_id.replace("/", "-")
         splitted_id = project_id.split("-")
@@ -212,3 +113,55 @@ class LawProject(BaseModel):
         self.summary = project_summary
         self.save()
         return project_summary
+
+    @classmethod
+    def split_id(self, project_id: str):
+        if project_id is None:
+            return None, None, None
+        comps = project_id.split("-")
+        if len(comps) == 2:
+            num, year = comps
+            source = None
+        elif len(comps) == 3:
+            num, source, year = comps
+        else:
+            self.logger.info(f"Invalid project id: {project_id}")
+            return None, None, None
+        num = int(num)
+        source = source.upper() if source else None
+        year = int(year)
+        return num, source, year
+
+    def get_origin_chamber(self):
+        """
+        Devuelve Diputados o Senado (None si el proyecto no tiene ningún expediente)
+        Si el proyecto inició fuera del Congreso (PE), devuelve la cámara por la que ingresó.
+        """
+        if not self.senate_project_id and not self.deputies_project_id:
+            return None
+        if not self.senate_project_id:
+            return ProjectChambers.DEPUTIES
+        elif not self.deputies_project_id:
+            return ProjectChambers.SENATORS
+        elif self.deputies_source == "S":
+            # Si en diputados, la fuente es S, entonces ingresó por el Senado
+            return ProjectChambers.SENATORS
+        elif self.senate_source in ["D", "CD"]:
+            # Si en senado, la fuente es D, entonces ingresó por Diputados
+            return ProjectChambers.DEPUTIES
+        elif "CD" in self.senate_source:
+            # Casos borde (tal vez conviene corregirlos) con fuente de Senado CDX.
+            # Ejemplo: proyecto con senate_project_id 76-CD5-1988
+            return ProjectChambers.DEPUTIES
+        else:
+            raise ProjectOriginFileConflict(self.pk)
+
+    @property
+    def origin_file(self):
+        origin_chamber = self.get_origin_chamber()
+        if origin_chamber == ProjectChambers.DEPUTIES:
+            return self.deputies_project_id
+        elif origin_chamber == ProjectChambers.SENATORS:
+            return self.senate_project_id
+        else:
+            return None

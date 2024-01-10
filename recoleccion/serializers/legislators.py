@@ -62,7 +62,7 @@ class LegislatorDetailsSerializer(serializers.ModelSerializer):
         return sorted(all_seats, key=lambda seat: seat["start_of_term"], reverse=True)
 
     def get_last_party(self, obj: Person):
-        return obj.last_party.main_denomination
+        return obj.last_party.main_denomination if obj.last_party else None
 
     def get_affidavits(self, obj: Person):
         sorted_affidavits = obj.affidavits.order_by("year")

@@ -5,30 +5,11 @@ import pandas as pd
 from recoleccion.models import LawProject
 from recoleccion.components.writers import Writer
 from recoleccion.models.law import Law
-from recoleccion.utils.enums.project_chambers import ProjectChambers
 import re
 
 
 class LawProjectsWriter(Writer):
     model = LawProject
-
-    @classmethod
-    def split_id(self, project_id: str):
-        if project_id is None:
-            return None, None, None
-        comps = project_id.split("-")
-        if len(comps) == 2:
-            num, year = comps
-            source = None
-        elif len(comps) == 3:
-            num, source, year = comps
-        else:
-            self.logger.info(f"Invalid project id: {project_id}")
-            return None, None, None
-        num = int(num)
-        source = source.upper() if source else None
-        year = int(year)
-        return num, source, year
 
     @classmethod
     def format_year(cls, project_id: str):
@@ -80,9 +61,9 @@ class LawProjectsWriter(Writer):
         row["senate_project_id"] = senate_project_id  # fix for senate projects with wrong format
         law = row.get("law", None)
         row = row.drop("law", errors="ignore")
-        deputies_number, deputies_source, deputies_year = cls.split_id(deputies_project_id)
+        deputies_number, deputies_source, deputies_year = LawProject.split_id(deputies_project_id)
         deputies_year = cls.format_year(deputies_project_id)
-        senate_number, senate_source, senate_year = cls.split_id(senate_project_id)
+        senate_number, senate_source, senate_year = LawProject.split_id(senate_project_id)
         if not deputies_number and not senate_number:
             # We skip
             return None, False
@@ -133,7 +114,7 @@ class LawProjectsWriter(Writer):
             row = data.loc[i]
             project_id = row.get("project_id")
             day_order = row.get("day_order")
-            deputies_number, deputies_source, deputies_year = cls.split_id(project_id)
+            deputies_number, deputies_source, deputies_year = LawProject.split_id(project_id)
             project = LawProject.objects.filter(
                 deputies_number=deputies_number, deputies_source=deputies_source, deputies_year=deputies_year
             ).first()
@@ -156,7 +137,7 @@ class LawProjectsWriter(Writer):
             row: pd.Series = data.loc[i]
             project_id = row.get("project_id")
             project_status = row.get("project_status")
-            deputies_number, deputies_source, deputies_year = cls.split_id(project_id)
+            deputies_number, deputies_source, deputies_year = LawProject.split_id(project_id)
             project = LawProject.objects.filter(
                 deputies_number=deputies_number, deputies_source=deputies_source, deputies_year=deputies_year
             ).first()

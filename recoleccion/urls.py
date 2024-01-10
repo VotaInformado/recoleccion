@@ -17,6 +17,7 @@ from recoleccion.views.legislators import (
     NeuralNetworkLegislatorViewSet,
     LegislatorLawProjectsViewSet,
 )
+from recoleccion.views.news import NewsViewSet
 from recoleccion.views.prediction import PredictionViewSet
 from recoleccion.views.senate import SenateViewSet
 from recoleccion.views.laws import LawsViewSet
@@ -102,13 +103,13 @@ network_router = SimpleRouter()
 
 network_router.register(r"votes", NeuralNetworkVotesViewSet, basename="votes")
 network_router.register(r"authors", NeuralNetworkAuthorsViewSet, basename="authors")
-network_router.register(
-    r"law-projects", NeuralNetworkProjectsViewSet, basename="law-projects"
-)
-network_router.register(
-    r"legislators", NeuralNetworkLegislatorViewSet, basename="legislators"
-)
+network_router.register(r"law-projects", NeuralNetworkProjectsViewSet, basename="law-projects")
+network_router.register(r"legislators", NeuralNetworkLegislatorViewSet, basename="legislators")
 network_router.register(r"parties", PartiesViewSet, basename="parties")
+
+news_router = SimpleRouter()
+
+news_router.register(r"", NewsViewSet, basename="news")
 
 
 def redirect_to_health(request):
@@ -121,16 +122,15 @@ def health_check(request):
 
 urlpatterns = [
     path("", redirect_to_health),
+    path("", include(router.urls)),
     path("admin/", admin.site.urls),
     path("health/", health_check, name="health_check"),
-    path("", include(router.urls)),
     path("neural-network/", include(network_router.urls)),
+    path("news/", include(news_router.urls)),
     path(
         "swagger/",
         schema_view.with_ui("swagger", cache_timeout=0),
         name="schema-swagger-ui",
     ),
-    path(
-        "swagger.json", schema_view.without_ui(cache_timeout=0), name="schema-json"
-    ),  # To download the swagger.json
+    path("swagger.json", schema_view.without_ui(cache_timeout=0), name="schema-json"),  # To download the swagger.json
 ]

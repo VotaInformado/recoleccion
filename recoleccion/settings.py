@@ -213,3 +213,6 @@ NEURAL_NETWORK_URL = config.get("NEURAL_NETWORK_URL")
 # Project Summarizer
 SUMMARIZER_API_KEY = config.get("SUMMARIZER_API_KEY")
 SUMMARIZER_URL = config.get("SUMMARIZER_URL")
+
+# News Provider
+NEWS_PROVIDER_API_KEY = config.get("NEWS_PROVIDER_API_KEY")

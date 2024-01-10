@@ -18,10 +18,14 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("--class-name", type=str, required=True)
+        parser.add_argument("--include-summaries", type=bool, default=False)
+        # Por defecto, no vamos a corregir los resúmenes oficiales
 
     def handle(self, *args, **options):
         text_formatter = TextFormatter()
         class_name = options["class_name"]
+        include_summaries = options["include_summaries"]
+        logger.info(f"Correcting texts for {class_name}")
         if class_name == "Law":
             objects = Law.objects.filter(formatted=False)
         elif class_name == "LawProject":
@@ -35,7 +39,7 @@ class Command(BaseCommand):
                 corrected_title = text_formatter.format_text(object_title)
                 object.title = corrected_title
             object_summary = object.summary
-            if object_summary:
+            if include_summaries and object_summary:
                 logger.info(f"Correcting summary for {class_name} with id {object.id}")
                 corrected_summary = text_formatter.format_text(object_summary)
                 object.summary = corrected_summary

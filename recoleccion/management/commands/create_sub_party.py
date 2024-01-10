@@ -8,7 +8,16 @@ from django.core.management.base import BaseCommand
 from django.db import transaction
 
 # Components
-from recoleccion.models import Authorship, DeputySeat, Party, PartyDenomination, PartyRelationTypes, SenateSeat, Vote
+from recoleccion.models import (
+    Authorship,
+    DeputySeat,
+    Party,
+    PartyDenomination,
+    PartyLinkingDecision,
+    PartyRelationTypes,
+    SenateSeat,
+    Vote,
+)
 import logging
 
 
@@ -19,7 +28,7 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument("--party-id", type=int)
         parser.add_argument("--sub-party-id", type=int)
-        parser.add_argument("--relation-type", type=str, default=PartyRelationTypes.SUB_PARTY)
+        parser.add_argument("--relation-type", type=str, default=PartyRelationTypes.ALTERNATIVE_DENOMINATION)
 
     def handle(self, *args, **options):
         party_id = options["party_id"]
@@ -36,6 +45,7 @@ class Command(BaseCommand):
         sub_party_deputy_seats = DeputySeat.objects.filter(party_id=sub_party_id)
         sub_party_votes = Vote.objects.filter(party_id=sub_party_id)
         sub_party_autorships = Authorship.objects.filter(party_id=sub_party_id)
+        sub_party_linking_decisions = PartyLinkingDecision.objects.filter(party_id=sub_party_id)
         self.logger.info(f"Updated {len(sub_party_senate_seats)} senate seats")
         sub_party_senate_seats.update(party_id=party_id)
         self.logger.info(f"Updated {len(sub_party_deputy_seats)} deputy seats")
@@ -44,6 +54,8 @@ class Command(BaseCommand):
         sub_party_votes.update(party_id=party_id)
         self.logger.info(f"Updated {len(sub_party_autorships)} authorships")
         sub_party_autorships.update(party_id=party_id)
+        self.logger.info(f"Updated {len(sub_party_linking_decisions)} linking decisions")
+        sub_party_linking_decisions.update(party_id=party_id)
         if not sub_party:
             return
         sub_party.delete()

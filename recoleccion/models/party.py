@@ -10,11 +10,7 @@ from recoleccion.models.law_project import LawProject
 from recoleccion.models.person import Person
 from recoleccion.models.senate_seat import SenateSeat
 from recoleccion.models.vote import Vote
-
-
-class PartyRelationTypes(models.TextChoices):
-    ALTERNATIVE_DENOMINATION = "ALTERNATIVE_DENOMINATION", "Denominación alternativa"
-    SUB_PARTY = "SUB_PARTY", "Sub partido"
+from recoleccion.utils.enums.party_relation_types import PartyRelationTypes
 
 
 class Party(BaseModel):

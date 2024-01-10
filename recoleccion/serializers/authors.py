@@ -25,18 +25,21 @@ class LawProjectAuthorsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Authorship
         fields = ["person", "party", "author_type"]
+        depth = 1
 
     def get_person(self, obj):
         from recoleccion.serializers.persons import PersonModelSerializer
 
         return PersonModelSerializer(obj.person).data
 
-    # def to_representation(self, instance): TODO: definir cómo se devuelve esto
-    #     # we put all the info at the top level
-    #     data = super().to_representation(instance)
-    #     data = {**data, **data.pop("person")}
-    #     data.pop("person")
-    #     return data
+    def to_representation(self, instance):
+        # we put all the info at the top level
+        data = super().to_representation(instance)
+        data = {**data, **data.pop("person")}
+        data.pop("person")
+        data["full_name"] = data["name"] + " " + data["last_name"]
+        data["party"] = data["party"]["main_denomination"]
+        return data
 
 
 class NeuralNetworkAuthorSerializer(serializers.ModelSerializer):

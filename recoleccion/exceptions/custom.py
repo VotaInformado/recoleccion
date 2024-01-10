@@ -83,3 +83,23 @@ class EmptyText(CustomException):
     def __init__(self, project_id: int):
         description = f"The project with id {project_id} has no text"
         super().__init__(self.CODE, self.STATUS_CODE, description)
+
+
+class ProjectOriginFileConflict(CustomException):
+    CODE = "PROJECT_ORIGIN_FILE_CONFLICT"
+    STATUS_CODE = 400
+    DESCRIPTION = "There is a conflict when trying to determine the origin file of the project"
+
+    def __init__(self, project_id: int):
+        description = f"The project with id {project_id} has a conflict between the origin file and the origin chamber"
+        super().__init__(self.CODE, self.STATUS_CODE, description)
+
+
+class NewsProviderLimitReached(CustomException):
+    CODE = "NEWS_PROVIDER_LIMIT_REACHED"
+    STATUS_CODE = 429
+    DESCRIPTION = "The news provider limit has been reached"
+
+    def __init__(self,):
+        description = "The news provider has reached its limit"
+        super().__init__(self.CODE, self.STATUS_CODE, description)

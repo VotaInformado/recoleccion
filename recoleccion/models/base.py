@@ -37,7 +37,12 @@ class BaseModel(models.Model):
         else:
             if cls._meta.unique_together:
                 unique_fields = cls._meta.unique_together[0]
-                filter_kwargs = {field: kwargs[field] for field in unique_fields}
+                filter_kwargs = {}
+                for field in unique_fields:
+                    if field not in kwargs:
+                        continue
+                    else:
+                        filter_kwargs[field] = kwargs[field]
                 instance = cls.objects.filter(**filter_kwargs).first()
             else:
                 instance = None

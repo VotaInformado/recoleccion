@@ -14,3 +14,4 @@ from .senate_seat import SenateSeat
 from .social_data import SocialData
 from .vote import Vote
 from .vote_session import PartyVoteSession, VoteSession
+from .stored_news import StoredNews

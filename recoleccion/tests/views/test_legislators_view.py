@@ -1,6 +1,7 @@
 import random
 from django.core.management import call_command
 from django.db import transaction
+from recoleccion.models.deputy_seat import DeputySeat
 
 # Project
 from recoleccion.models.law_project import LawProject
@@ -91,6 +92,13 @@ class LegislatorViewTestCase(LinkingAPITestCase):
         call_command("loaddata", "person.json")
         call_command("loaddata", "law_project.json")
         chosen_person = Person.objects.first()
+        DeputySeat.objects.create(
+            person_id=chosen_person.pk,
+            district="Province",
+            party_name="A party",
+            start_of_term="2020-01-01",
+            end_of_term="2024-01-01",
+        )
         self.create_votes(EXPECTED_VOTES, chosen_person)
         url = f"/legislators/{chosen_person.pk}/"
         response = self.client.get(url)

@@ -19,7 +19,7 @@ class LegislatorInfoSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
     def get_last_party(self, obj: Person):
-        return obj.last_party.main_denomination
+        return obj.last_party.main_denomination if obj.last_party else None
 
 
 class LegislatorDetailsSerializer(serializers.ModelSerializer):

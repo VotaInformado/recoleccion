@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 # Project
 from recoleccion.models import Person
-from recoleccion.utils.enums.project_chambers import ProjectChambers
+from recoleccion.utils.enums.legislator_seats import LegislatorSeats
 
 
 class PredictionRequestSerializer(serializers.Serializer):
@@ -26,7 +26,10 @@ class PredictionResponseSerializer(serializers.Serializer):
 
 
 class ChamberPredictionRequestSerializer(serializers.Serializer):
-    chamber = serializers.ChoiceField(choices=ProjectChambers.choices, required=False)
+    chamber = serializers.ChoiceField(
+        choices=LegislatorSeats.choices, required=False, allow_null=True
+    )
+
     law_project_id = serializers.IntegerField()
 
 

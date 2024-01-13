@@ -149,7 +149,7 @@ class LawProject(BaseModel):
         elif self.senate_source in ["D", "CD"]:
             # Si en senado, la fuente es D, entonces ingresó por Diputados
             return ProjectChambers.DEPUTIES
-        elif "CD" in self.senate_source:
+        elif self.senate_source and ("CD" in self.senate_source):
             # Casos borde (tal vez conviene corregirlos) con fuente de Senado CDX.
             # Ejemplo: proyecto con senate_project_id 76-CD5-1988
             return ProjectChambers.DEPUTIES

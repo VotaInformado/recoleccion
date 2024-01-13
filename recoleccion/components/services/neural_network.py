@@ -35,6 +35,7 @@ class NeuralNetworkService:
     def get_legislator_request_data(self, prediction_options: dict):
         project_id = prediction_options.get("law_project_id")
         legislator_id = prediction_options.get("person_id")
+
         project = LawProject.objects.get(id=project_id)
         legislator_data = self.get_legislator_data(legislator_id)
         authors_data = self.get_party_authors(project)
@@ -63,10 +64,14 @@ class NeuralNetworkService:
         url = f"{self.base_url}/predict-legislator-vote/"
         data = self.get_legislator_request_data(prediction_options)
         response = requests.post(url, json=data)
+        if response.status_code != 200:
+            raise Exception(response.text)
         return response.json()
 
     def get_chamber_prediction(self, prediction_options: dict):
         url = f"{self.base_url}/predict-project-votes/"
         data = self.get_chamber_request_data(prediction_options)
         response = requests.post(url, json=data)
+        if response.status_code != 200:
+            raise Exception(response.text)
         return response.json()

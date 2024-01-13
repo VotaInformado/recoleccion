@@ -10,7 +10,7 @@ from recoleccion.models import (
     LawProject,
     Person,
 )
-from recoleccion.utils.enums.project_chambers import ProjectChambers
+from recoleccion.utils.enums.legislator_seats import LegislatorSeats
 
 
 class PredictionViewTestCase(APITestCase):
@@ -24,7 +24,11 @@ class PredictionViewTestCase(APITestCase):
             "law_project_id": project_id,
         }
         url = "/predictions/predict-legislator-vote/"
-        with mck.mock_method(requests, "post", return_value=mck.mock_legislator_response(chosen_legislator.pk)):
+        with mck.mock_method(
+            requests,
+            "post",
+            return_value=mck.mock_legislator_response(chosen_legislator.pk),
+        ):
             response = self.client.post(url, payload)
         self.assertEqual(response.status_code, 200)
         response_legislator_id = response.data["legislator"]["id"]
@@ -38,13 +42,15 @@ class PredictionViewTestCase(APITestCase):
 
     def test_chamber_prediction(self):
         project_id = LawProject.objects.first().id
-        chamber = random.choice([ProjectChambers.DEPUTIES, ProjectChambers.SENATORS])
+        chamber = random.choice([LegislatorSeats.DEPUTY, LegislatorSeats.SENATOR])
         payload = {
             "chamber": chamber,
             "law_project_id": project_id,
         }
         url = "/predictions/predict-chamber-vote/"
-        with mck.mock_method(requests, "post", return_value=mck.mock_chamber_response()):
+        with mck.mock_method(
+            requests, "post", return_value=mck.mock_chamber_response()
+        ):
             response = self.client.post(url, payload)
         self.assertEqual(response.status_code, 200)
 
@@ -54,6 +60,8 @@ class PredictionViewTestCase(APITestCase):
             "law_project_id": project_id,
         }
         url = "/predictions/predict-chamber-vote/"
-        with mck.mock_method(requests, "post", return_value=mck.mock_chamber_response()):
+        with mck.mock_method(
+            requests, "post", return_value=mck.mock_chamber_response()
+        ):
             response = self.client.post(url, payload)
         self.assertEqual(response.status_code, 200)

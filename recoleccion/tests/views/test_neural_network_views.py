@@ -218,7 +218,7 @@ class NeuralNetworkDataTestCase(APITestCase):
     def test_retrieving_all_projects_for_neural_network(self):
         PAGE_SIZE = 1000
         EXPECTED_COLUMNS = {
-            "project": str,
+            "project_id": str,
             "project_title": str,
             "project_text": str,
             "project_year": int | np.integer,
@@ -248,7 +248,7 @@ class NeuralNetworkDataTestCase(APITestCase):
         TOTAL_PROJECTS = 3000
         NEW_PROJECTS = 2000  # Page size is 1000 by default
         EXPECTED_COLUMNS = {
-            "project": str,
+            "project_id": str,
             "project_title": str,
             "project_text": str,
             "project_year": int | np.integer,

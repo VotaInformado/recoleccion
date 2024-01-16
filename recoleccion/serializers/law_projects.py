@@ -92,7 +92,7 @@ class NeuralNetworkProjectSerializer(serializers.ModelSerializer):
     def get_project_text(self, obj: LawProject):
         # If the project has no text, return a dot because the neural network
         # can't predict without text
-        return obj.text or "."
+        return obj.text or "_"
 
 
 class FittingDataValidationSerializer(serializers.Serializer):

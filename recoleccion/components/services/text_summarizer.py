@@ -41,6 +41,6 @@ class TextSummarizer:
         response = requests.post(cls.SUMMARIZER_URL, headers=cls.BASE_HEADERS, json=payload)
         try:
             response_content = response.json()["content"][0]["text"]
-            return response_content
+            return response_content.strip()
         except Exception as e:
             raise TextSummarizerException(e)

@@ -174,12 +174,15 @@ class GovernmentLawSource(DataSource):
     @classmethod
     def _get_law_title(cls, row):
         description_element = row.find("td", {"class": "descripcion"})
-        title_element = description_element.find("h3")
-        title = title_element.text.strip()
+        desc_element = description_element.find("h3")
+        desc_text = desc_element.text.strip()
+        label_element = description_element.find("div", {"class": "label label-default"})
+        label_text = label_element.text.strip()
+        title = label_text if len(label_text) > len(desc_text) else desc_text
         return title
 
     @classmethod
-    def get_page_data(cls, page: int):
+    def get_page_data(cls, page: int, titles_only):
         page_data = []
         response = cls._make_page_request(page)
         data = response.content
@@ -191,10 +194,14 @@ class GovernmentLawSource(DataSource):
                 logger.warning("Unable to retrieve law's number skipping...")
             if not law_link:
                 logger.warning(f"Unable to retrieve link for law {law_number}, skipping...")
+            law_title = cls._get_law_title(row)
+            if titles_only:
+                law_info = {"law_number": law_number, "title": law_title}
+                page_data.append(law_info)
+                continue
             publication_date = cls._get_publication_date(row)
             law_summary = cls._get_law_summary(law_link)
             law_text = cls._get_law_text(law_link)
-            law_title = cls._get_law_title(row)
             law_info = {
                 "law_number": law_number,
                 "publication_date": publication_date,

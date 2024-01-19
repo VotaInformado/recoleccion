@@ -18,13 +18,14 @@ class Command(PageThreadedCommand):
     def add_arguments(self, parser):
         super().add_arguments(parser)
         parser.add_argument("--starting-page", type=int, default=1)
+        parser.add_argument("--titles-only", type=bool, default=False)
 
-    def main_function(self, starting_page: int, step_size: int):
+    def main_function(self, starting_page: int, step_size: int, titles_only: bool):
         writer = LawsWriter()
         page = starting_page
         while page <= self.LAST_PAGE:
             logger.info(f"Getting page {page}")
-            laws: pd.DataFrame = GovernmentLawSource.get_page_data(page)
+            laws: pd.DataFrame = GovernmentLawSource.get_page_data(page, titles_only)
             if laws.empty:
                 self.save_missing_record(page)
             writer.write(laws)

@@ -56,11 +56,11 @@ class Person(BaseModel):
         last_deputy_seat = self.deputy_seats.order_by("-end_of_term").first()
         last_senate_seat = self.senate_seats.order_by("-end_of_term").first()
         if not last_deputy_seat:
-            return last_senate_seat.party
+            return last_senate_seat.party if last_senate_seat else None
         if not last_senate_seat:
             return last_deputy_seat.party
         if last_deputy_seat.end_of_term > last_senate_seat.end_of_term:
             last_party = last_deputy_seat.party
         else:
-            last_party = last_senate_seat.party
+            last_party = last_senate_seat.party if last_senate_seat else None
         return last_party

@@ -37,6 +37,20 @@ services:
     ports:
       - "5433:5432"
 
+  scheduler.recoleccion:
+    build:
+      context: .
+      dockerfile: ./compose/local/django/Dockerfile
+    image: vi-recoleccion-django
+    volumes:
+      - .:/app
+    env_file:
+      - ./.envs/.local/.django
+      - ./.envs/.local/.postgres
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    command: /start_scheduler
+
 networks:
   default:
       name: vi-network

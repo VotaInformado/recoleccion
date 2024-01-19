@@ -177,7 +177,7 @@ class GovernmentLawSource(DataSource):
         desc_element = description_element.find("h3")
         desc_text = desc_element.text.strip()
         label_element = description_element.find("div", {"class": "label label-default"})
-        label_text = label_element.text.strip()
+        label_text = label_element.text.strip() if label_element else ""
         title = label_text if len(label_text) > len(desc_text) else desc_text
         return title
 

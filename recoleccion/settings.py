@@ -58,6 +58,7 @@ DJANGO_APPS = [
     "drf_yasg",
     "corsheaders",
     "django_filters",
+    "django_apscheduler",
 ]
 
 LOCAL_APPS = [

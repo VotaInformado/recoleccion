@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 
-class NewsRequestSerializer(serializers.Serializer):
+class GeneralNewsRequestSerializer(serializers.Serializer):
     max_news = serializers.IntegerField(required=False, default=10)
 
 
@@ -11,10 +11,23 @@ class NewsSerializer(serializers.Serializer):
     video_url = serializers.CharField()
     # content = serializers.CharField()
     image_url = serializers.CharField()
-    pubDate = serializers.CharField()
+    date = serializers.CharField(source="pubDate")
     description = serializers.CharField()
     source_id = serializers.CharField()  # nos sirve para saber qué fuentes filtrar
 
 
-class NewsResponseSerializer(serializers.ListSerializer):
+class GeneralNewsResponseSerializer(serializers.ListSerializer):
     child = NewsSerializer()
+
+
+class LegislatorNewsSerializer(serializers.Serializer):
+    title = serializers.CharField()
+    link = serializers.CharField()
+    description = serializers.CharField(source="snippet")
+    date = serializers.CharField()
+    image_url = serializers.CharField(source="imageUrl")
+    source = serializers.CharField()
+
+
+class LegislatorNewsResponseSerializer(serializers.ListSerializer):
+    child = LegislatorNewsSerializer()

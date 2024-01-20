@@ -1,18 +1,24 @@
 # Django rest framework
-from rest_framework import viewsets, mixins
+from rest_framework import mixins, status, viewsets
+from rest_framework.response import Response
+from rest_framework.decorators import action
+from drf_yasg.utils import swagger_auto_schema
+from recoleccion.components.services.news.news_provider import NewsProvider
 
 # Project
+from recoleccion.models.person import Person
+from recoleccion.models.vote import Vote
+from recoleccion.models.law_project import LawProject
+from recoleccion.serializers.news import LegislatorNewsResponseSerializer
+from recoleccion.serializers.votes import VoteModelSerializer
+from recoleccion.serializers.law_projects import LawProjectListSerializer
 from recoleccion.models.authorship import Authorship
 from recoleccion.serializers.legislators import (
     LegislatorDetailsSerializer,
     LegislatorInfoSerializer,
     NeuralNetworkLegislatorSerializer,
 )
-from recoleccion.models.person import Person
-from recoleccion.models.vote import Vote
-from recoleccion.models.law_project import LawProject
-from recoleccion.serializers.votes import VoteModelSerializer
-from recoleccion.serializers.law_projects import LawProjectListSerializer
+from recoleccion.utils.documentation import LEGISLATORS_NEWS_DESCRIPTION
 
 
 class LegislatorsViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
@@ -27,6 +33,19 @@ class LegislatorsViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.
     search_fields = ["name", "last_name"]
     filterset_fields = ["is_active", "last_seat"]
     ordering_fields = ["name", "last_name", "last_seat", "is_active"]
+
+    @swagger_auto_schema(
+        methods=["get"],
+        responses={status.HTTP_200_OK: LegislatorNewsResponseSerializer},
+        operation_description=LEGISLATORS_NEWS_DESCRIPTION,
+    )
+    @action(detail=True, methods=["get"], url_path="news")
+    def get_legislator_news(self, request, pk=None):
+        legislator: Person = self.get_object()
+        legislator_news = NewsProvider.get_legislator_news(legislator)
+        response = LegislatorNewsResponseSerializer(legislator_news).data
+        return Response(response)
+
 
 class LegislatorVotesViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
     serializer_class = VoteModelSerializer

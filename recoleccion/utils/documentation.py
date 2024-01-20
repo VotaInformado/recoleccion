@@ -8,4 +8,10 @@ PREDICTION_ENDPOINT_DESCRIPTION = """
 
 
 TEXT_SUMMARIZATION_DESCRIPTION = """
-    Endpoint that generates a summary of a law project text"""
+    Endpoint that generates a summary of a law project text
+"""
+
+
+LEGISLATORS_NEWS_DESCRIPTION = """
+    Endpoint that returns the news of a given legislator, searched by its full name
+"""

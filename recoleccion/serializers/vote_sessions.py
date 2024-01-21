@@ -14,6 +14,7 @@ class BaseVoteSessionSerializer(serializers.Serializer):
 
 
 class PartyVoteSessionSerializer(BaseVoteSessionSerializer):
+    id = serializers.IntegerField()
     title = serializers.CharField()
     total_votes = serializers.IntegerField()
 

@@ -29,11 +29,15 @@ class LegislatorDetailsSerializer(serializers.ModelSerializer):
     projects = serializers.SerializerMethodField()
     affidavits = serializers.SerializerMethodField()
     last_party = serializers.SerializerMethodField()
+    picture_url = serializers.SerializerMethodField()
 
     class Meta:
         model = Person
         fields = "__all__"
         read_only_fields = ["id"]
+
+    def get_picture_url(self, obj):
+        return obj.social_data.picture_url if obj.social_data else None
 
     def get_votes(self, obj):
         from django.db.models import Count, Q

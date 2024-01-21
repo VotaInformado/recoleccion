@@ -10,6 +10,7 @@ from recoleccion.serializers.vote_sessions import VoteSessionSerializer
 
 class LawProjectListSerializer(serializers.ModelSerializer):
     year = serializers.SerializerMethodField()
+    party_authors = serializers.SerializerMethodField()
 
     class Meta:
         model = LawProject
@@ -18,6 +19,11 @@ class LawProjectListSerializer(serializers.ModelSerializer):
 
     def get_year(self, obj: LawProject):
         return obj.get_year()
+    
+    def get_party_authors(self, obj: LawProject):
+        authors = Authorship.objects.filter(project=obj)
+        parties = authors.values_list("party_name", flat=True).distinct()
+        return list(parties)
 
 
 class LawProjectRetrieveSerializer(serializers.ModelSerializer):

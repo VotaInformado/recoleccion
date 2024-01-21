@@ -31,7 +31,6 @@ class PersonLinker(Linker):
     def get_canonical_data(self) -> dict:
         if self.use_alternative_names or True:
             return self._get_canonical_data_alternative_format()
-        return self._get_canonical_data()
 
     def _get_canonical_data(self) -> dict:
         all_persons = Person.objects.all().order_by("id")

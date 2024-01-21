@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
-
+import ast
 import os
 from pathlib import Path
 
@@ -216,6 +216,6 @@ SUMMARIZER_API_KEY = config.get("SUMMARIZER_API_KEY")
 SUMMARIZER_URL = config.get("SUMMARIZER_URL")
 
 # News
-LEGISLATOR_NEWS_ENABLED = config.get("LEGISLATOR_NEWS_ENABLED", False)
+LEGISLATOR_NEWS_ENABLED = ast.literal_eval(config.get("LEGISLATOR_NEWS_ENABLED", "False"))
 GLOBAL_NEWS_PROVIDER_API_KEY = config.get("GLOBAL_NEWS_PROVIDER_API_KEY")
 LEGISLATOR_NEWS_PROVIDER_API_KEY = config.get("LEGISLATOR_NEWS_PROVIDER_API_KEY")

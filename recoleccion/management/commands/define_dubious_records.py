@@ -11,12 +11,8 @@ logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
-    def print_comparison(self, pending_decision: LinkingDecision):
-        pass
-
     def ask_for_user_decision(self, pending_decision: LinkingDecision) -> str:
         logger.info(f"Pending decision: {pending_decision}")
-        self.print_comparison(pending_decision)
         while True:
             user_response = input("Make your decision: y(yes), n(no), s(skip): ")
             if user_response == "y":

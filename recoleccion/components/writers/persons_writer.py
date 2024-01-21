@@ -1,9 +1,12 @@
 import pandas as pd
 import numpy as np
+import logging
 
 # Project
 from recoleccion.models import Person, SocialData
 from .writer import Writer
+
+logger = logging.getLogger(__name__)
 
 
 class PersonsWriter(Writer):
@@ -15,14 +18,14 @@ class PersonsWriter(Writer):
         # Aca pueden quedar personas duplicadas entre sí, pero escritas distintas
         # Se puede usar Dedupe.
         missing_persons = missing_persons.drop_duplicates(subset=["name", "last_name"], keep="last")
-        cls.logger.info(f"{len(missing_persons)} new persons will be written to the database")
+        logger.info(f"{len(missing_persons)} new persons will be written to the database")
         return missing_persons
 
     @classmethod
     def get_existing_persons(cls, data: pd.DataFrame):
         existing_persons = data[data["person_id"].notnull()]
         existing_persons = existing_persons.drop_duplicates(subset=["person_id"], keep="last")
-        cls.logger.info(f"{len(existing_persons)} persons will be updated in the database")
+        logger.info(f"{len(existing_persons)} persons will be updated in the database")
         return existing_persons
 
     @classmethod
@@ -33,11 +36,11 @@ class PersonsWriter(Writer):
                 person.is_active = False
                 person.save()
                 deactivated_persons += 1
-        cls.logger.info(f"{deactivated_persons} persons were deactivated")
+        logger.info(f"{deactivated_persons} persons were deactivated")
 
     @classmethod
     def write(cls, data: pd.DataFrame, add_social_data=False, update_active_persons=False):
-        cls.logger.info(f"Received {len(data)} persons to write")
+        logger.info(f"Received {len(data)} persons to write")
         modified_persons = []
         missing_persons = cls.get_missing_persons(data)
         existing_persons = cls.get_existing_persons(data)
@@ -108,3 +111,28 @@ class PersonsWriter(Writer):
                 info["is_active"] = is_active
             info["last_seat"] = row["seat_type"]
         return Person.update_or_raise(**info)
+
+    @classmethod
+    def update_social_data(cls, data: pd.DataFrame):
+        data = data.reset_index(drop=True)
+        data = data.replace({pd.NA: None, np.nan: None})
+        data = data.drop(columns="full_name")
+        data = data.rename(columns={"name": "person_name", "last_name": "person_last_name"})
+        created_associated = created_disassociated = updated = 0
+        for _, row in data.iterrows():
+            row_data = row.to_dict()
+            row_data.pop("index")
+            if not row_data["person_id"]:
+                SocialData.objects.create(**row_data)
+                created_disassociated += 1
+            else:
+                social_data = SocialData.objects.filter(person_id=row_data["person_id"]).first()
+                if social_data:
+                    social_data.update(**row_data)
+                    updated += 1
+                else:
+                    SocialData.objects.create(**row_data)
+                    created_associated += 1
+        logger.info(f"{created_associated} social data rows were created associated to a person")
+        logger.info(f"{created_disassociated} social data rows were created disassociated")
+        logger.info(f"{updated} social data rows were updated")

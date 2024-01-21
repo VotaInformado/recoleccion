@@ -6,6 +6,7 @@ from recoleccion.models.affidavit_entry import AffidavitEntry
 
 # Project
 from recoleccion.models.base import BaseModel
+from recoleccion.models.social_data import SocialData
 from recoleccion.utils.enums.linking_decision_options import LinkingDecisionOptions
 from recoleccion.models.vote import Vote
 from recoleccion.models.authorship import Authorship
@@ -57,6 +58,8 @@ class LinkingDecision(BaseModel):
         self._update_records(related_deputy_seats)
         related_affidavits = AffidavitEntry.objects.filter(linking_id=self.uuid).all()
         self._update_records(related_affidavits)
+        related_social_data = SocialData.objects.filter(linking_id=self.uuid).all()
+        self._update_records(related_social_data)
         total_updated = (
             related_votes.count()
             + related_authors.count()
@@ -77,6 +80,8 @@ class LinkingDecision(BaseModel):
         related_deputy_seats.update(linking_id=None)
         related_affidavits = AffidavitEntry.objects.filter(linking_id=self.uuid).all()
         related_affidavits.update(linking_id=None)
+        related_social_data = SocialData.objects.filter(linking_id=self.uuid).all()
+        related_social_data.update(linking_id=None)
         total_updated = (
             related_votes.count()
             + related_authors.count()

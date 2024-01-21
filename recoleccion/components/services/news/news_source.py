@@ -90,7 +90,7 @@ class LegislatorNewsSource:
     @classmethod
     def fetch_legislator_news(cls, legislator_name: str):
         if not settings.LEGISLATOR_NEWS_ENABLED:
-            return DEFAULT_LEGISLATOR_NEWS
+            return []
         payload = json.dumps({"q": legislator_name, "gl": "ar", "hl": "es"})
         headers = {"X-API-KEY": settings.LEGISLATOR_NEWS_PROVIDER_API_KEY, "Content-Type": "application/json"}
         logger.info(f"Searching news for legislator {legislator_name}")

@@ -61,8 +61,8 @@ class LawsProjectWriter(TestCase):
         self.assertEqual(law_project.publication_date, None)
 
     def test_format_year_parses_correctly_two_digit_year(self):
-        year_above_2000 = LawProjectsWriter.format_year("20")
-        year_before_2000 = LawProjectsWriter.format_year("97")
+        year_above_2000 = LawProject.format_year("20")
+        year_before_2000 = LawProject.format_year("97")
         self.assertEqual(year_above_2000, 2020)
         self.assertEqual(year_before_2000, 1997)
 
@@ -71,27 +71,27 @@ class LawsProjectWriter(TestCase):
         self.assertEqual(year, 2003)
 
     def test_format_year_parses_correctly_four_digit_year(self):
-        year_above_2000 = LawProjectsWriter.format_year("2013")
-        year_before_2000 = LawProjectsWriter.format_year("1988")
+        year_above_2000 = LawProject.format_year("2013")
+        year_before_2000 = LawProject.format_year("1988")
         self.assertEqual(year_above_2000, 2013)
         self.assertEqual(year_before_2000, 1988)
 
     def test_format_year_parses_correctly_year_with_leading_zeros(self):
-        year_above_2000 = LawProjectsWriter.format_year("013")
-        year_before_2000 = LawProjectsWriter.format_year("090")
+        year_above_2000 = LawProject.format_year("013")
+        year_before_2000 = LawProject.format_year("090")
         self.assertEqual(year_above_2000, 2013)
         self.assertEqual(year_before_2000, 1990)
 
     def test_format_year_all_two_digits_years_are_parsed_correctly(self):
         for year in range(1980, 2023):
             year_str = str(year)[-2:]
-            year_formatted = LawProjectsWriter.format_year(year_str)
+            year_formatted = LawProject.format_year(year_str)
             self.assertEqual(year_formatted, year)
 
     def test_format_year_all_four_digit_years_are_parsed_correctly(self):
         for year in range(1980, 2023):
             year_str = str(year)
-            year_formatted = LawProjectsWriter.format_year(year_str)
+            year_formatted = LawProject.format_year(year_str)
             self.assertEqual(year_formatted, year)
 
 

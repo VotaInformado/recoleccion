@@ -12,19 +12,6 @@ class LawProjectsWriter(Writer):
     model = LawProject
 
     @classmethod
-    def format_year(cls, project_id: str):
-        if not project_id:
-            return None
-        project_year = re.split("-|/", project_id)[-1]
-        year = int(project_year)
-        if year < 50:
-            return year + 2000
-        if year < 100:
-            return year + 1900
-
-        return int(project_year)
-
-    @classmethod
     def write(cls, data: pd.DataFrame, update_existing=True):
         cls.logger.info(f"Received {len(data)} law projects to write...")
         written, updated = [], []
@@ -62,12 +49,12 @@ class LawProjectsWriter(Writer):
         law = row.get("law", None)
         row = row.drop("law", errors="ignore")
         deputies_number, deputies_source, deputies_year = LawProject.split_id(deputies_project_id)
-        deputies_year = cls.format_year(deputies_project_id)
+        deputies_year = LawProject.format_year(deputies_project_id)
         senate_number, senate_source, senate_year = LawProject.split_id(senate_project_id)
         if not deputies_number and not senate_number:
             # We skip
             return None, False
-        senate_year = cls.format_year(senate_project_id)
+        senate_year = LawProject.format_year(senate_project_id)
         row.update(
             {
                 "deputies_project_id": f"{deputies_number}-{deputies_source}-{deputies_year}"

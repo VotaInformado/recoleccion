@@ -115,7 +115,17 @@ class LawProject(BaseModel):
         return project_summary
 
     @classmethod
-    def split_id(self, project_id: str):
+    def format_year(cls, year: int | str):
+        year = int(year)
+        if year < 50:
+            return year + 2000
+        if year < 100:
+            return year + 1900
+
+        return year
+
+    @classmethod
+    def split_id(cls, project_id: str):
         if project_id is None:
             return None, None, None
         comps = project_id.split("-")
@@ -125,11 +135,11 @@ class LawProject(BaseModel):
         elif len(comps) == 3:
             num, source, year = comps
         else:
-            self.logger.info(f"Invalid project id: {project_id}")
+            # self.logger.info(f"Invalid project id: {project_id}")
             return None, None, None
         num = int(num)
         source = source.upper() if source else None
-        year = int(year)
+        year = cls.format_year(year)
         return num, source, year
 
     def get_origin_chamber(self):

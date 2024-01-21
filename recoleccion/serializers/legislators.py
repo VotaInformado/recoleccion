@@ -1,8 +1,9 @@
 # Django REST Framework
 from rest_framework import serializers
+from django.core.exceptions import ObjectDoesNotExist
 
 # Project
-from recoleccion.models.person import Person
+from recoleccion.models import Person, SocialData
 from recoleccion.serializers.affidavits import AffidavitBasicSerializer
 from recoleccion.serializers.deputies import ReducedDeputySeatSerializer
 from recoleccion.serializers.senate import ReducedSenateSeatSerializer
@@ -37,7 +38,10 @@ class LegislatorDetailsSerializer(serializers.ModelSerializer):
         read_only_fields = ["id"]
 
     def get_picture_url(self, obj):
-        return obj.social_data.picture_url if obj.social_data else None
+        try:
+            return obj.social_data.picture_url
+        except ObjectDoesNotExist:
+            return None
 
     def get_votes(self, obj):
         from django.db.models import Count, Q

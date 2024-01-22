@@ -14,6 +14,13 @@ from recoleccion.utils.enums.legislator_seats import LegislatorSeatSerializer
 class LegislatorInfoSerializer(serializers.ModelSerializer):
     last_seat = LegislatorSeatSerializer()
     last_party = serializers.SerializerMethodField()
+    picture_url = serializers.SerializerMethodField()
+
+    def get_picture_url(self, obj):
+        try:
+            return obj.social_data.picture_url
+        except ObjectDoesNotExist:
+            return None
 
     class Meta:
         model = Person

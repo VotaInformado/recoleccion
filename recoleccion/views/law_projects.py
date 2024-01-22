@@ -18,7 +18,9 @@ from recoleccion.models import LawProject, Vote
 from recoleccion.utils.documentation import TEXT_SUMMARIZATION_DESCRIPTION
 
 
-class LawProjectsViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
+class LawProjectsViewSet(
+    viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin
+):
     def get_serializer_class(self):
         if self.action == "list":
             return LawProjectListSerializer
@@ -26,7 +28,7 @@ class LawProjectsViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.
             return LawProjectRetrieveSerializer
 
     queryset = LawProject.objects.order_by("id").all()
-    search_fields = ["title"]
+    search_fields = ["title", "deputies_project_id", "senate_project_id"]
     filterset_fields = {
         "origin_chamber": ["exact"],
         "status": ["in"],

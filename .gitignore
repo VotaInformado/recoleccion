@@ -159,6 +159,6 @@ deploy.zip
 
 .python-version
 
-.envs/.local/
+.envs/
 
 *.zip

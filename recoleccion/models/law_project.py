@@ -27,7 +27,9 @@ class LawProject(BaseModel):
     title = models.TextField()
     # no tiene resumen en principio
     publication_date = models.DateField(null=True)
-    status = models.CharField(choices=ProjectStatus.choices, max_length=30, null=True)
+    status = models.CharField(
+        choices=ProjectStatus.choices, max_length=30, default=ProjectStatus.ORIGIN_CHAMBER_COMISSION
+    )
     source = models.CharField(max_length=100, null=True)
     text = models.TextField(null=True)
     link = models.CharField(max_length=250, null=True)

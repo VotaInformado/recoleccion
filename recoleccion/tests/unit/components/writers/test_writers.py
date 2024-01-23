@@ -1,6 +1,5 @@
 from django.test import TestCase
 from recoleccion.models import LawProject
-from recoleccion.components.writers.law_projects_writer import LawProjectsWriter
 
 
 class LawsProjectWriter(TestCase):
@@ -67,7 +66,7 @@ class LawsProjectWriter(TestCase):
         self.assertEqual(year_before_2000, 1997)
 
     def test_format_year_parses_correctly_one_digit_year(self):
-        year = LawProjectsWriter.format_year("3")
+        year = LawProject.format_year("3")
         self.assertEqual(year, 2003)
 
     def test_format_year_parses_correctly_four_digit_year(self):

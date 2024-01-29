@@ -43,6 +43,7 @@ ALLOWED_HOSTS = [
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://votainformado-staging.s3-website-sa-east-1.amazonaws.com",
+    "https://web-92roqeult-manusturlas-projects.vercel.app",
 ]
 
 

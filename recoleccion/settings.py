@@ -43,7 +43,7 @@ ALLOWED_HOSTS = [
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://votainformado-staging.s3-website-sa-east-1.amazonaws.com",
-    "https://web-92roqeult-manusturlas-projects.vercel.app",
+    "https://web-plum-one.vercel.app",
 ]
 
 
@@ -173,7 +173,10 @@ LOGGING = {
     "disable_existing_loggers": False,
     "filters": {"require_debug_false": {"()": "django.utils.log.RequireDebugFalse"}},
     "formatters": {
-        "verbose": {"format": "%(levelname)s %(asctime)s %(module)s " "%(process)d %(thread)d %(message)s"},
+        "verbose": {
+            "format": "%(levelname)s %(asctime)s %(module)s "
+            "%(process)d %(thread)d %(message)s"
+        },
         "colored_formatter": {
             "()": "colorlog.ColoredFormatter",
             "format": "\n%(log_color)s%(levelname)-8s%(white)s(%(threadName)s) %(message)s",
@@ -217,6 +220,8 @@ SUMMARIZER_API_KEY = config.get("SUMMARIZER_API_KEY")
 SUMMARIZER_URL = config.get("SUMMARIZER_URL")
 
 # News
-LEGISLATOR_NEWS_ENABLED = ast.literal_eval(config.get("LEGISLATOR_NEWS_ENABLED", "False"))
+LEGISLATOR_NEWS_ENABLED = ast.literal_eval(
+    config.get("LEGISLATOR_NEWS_ENABLED", "False")
+)
 GLOBAL_NEWS_PROVIDER_API_KEY = config.get("GLOBAL_NEWS_PROVIDER_API_KEY")
 LEGISLATOR_NEWS_PROVIDER_API_KEY = config.get("LEGISLATOR_NEWS_PROVIDER_API_KEY")

@@ -17,10 +17,7 @@ class LegislatorInfoSerializer(serializers.ModelSerializer):
     picture_url = serializers.SerializerMethodField()
 
     def get_picture_url(self, obj):
-        try:
-            return obj.social_data.picture_url
-        except ObjectDoesNotExist:
-            return None
+        return obj.picture_url
 
     class Meta:
         model = Person
@@ -45,10 +42,7 @@ class LegislatorDetailsSerializer(serializers.ModelSerializer):
         read_only_fields = ["id"]
 
     def get_picture_url(self, obj):
-        try:
-            return obj.social_data.picture_url
-        except ObjectDoesNotExist:
-            return None
+        return obj.picture_url
 
     def get_votes(self, obj):
         from django.db.models import Count, Q

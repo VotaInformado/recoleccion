@@ -30,7 +30,6 @@ class LawProject(BaseModel):
     status = models.CharField(
         choices=ProjectStatus.choices, max_length=30, default=ProjectStatus.ORIGIN_CHAMBER_COMISSION
     )
-    source = models.CharField(max_length=100, null=True)
     text = models.TextField(null=True)
     link = models.CharField(max_length=250, null=True)
     summary = models.TextField(null=True)

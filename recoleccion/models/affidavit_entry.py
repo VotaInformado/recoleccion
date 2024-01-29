@@ -12,7 +12,6 @@ class AffidavitEntry(BaseModel):
     year = models.IntegerField()
     affidavit_type = models.CharField(choices=AffidevitType.choices, max_length=10)
     value = models.DecimalField(max_digits=20, decimal_places=2)
-    source = models.CharField(max_length=255)
     # details = models.TextField(null=True, blank=True)
 
     class Meta:

@@ -26,7 +26,6 @@ class Vote(BaseModel):
         max_length=200, null=True, help_text="Reference in case of not finding the project or law"
     )
     reference_description = models.TextField(null=True)
-    source = models.CharField(max_length=100, null=True)
     vote_type = models.CharField(choices=VoteTypes.choices, max_length=10, default=VoteTypes.OTHER)
 
     def save(self, *args, **kwargs):

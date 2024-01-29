@@ -1,6 +1,7 @@
 # Django
 from django.db import models
 from django.core.validators import MinLengthValidator
+from django.core.exceptions import ObjectDoesNotExist
 
 # Base model
 from recoleccion.models.base import BaseModel
@@ -65,3 +66,10 @@ class Person(BaseModel):
         else:
             last_party = last_senate_seat.party if last_senate_seat else None
         return last_party
+
+    @property
+    def picture_url(self):
+        try:
+            return self.social_data.picture_url
+        except ObjectDoesNotExist:
+            return None

@@ -171,6 +171,7 @@ class PartiesViewTestCase(APITestCase):
         law_projects = response.json()["results"]
         self.assertEqual(len(law_projects), MAX_RESULTS)
         for retrieved_project in law_projects:
+            import pdb; pdb.set_trace()
             self.assertIn(retrieved_project["title"], self.chosen_project_titles)
             self.assertEqual(retrieved_project["total_votes"], TOTAL_VOTES)
 

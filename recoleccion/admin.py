@@ -1,8 +1,19 @@
 # Django
 from django.contrib import admin
+from django.core.exceptions import ObjectDoesNotExist
 
 # Project
-from recoleccion.models import Party, PartyDenomination, SenateSeat, DeputySeat, Vote, Authorship, PartyLinkingDecision
+from recoleccion.models import (
+    Authorship,
+    DeputySeat,
+    Party,
+    PartyDenomination,
+    PartyLinkingDecision,
+    Person,
+    SenateSeat,
+    SocialData,
+    Vote,
+)
 from recoleccion.utils.enums.party_relation_types import PartyRelationTypes
 from django.db import IntegrityError
 
@@ -86,3 +97,25 @@ class PartyAdmin(admin.ModelAdmin):
         self.message_user(request, f"Deleted sub party {sub_party.main_denomination}", level="INFO")
 
     create_sub_party.short_description = "Crear sub partido"
+
+
+@admin.register(Person)
+class PersonAdmin(admin.ModelAdmin):
+    list_display = ["id", "name", "last_name", "display_image_url"]
+    list_filter = ["id", "name", "last_name"]
+    search_fields = ["id", "name", "last_name"]
+
+    actions = ["add_image"]
+
+    def display_image_url(self, obj):
+        return obj.social_data.picture_url if obj.social_data else None
+
+    def add_image(self, request, queryset):
+        for person in queryset:
+            picture_url = input(f"Ingrese la url de la imagen de {person.full_name}: ")
+            try:
+                person.social_data.picture_url = picture_url
+                person.social_data.save()
+            except ObjectDoesNotExist:
+                SocialData.objects.create(person=person, picture_url=picture_url)
+

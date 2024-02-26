@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
+
 import ast
 import os
 from pathlib import Path
@@ -44,6 +45,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://votainformado-staging.s3-website-sa-east-1.amazonaws.com",
     "https://web-plum-one.vercel.app",
+    "https://www.votainformado.com.ar",
 ]
 
 

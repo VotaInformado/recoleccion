@@ -35,6 +35,7 @@ from recoleccion.views.parties import (
 )
 from recoleccion.views.votes import NeuralNetworkVotesViewSet
 from recoleccion.views.authors import NeuralNetworkAuthorsViewSet
+from recoleccion.views.certificateValidation import read_file
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -103,8 +104,12 @@ network_router = SimpleRouter()
 
 network_router.register(r"votes", NeuralNetworkVotesViewSet, basename="votes")
 network_router.register(r"authors", NeuralNetworkAuthorsViewSet, basename="authors")
-network_router.register(r"law-projects", NeuralNetworkProjectsViewSet, basename="law-projects")
-network_router.register(r"legislators", NeuralNetworkLegislatorViewSet, basename="legislators")
+network_router.register(
+    r"law-projects", NeuralNetworkProjectsViewSet, basename="law-projects"
+)
+network_router.register(
+    r"legislators", NeuralNetworkLegislatorViewSet, basename="legislators"
+)
 network_router.register(r"parties", PartiesViewSet, basename="parties")
 
 news_router = SimpleRouter()
@@ -132,5 +137,8 @@ urlpatterns = [
         schema_view.with_ui("swagger", cache_timeout=0),
         name="schema-swagger-ui",
     ),
-    path("swagger.json", schema_view.without_ui(cache_timeout=0), name="schema-json"),  # To download the swagger.json
+    path(
+        "swagger.json", schema_view.without_ui(cache_timeout=0), name="schema-json"
+    ),  # To download the swagger.json
+    path("/.well-known/pki-validation/74B3E853F16E32C8F625E917F6157A17.txt", read_file),
 ]

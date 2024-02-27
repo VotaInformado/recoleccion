@@ -140,5 +140,5 @@ urlpatterns = [
     path(
         "swagger.json", schema_view.without_ui(cache_timeout=0), name="schema-json"
     ),  # To download the swagger.json
-    path("/.well-known/pki-validation/74B3E853F16E32C8F625E917F6157A17.txt", read_file),
+    path(".well-known/pki-validation/74B3E853F16E32C8F625E917F6157A17.txt", read_file),
 ]

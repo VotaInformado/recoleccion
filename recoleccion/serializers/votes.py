@@ -21,10 +21,18 @@ class VoteModelSerializer(serializers.ModelSerializer):
 class LegislatorVoteSerializer(serializers.ModelSerializer):
     project = LawProjectBasicInfoSerializer()
     project_id = serializers.SerializerMethodField()
+    reference = serializers.SerializerMethodField()
 
     class Meta:
         model = Vote
         fields = ["project_id", "project", "vote", "date", "chamber"]
+
+    def get_reference(self, obj: Vote):
+        if obj.project:
+            return None
+        reference_id = obj.reference
+        reference_description = obj.reference_description
+        return f"{reference_id} - {reference_description}"
 
     def get_project_id(self, obj: Vote):
         if not obj.project:
@@ -40,7 +48,8 @@ class LegislatorVoteSerializer(serializers.ModelSerializer):
         if project_id:
             data["project"]["project_id"] = project_id
         else:
-            data["project"] = None
+            data["project"]["project_id"] = None
+            data["project"]["reference"] = data.pop("reference")
         return data
 
 

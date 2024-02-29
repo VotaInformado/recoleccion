@@ -30,14 +30,8 @@ def is_internal_mock_enabled():
 
 def mock_method(mocked_class, method_name, return_value=None, new_callable=None):
     """Mocks a method of a class"""
-    mocked_class_name = mocked_class.__name__
-    if is_internal_mock_enabled():
-        patcher = patch.object(mocked_class, method_name, return_value=return_value, new_callable=new_callable)
-        return patcher
-    else:
-        # This function needs to return a context manager, so this must be used
-        patcher = patch.object(FakeClass, "fake_method", return_value=return_value)
-        return patcher
+    patcher = patch.object(mocked_class, method_name, return_value=return_value, new_callable=new_callable)
+    return patcher
 
 
 def mock_method_side_effect(mocked_class, method_name, side_effect, autospec=True):

@@ -1,6 +1,5 @@
 # Django rest framework
 from typing import List
-from rest_framework.response import Response
 from rest_framework import viewsets, mixins
 from django.db.models import Q, Count, Max
 
@@ -19,13 +18,14 @@ from recoleccion.serializers.parties import (
 # Models
 from recoleccion.models import Party, Authorship, LawProject, Person
 from recoleccion.utils.enums.vote_choices import VoteChoices
-from recoleccion.utils.wrappers import manual_pagination
 
 
-class PartiesViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
-    queryset = Party.objects.all()
+class PartiesViewSet(
+    viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin
+):
+    # queryset = Party.objects.all()
 
-    ordering_fields = ["main_denomination"]
+    ordering_fields = ["main_denomination", "sub_parties_count"]
     search_fields = ["main_denomination"]
 
     def get_serializer_class(self):
@@ -34,12 +34,13 @@ class PartiesViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.Retr
         elif self.action == "retrieve":
             return PartyDetailsSerializer
 
-    @manual_pagination
-    def list(self, request, *args, **kwargs):
-        parties: List[Party] = list(self.get_queryset())
-        parties.sort(key=lambda party: len(party.sub_parties), reverse=True)
-        parties_data = self.get_serializer(parties, many=True).data
-        return Response(parties_data)
+    def get_queryset(self):
+        parties = Party.objects.annotate(
+            sub_parties_count=Count(
+                "denominations", filter=Q(denominations__relation_type="SUB_PARTY")
+            ),
+        ).order_by("-sub_parties_count")
+        return parties
 
 
 class PartiesLawProjectVotesViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
@@ -76,7 +77,9 @@ class PartiesLawProjectVotesViewSet(viewsets.GenericViewSet, mixins.ListModelMix
         return party_projects
 
 
-class PartiesAuthorsProjectsCountViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
+class PartiesAuthorsProjectsCountViewSet(
+    viewsets.GenericViewSet, mixins.ListModelMixin
+):
     serializer_class = AuthorsProjectsCountSerializer
 
     # ordering_fields = [""]

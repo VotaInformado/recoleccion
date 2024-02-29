@@ -24,7 +24,6 @@ class PartiesViewSet(
     viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin
 ):
     ordering_fields = ["main_denomination", "sub_parties_count"]
-    search_fields = ["main_denomination", "all_denominations"]
 
     def get_serializer_class(self):
         if self.action == "list":
@@ -34,14 +33,18 @@ class PartiesViewSet(
 
     def get_queryset(self):
         party_id = self.kwargs.get("pk")
+        search = self.request.query_params.get("search", None)
         if party_id:
-            return Party.objects
+            return Party.objects.all()
         parties = Party.objects.annotate(
-            all_denominations=F("denominations__denomination"),
             sub_parties_count=Count(
                 "denominations", filter=Q(denominations__relation_type="SUB_PARTY")
             ),
         ).order_by("-sub_parties_count")
+        if search:
+            parties = parties.filter(
+                denominations__denomination__icontains=search
+            ).distinct()
         return parties
 
 

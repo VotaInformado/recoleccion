@@ -33,6 +33,9 @@ class PartiesViewSet(
             return PartyDetailsSerializer
 
     def get_queryset(self):
+        party_id = self.kwargs.get("pk")
+        if party_id:
+            return Party.objects
         parties = Party.objects.annotate(
             all_denominations=F("denominations__denomination"),
             sub_parties_count=Count(

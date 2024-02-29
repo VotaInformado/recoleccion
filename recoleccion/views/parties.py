@@ -1,4 +1,6 @@
 # Django rest framework
+from typing import List
+from rest_framework.response import Response
 from rest_framework import viewsets, mixins
 from django.db.models import Q, Count, Max
 
@@ -17,6 +19,7 @@ from recoleccion.serializers.parties import (
 # Models
 from recoleccion.models import Party, Authorship, LawProject, Person
 from recoleccion.utils.enums.vote_choices import VoteChoices
+from recoleccion.utils.wrappers import manual_pagination
 
 
 class PartiesViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
@@ -30,6 +33,13 @@ class PartiesViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.Retr
             return PartyInfoSerializer
         elif self.action == "retrieve":
             return PartyDetailsSerializer
+
+    @manual_pagination
+    def list(self, request, *args, **kwargs):
+        parties: List[Party] = list(self.get_queryset())
+        parties.sort(key=lambda party: len(party.sub_parties), reverse=True)
+        parties_data = self.get_serializer(parties, many=True).data
+        return Response(parties_data)
 
 
 class PartiesLawProjectVotesViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):

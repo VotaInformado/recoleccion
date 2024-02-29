@@ -1,7 +1,7 @@
 # Django rest framework
 from typing import List
 from rest_framework import viewsets, mixins
-from django.db.models import Q, Count, Max
+from django.db.models import Q, Count, Max, F
 
 # Serializers
 from recoleccion.serializers.authors import (
@@ -23,10 +23,8 @@ from recoleccion.utils.enums.vote_choices import VoteChoices
 class PartiesViewSet(
     viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin
 ):
-    # queryset = Party.objects.all()
-
     ordering_fields = ["main_denomination", "sub_parties_count"]
-    search_fields = ["main_denomination"]
+    search_fields = ["main_denomination", "all_denominations"]
 
     def get_serializer_class(self):
         if self.action == "list":
@@ -36,6 +34,7 @@ class PartiesViewSet(
 
     def get_queryset(self):
         parties = Party.objects.annotate(
+            all_denominations=F("denominations__denomination"),
             sub_parties_count=Count(
                 "denominations", filter=Q(denominations__relation_type="SUB_PARTY")
             ),

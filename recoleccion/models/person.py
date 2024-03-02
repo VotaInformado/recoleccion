@@ -29,6 +29,7 @@ class Person(BaseModel):
     last_seat = models.CharField(choices=LegislatorSeats.choices, max_length=10, null=True)
     is_active = models.BooleanField(default=False)
     news_search_terms = models.CharField(max_length=200, null=True, help_text="Search terms for news API")
+    name_corrected = models.BooleanField(default=False)
 
     def get_last_party(self):
         if self.last_seat == "Diputados":

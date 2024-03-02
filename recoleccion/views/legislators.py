@@ -37,12 +37,10 @@ class LegislatorsViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.
     def get_queryset(self):
         queryset = super().get_queryset()
         ordering_param = self.request.query_params.get("ordering")
-
         if ordering_param == "party":
             queryset = queryset.order_by("last_party__main_denomination")
         elif ordering_param == "-party":
             queryset = queryset.order_by("-last_party__main_denomination")
-
         return queryset
 
     @swagger_auto_schema(

@@ -75,6 +75,15 @@ class TextSummarizerException(CustomException):
         super().__init__(self.CODE, self.STATUS_CODE, description or self.DESCRIPTION)
 
 
+class NameCorrectorException(CustomException):
+    CODE = "NAME_CORRECTOR_EXCEPTION"
+    STATUS_CODE = 400
+    DESCRIPTION = "Error correcting names"
+
+    def __init__(self, description=None):
+        super().__init__(self.CODE, self.STATUS_CODE, description or self.DESCRIPTION)
+
+
 class EmptyText(CustomException):
     CODE = "EMPTY_PROJECT_TEXT"
     STATUS_CODE = 400
@@ -100,6 +109,8 @@ class NewsProviderLimitReached(CustomException):
     STATUS_CODE = 429
     DESCRIPTION = "The news provider limit has been reached"
 
-    def __init__(self,):
+    def __init__(
+        self,
+    ):
         description = "The news provider has reached its limit"
         super().__init__(self.CODE, self.STATUS_CODE, description)

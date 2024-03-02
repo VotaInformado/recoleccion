@@ -32,7 +32,18 @@ class LegislatorsViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.
     queryset = Person.objects.order_by("id").all()
     search_fields = ["name", "last_name"]
     filterset_fields = ["is_active", "last_seat"]
-    ordering_fields = ["name", "last_name", "last_seat", "is_active"]
+    ordering_fields = ["name", "last_name", "last_seat", "is_active", "last_party__main_denomination"]
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        ordering_param = self.request.query_params.get("ordering")
+
+        if ordering_param == "party":
+            queryset = queryset.order_by("last_party__main_denomination")
+        elif ordering_param == "-party":
+            queryset = queryset.order_by("-last_party__main_denomination")
+
+        return queryset
 
     @swagger_auto_schema(
         methods=["get"],

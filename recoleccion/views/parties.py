@@ -52,7 +52,7 @@ class PartiesLawProjectVotesViewSet(viewsets.GenericViewSet, mixins.ListModelMix
     serializer_class = PartyVoteSessionSerializer
 
     search_fields = ["title"]
-    ordering_fields = ["date"]
+    ordering_fields = ["date", "title"]
     ordering = ["-date"]
 
     def get_queryset(self):
@@ -79,6 +79,14 @@ class PartiesLawProjectVotesViewSet(viewsets.GenericViewSet, mixins.ListModelMix
                 filter=Q(votes__party=party, votes__vote=VoteChoices.ABSENT.value),
             ),
         )
+
+        # Filter by date
+        date_gte = self.request.query_params.get("date__gte", None)
+        date_lte = self.request.query_params.get("date__lte", None)
+        if date_gte:
+            party_projects = party_projects.filter(date__gte=date_gte)
+        if date_lte:
+            party_projects = party_projects.filter(date__lte=date_lte)
         return party_projects
 
 

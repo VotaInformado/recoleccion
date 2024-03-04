@@ -29,7 +29,11 @@ class Party(BaseModel):
 
     @property
     def alternative_denominations(self) -> List[str]:
-        main_denomination_id = PartyDenomination.objects.filter(denomination=self.main_denomination).first().pk
+        main_denomination = PartyDenomination.objects.filter(denomination=self.main_denomination).first()
+        if not main_denomination:
+            main_denomination_id = None
+        else:
+            main_denomination_id = main_denomination.pk
         all_denominations = PartyDenomination.objects.filter(
             party=self, relation_type=PartyRelationTypes.ALTERNATIVE_DENOMINATION
         ).exclude(id=main_denomination_id)
@@ -46,7 +50,6 @@ class Party(BaseModel):
         senate_members = SenateSeat.objects.filter(party=self).values_list("person", flat=True)
         members_from_votes = Vote.objects.filter(party=self).values_list("person", flat=True)
         members_from_authors = Authorship.objects.filter(party=self).values_list("person", flat=True)
-        # these are all ids
         members = list(deputy_members) + list(senate_members) + list(members_from_votes) + list(members_from_authors)
         members = set(members)
         return [Person.objects.get(pk=member_id) for member_id in members if member_id]

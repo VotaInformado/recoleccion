@@ -5,7 +5,9 @@ from django.core.exceptions import ObjectDoesNotExist
 
 # Base model
 from recoleccion.models.base import BaseModel
+from recoleccion.models.deputy_seat import DeputySeat
 from recoleccion.models.law_project import LawProject
+from recoleccion.models.senate_seat import SenateSeat
 
 # Project
 from recoleccion.utils.enums.legislator_seats import LegislatorSeats
@@ -31,24 +33,23 @@ class Person(BaseModel):
     news_search_terms = models.CharField(max_length=200, null=True, help_text="Search terms for news API")
     name_corrected = models.BooleanField(default=False)
 
-    def get_last_party(self):
-        if self.last_seat == "Diputados":
-            last_deputy_seat = self.deputy_seats.order_by("-end_of_term").first()
-            last_party = last_deputy_seat.party
-        elif self.last_seat == "Senado":
-            last_senate_seat = self.senate_seats.order_by("-end_of_term").first()
-            last_party = last_senate_seat.party
-        last_deputy_seat = self.deputy_seats.order_by("-end_of_term").first()
-        last_senate_seat = self.senate_seats.order_by("-end_of_term").first()
-        if not last_deputy_seat:
-            return last_senate_seat.party if last_senate_seat else None
-        if not last_senate_seat:
-            return last_deputy_seat.party
-        if last_deputy_seat.end_of_term > last_senate_seat.end_of_term:
-            last_party = last_deputy_seat.party
-        else:
-            last_party = last_senate_seat.party if last_senate_seat else None
-        return last_party
+    def get_last_seat(self) -> DeputySeat | SenateSeat | None:
+        deputy_seats = DeputySeat.objects.filter(person=self).order_by("-end_of_term")
+        senate_seats = DeputySeat.objects.filter(person=self).order_by("-end_of_term")
+        all_seats = list(deputy_seats) + list(senate_seats)
+        all_seats.sort(key=lambda x: x.end_of_term, reverse=True)
+        if not all_seats:
+            return None
+        return all_seats[0]
+
+    def update_last_party_and_seat(self):
+        last_seat: DeputySeat | SenateSeat = self.get_last_seat()
+        if not last_seat:
+            return False
+        self.last_seat = last_seat.seat_type
+        self.last_party = last_seat.party
+        self.save()
+        return True
 
     def __str__(self):
         base_str = f"{self.name} {self.last_name}, last seat: {self.last_seat}"

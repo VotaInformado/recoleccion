@@ -2,6 +2,7 @@ from django.db import models
 
 # Base model
 from recoleccion.models.base import BaseModel
+from recoleccion.utils.enums.legislator_seats import LegislatorSeats
 
 
 class SenateSeat(BaseModel):
@@ -15,6 +16,7 @@ class SenateSeat(BaseModel):
     party_name = models.CharField(max_length=150)
     start_of_term = models.DateField()
     end_of_term = models.DateField()
+    seat_type = LegislatorSeats.SENATOR
 
     def __str__(self):
         return f"{self.person.name} {self.person.last_name}: {self.start_of_term} - {self.end_of_term}"

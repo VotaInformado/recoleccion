@@ -2,6 +2,7 @@ from django.db import models
 
 # Base model
 from recoleccion.models.base import BaseModel
+from recoleccion.utils.enums.legislator_seats import LegislatorSeats
 
 
 class DeputySeat(BaseModel):
@@ -16,6 +17,7 @@ class DeputySeat(BaseModel):
     party = models.ForeignKey("Party", on_delete=models.CASCADE, related_name="deputy_seats", null=True)
     start_of_term = models.DateField()
     end_of_term = models.DateField()
+    seat_type = LegislatorSeats.DEPUTY
 
     def __str__(self):
         return f"{self.person.name} {self.person.last_name}: {self.start_of_term} - {self.end_of_term}"

@@ -2,12 +2,13 @@
 
 from django.db import migrations, models
 import django.db.models.deletion
-from recoleccion.models import Person
+from recoleccion.models import Person as PersonModel
 
 
 class Migration(migrations.Migration):
 
     def set_last_party(apps, schema_editor):
+        Person: PersonModel = apps.get_model("recoleccion", "Person")
         for person in Person.objects.all():
             person.last_party = person.get_last_party()
             person.save()

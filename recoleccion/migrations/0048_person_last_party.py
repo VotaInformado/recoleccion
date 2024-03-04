@@ -3,6 +3,7 @@
 from django.db import migrations, models
 import django.db.models.deletion
 from recoleccion.models import Person as PersonModel
+from recoleccion.models.party import Party
 
 
 class Migration(migrations.Migration):
@@ -10,7 +11,8 @@ class Migration(migrations.Migration):
     def set_last_party(apps, schema_editor):
         Person: PersonModel = apps.get_model("recoleccion", "Person")
         for person in Person.objects.all():
-            person.last_party = person.get_last_party()
+            party: Party = person.get_last_party()
+            person.last_party = party.main_denomination if party else None
             person.save()
 
     dependencies = [

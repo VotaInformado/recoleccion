@@ -173,48 +173,6 @@ class PartyLinker(Linker):
                 return True
         return False
 
-    def apply_manual_linking(self, messy_data: dict, dubious_results: list) -> Tuple[pd.DataFrame, dict]:
-        """
-        Applies previously made decisions to the linking process. To be used before actually using the Gazetteer.
-        Receives messy_data, and links it using previously saved decisions
-        Returns approved_data, rejected_data and undefined_data
-        """
-        dubious_messy_records = set([record[0] for record in dubious_results])
-        dubious_data = {k: v for k, v in messy_data.items() if k in dubious_messy_records}
-        approved_data, rejected_data, linked_indexes = [], [], []
-        undefined_data = {}
-        ud_index = 0
-        canonical_data: dict = self.get_canonical_data()
-
-        for messy_index, messy_record in dubious_data.items():
-            messy_denomination = messy_record["denomination"]
-            decision_found = False
-            for canonical_index, canonical_record in canonical_data.items():
-                party_id = canonical_record["party_id"]
-                is_approved, party_id = self.approved_linking(party_id, messy_denomination)
-                if is_approved:
-                    messy_record: dict = dubious_data[messy_index]
-                    messy_record["party_id"] = party_id
-                    approved_data.append(messy_record)
-                    linked_indexes.append(messy_index)
-                    decision_found = True
-                    break
-                elif self.rejected_linking(party_id, messy_denomination):
-                    messy_record: dict = dubious_data[messy_index]
-                    messy_record["party_id"] = DENIED_INDICATOR
-                    # we have to differentiate between rejected and undefined
-                    rejected_data.append(messy_record)
-                    linked_indexes.append(messy_index)
-                    decision_found = True
-                    break
-            if not decision_found:
-                messy_record = dubious_data[messy_index]
-                undefined_data[ud_index] = messy_record
-                ud_index += 1
-        manually_linked_data: pd.DataFrame = self.assemble_manually_linked_data(approved_data, rejected_data)
-        dubious_results = [result for result in dubious_results if result[0] not in linked_indexes]
-        return manually_linked_data, dubious_results, linked_indexes
-
     def _set_record_id(self, party_denomination_id: int, record_linking_id: int):
         party_id = PartyDenomination.objects.get(id=party_denomination_id).party_id
         classes = ["Authorship", "DeputySeat", "SenateSeat", "Vote"]
@@ -229,6 +187,12 @@ class PartyLinker(Linker):
     def get_or_save_pending_linking_decision(
         self, canonical_record: dict, messy_record: dict
     ) -> Tuple[PartyLinkingDecision, bool]:
+        """
+        Receives a canonical record and a messy record
+        Checks if there is a pending decision for the pair, using canonical_record_id and messy_denomination
+        If there is one, returns the decision and False
+        If there isn't, creates a new decision and returns it with True
+        """
         party_id = self.get_record_id(canonical_record)
         messy_denomination = messy_record["denomination"]
         existing_decision = PartyLinkingDecision.objects.filter(

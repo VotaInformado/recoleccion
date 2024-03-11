@@ -95,7 +95,12 @@ class Linker:
     def classify(self, messy_data: dict):
         """
         Receives a dict with the messy data
-        Returns 3 lists: certain_matches, undefined_matches, distinct_matches
+        Uses the Gazetteer to classify the data in certain, dubious and distinct matches.
+        For the dubious matches, it checks if there is a linking decision for the pair (messy, canonical)
+        If there isn't, it creates a new one (in PENDING state)
+        If there is one, and it has a definitive decision, it moves the record to certain or distinct matches
+        Otherwise, it leaves it in dubious matches
+        Finally, returns 3 lists: certain_matches, dubious_matches, distinct_matches
         """
         if not messy_data:
             return [], [], []  # this means no linking, see the usage of this function

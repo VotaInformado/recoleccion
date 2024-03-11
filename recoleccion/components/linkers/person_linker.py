@@ -228,60 +228,15 @@ class PersonLinker(Linker):
                 return True
         return False
 
-    def apply_manual_linking(self, messy_data: dict, dubious_results: list) -> Tuple[pd.DataFrame, dict]:
-        """
-        Applies previously made decisions to the linking process. To be used before actually using the Gazetteer.
-        Receives messy_data, and links it using previously saved decisions
-        Returns linked_data, undefined_data
-        """
-        dubious_messy_records = set([record[0] for record in dubious_results])
-        dubious_data = {k: v for k, v in messy_data.items() if k in dubious_messy_records}
-        approved_data, rejected_data, linked_indexes = [], [], []
-        undefined_data = {}
-        canonical_data: dict = self.get_canonical_data()
-
-        record_messy_names = [self.get_record_full_name(record) for record in dubious_data.values()]
-        defined_decisions = [LinkingDecisionOptions.APPROVED, LinkingDecisionOptions.DENIED]
-
-        linking_decisions = PersonLinkingDecision.objects.filter(
-            messy_name__in=record_messy_names, decision__in=defined_decisions
-        ).values("messy_name", "decision", "person_id")
-        linking_decisions_dict = defaultdict(list)
-        for decision in linking_decisions:
-            linking_decisions_dict[(decision["messy_name"], decision["person_id"])].append((decision["decision"]))
-
-        for messy_index, messy_record in dubious_data.items():
-            messy_full_name = self.get_record_full_name(messy_record)
-            decision_found = False
-            for canonical_index, canonical_record in canonical_data.items():
-                canonical_id = canonical_record["id"]
-                decision = linking_decisions_dict[(messy_full_name, canonical_id)]
-                if not decision:
-                    continue
-                if decision == LinkingDecisionOptions.APPROVED:
-                    messy_record: dict = dubious_data[messy_index]
-                    messy_record["person_id"] = canonical_id
-                    approved_data.append(messy_record)
-                    linked_indexes.append(messy_index)
-                    decision_found = True
-                    break
-                elif decision == LinkingDecisionOptions.DENIED:
-                    messy_record: dict = dubious_data[messy_index]
-                    messy_record["party_id"] = DENIED_INDICATOR
-                    rejected_data.append(messy_record)
-                    linked_indexes.append(messy_index)
-                    decision_found = True
-                    break
-            if not decision_found:
-                messy_record = dubious_data[messy_index]
-                undefined_data[messy_index] = messy_record
-        manually_linked_data: pd.DataFrame = self.assemble_manually_linked_data(approved_data, rejected_data)
-        dubious_results = [result for result in dubious_results if result[0] not in linked_indexes]
-        return manually_linked_data, dubious_results
-
     def get_or_save_pending_linking_decision(
         self, canonical_record: dict, messy_record: dict
     ) -> Tuple[PersonLinkingDecision, bool]:
+        """
+        Receives a canonical record and a messy record
+        Checks if there is a pending decision for the pair, using canonical_record_id and messy_denomination
+        If there is one, returns the decision and False
+        If there isn't, creates a new decision and returns it with True
+        """
         person_id = canonical_record["id"]
         if "name" in messy_record:
             messy_name = messy_record["name"] + " " + messy_record["last_name"]

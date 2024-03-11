@@ -1,11 +1,14 @@
 import pandas as pd
 from unittest.mock import patch
 from django.conf import settings
+import logging
 
 # Project
 from recoleccion.components.linkers import Linker
 from recoleccion.models.person import Person
 
+
+logger = logging.getLogger(__name__)
 
 BASE_URL = "http://localhost:8000"
 
@@ -94,9 +97,13 @@ def list_of_lists_to_tuple_of_tuples(data):
 
 
 def mock_linking_results(instance, *args, **kwargs):
+    logger.debug("Mocking linking results...")
     real_results = settings.REAL_METHOD(instance, *args, **kwargs)
+    logger.debug(f"Messy indexes: {settings.MESSY_INDEXES}")
+    logger.debug(f"Canonical indexes: {settings.CANONICAL_INDEXES}")
+    logger.debug(f"Initial results: {real_results}")
     max_conf_pair = max(real_results, key=lambda x: confidence(x))
-    max_confidence = max_conf_pair[1][0][1]
+    max_confidence = max_conf_pair[1][0][1] if max_conf_pair[1] else 0
     dubious_lower_limit = max_confidence * Linker.DUBIOUS_LOWER_LIMIT
     dubious_lower_limit = max(dubious_lower_limit, Linker.MIN_ACCEPTABLE_LOWER_LIMIT)
     dubious_upper_limit = max_confidence * Linker.DUBIOUS_UPPER_LIMIT
@@ -116,6 +123,7 @@ def mock_linking_results(instance, *args, **kwargs):
         canonical_pointer += 1
         new_list[1][0][1] = dubious_score
         real_results[i] = list_of_lists_to_tuple_of_tuples(new_list)
+    logger.debug(f"Final results: {real_results}")
     return real_results
 
 

@@ -1,5 +1,8 @@
+from django.conf import settings
+from dedupe import Gazetteer
+
 # Project
-from recoleccion.utils.wrappers import allowed_to_fail
+
 import recoleccion.tests.test_helpers.utils as ut
 from recoleccion.components.linkers import PartyLinker, PersonLinker
 from recoleccion.models.linking.person_linking import PersonLinkingDecision
@@ -402,10 +405,11 @@ class PartyLinkerTestCase(LinkingTestCase):
         """
         Hierarchy:
         1. Exact matching (this case)
-        2. Previous decisions  X -> This should be the final decision (same record)
-        3. Gazetteer
+        2. Gazetteer
+        3. Previous decisions (dubious records only)  X -> This should be the final decision (different record)
         """
         RECORD_ID = 2
+        settings.REAL_METHOD = Gazetteer.search
         CANONICAL_DENOMINATION = "DIFFERENT_PARTY"
         MESSY_DENOMINATION = "Partido Justicialista"
         party = Party.objects.create(main_denomination=CANONICAL_DENOMINATION)
@@ -413,7 +417,6 @@ class PartyLinkerTestCase(LinkingTestCase):
         ut.create_party_linking_decision(
             MESSY_DENOMINATION, CANONICAL_DENOMINATION, LinkingDecisionOptions.APPROVED, party.pk
         )
-
         canonical_record = {
             "denomination": CANONICAL_DENOMINATION,
             "party_id": EXPECTED_ID,
@@ -424,12 +427,17 @@ class PartyLinkerTestCase(LinkingTestCase):
         }
 
         canonical_data: dict = create_fake_df(self.canonical_columns, n=10)
-        canonical_data[len(canonical_data) + 1] = canonical_record
+        canonical_index = len(canonical_data) + 1
+        canonical_data[canonical_index] = canonical_record
+        settings.CANONICAL_INDEXES = [canonical_index]
         updated_data = create_fake_df(self.messy_columns, n=8, as_dict=False, dates_as_str=False)
-        updated_data.loc[len(updated_data)] = updated_record
+        messy_index = len(updated_data)
+        updated_data.loc[messy_index] = updated_record
+        settings.MESSY_INDEXES = [messy_index]  # these are the indexes of the pending decisions messy records
         with mck.mock_method(PartyLinker, "get_canonical_data", return_value=canonical_data):
-            linker = PartyLinker()
-            linked_data = linker.link_parties(updated_data)
-        row = linked_data[linked_data["denomination"] == MESSY_DENOMINATION]
+            with mck.mock_method_side_effect(Gazetteer, "search", side_effect=mck.mock_linking_results):
+                linker = PartyLinker()
+                linked_data = linker.link_parties(updated_data)
+            row = linked_data[linked_data["denomination"] == MESSY_DENOMINATION]
         self.assertEqual(row["record_id"].values[0], RECORD_ID)
         self.assertEqual(row["party_id"].values[0], EXPECTED_ID)

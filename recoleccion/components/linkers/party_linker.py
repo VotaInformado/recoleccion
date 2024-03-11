@@ -106,7 +106,6 @@ class PartyLinker(Linker):
         self.logger.info(f"Linking {len(data)} parties...")
         data = data.rename(columns={"id": "record_id"})
         try:
-            manually_linked_data = pd.DataFrame()  # In case of an exception, this variable will be used
             messy_data: dict = self.get_messy_data(data, save_original_denominations)
             exactly_matched_data, undefined_data = self.load_exact_matches(messy_data)
             self.logger.info(f"Exactly matched {exactly_matched_data.shape[0]} parties")
@@ -121,15 +120,12 @@ class PartyLinker(Linker):
                     merged_df["denomination"] = merged_df["denomination"].apply(lambda x: self.restore_denomination(x))
                 return merged_df
             certain, dubious, distinct = self.classify(undefined_data)
-            self.logger.info(f"{len(dubious)} entered in the dubious range")
-            manually_linked_data, dubious, linked_indexes = self.apply_manual_linking(undefined_data, dubious)
-            undefined_df = self.remove_linked_data(undefined_df, linked_indexes)
-            self.logger.info(f"{len(manually_linked_data)} previously made decisions were applied")
+            self.logger.info(f"{len(dubious)} records entered in the dubious range")
             certain_mapping = self.create_certain_mapping(undefined_df, certain)
             undefined_df["party_id"] = certain_mapping
             dubious_mapping = self.create_dubious_mapping(undefined_df, dubious)
             undefined_df["linking_id"] = dubious_mapping
-            self.logger.info(f"{len(distinct)} parties left will not be linked")
+            self.logger.info(f"{len(distinct)} parties will not be linked")
         except ValueError as e:
             if "first dataset is empty" in str(e) or "second dataset is empty" in str(e):
                 # Shouldn't be an error, just means that there are no matches
@@ -137,7 +133,7 @@ class PartyLinker(Linker):
                 self.logger.info("Linked 0 parties")
             else:
                 raise e
-        merged_df = self.merge_dataframes(exactly_matched_data, manually_linked_data, undefined_df)
+        merged_df = self.merge_dataframes(exactly_matched_data, undefined_df)
         if save_original_denominations:
             merged_df["denomination"] = merged_df["denomination"].apply(lambda x: self.restore_denomination(x))
         return merged_df
@@ -230,16 +226,18 @@ class PartyLinker(Linker):
             party_id=party_id
         ).denomination  # OJO: Denomination id != party id
 
-    def save_pending_linking_decision(self, canonical_record: dict, messy_record: dict) -> int:
+    def get_or_save_pending_linking_decision(
+        self, canonical_record: dict, messy_record: dict
+    ) -> Tuple[PartyLinkingDecision, bool]:
         party_id = self.get_record_id(canonical_record)
         messy_denomination = messy_record["denomination"]
         existing_decision = PartyLinkingDecision.objects.filter(
             party_id=party_id, messy_denomination=messy_denomination
         ).first()
         if existing_decision:
-            return existing_decision.uuid
+            return existing_decision, False
         new_decision = PartyLinkingDecision.objects.create(party_id=party_id, messy_denomination=messy_denomination)
-        return new_decision.uuid
+        return new_decision, True
 
     def get_linking_key(self, canonical_data_index: int, messy_record: dict):
         messy_denomination = messy_record["denomination"]

@@ -145,7 +145,6 @@ class PersonLinker(Linker):
         try:
             messy_data: dict = self.get_messy_data(data)
             exactly_matched_data, undefined_data = self.load_exact_matches(messy_data)
-            manually_linked_data = pd.DataFrame()  # In case of an exception, this variable will be used
             undefined_data = self.reset_index(undefined_data)
             undefined_df = pd.DataFrame.from_dict(undefined_data, orient="index")
             self.logger.info(f"Found {exactly_matched_data.shape[0]} exact matches")
@@ -155,9 +154,7 @@ class PersonLinker(Linker):
                 undefined_df["party_id"] = None
                 return self.merge_dataframes(exactly_matched_data, undefined_df)
             certain, dubious, distinct = self.classify(undefined_data)
-            self.logger.info(f"{len(dubious)} entered in the dubious range")
-            manually_linked_data, dubious = self.apply_manual_linking(undefined_data, dubious)
-            self.logger.info(f"{len(manually_linked_data)} previous decisions were applied")
+            self.logger.info(f"{len(dubious)} records entered in the dubious range")
             certain_mapping = self.create_certain_mapping(undefined_df, certain)
             undefined_df["person_id"] = certain_mapping
             dubious_mapping = self.create_dubious_mapping(undefined_df, dubious)
@@ -169,7 +166,7 @@ class PersonLinker(Linker):
                 self.logger.info("Linked 0 persons")
             else:
                 raise e
-        return self.merge_dataframes(exactly_matched_data, manually_linked_data, undefined_df)
+        return self.merge_dataframes(exactly_matched_data, undefined_df)
 
     def _convert_dates_to_str(self, data: pd.DataFrame) -> pd.DataFrame:
         # Convert datetime
@@ -282,17 +279,21 @@ class PersonLinker(Linker):
         dubious_results = [result for result in dubious_results if result[0] not in linked_indexes]
         return manually_linked_data, dubious_results
 
-    def save_pending_linking_decision(self, canonical_record: dict, messy_record: dict) -> int:
+    def get_or_save_pending_linking_decision(
+        self, canonical_record: dict, messy_record: dict
+    ) -> Tuple[PersonLinkingDecision, bool]:
         person_id = canonical_record["id"]
         if "name" in messy_record:
             messy_name = messy_record["name"] + " " + messy_record["last_name"]
         else:
             messy_name = messy_record["full_name"]
-        existing_decision = PersonLinkingDecision.objects.filter(person_id=person_id, messy_name=messy_name).first()
+        existing_decision = PersonLinkingDecision.objects.filter(
+            person_id=person_id, messy_name=messy_name
+        ).first()
         if existing_decision:
-            return existing_decision.uuid
+            return existing_decision, False
         new_decision = PersonLinkingDecision.objects.create(person_id=person_id, messy_name=messy_name)
-        return new_decision.uuid
+        return new_decision, True
 
     def get_linking_key(self, canonical_data_index: int, messy_record: dict):
         messy_full_name = self.get_record_full_name(messy_record)

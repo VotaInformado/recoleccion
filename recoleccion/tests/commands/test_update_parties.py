@@ -12,6 +12,8 @@ from recoleccion.models import Authorship, LawProject, Party, PartyDenomination,
 from recoleccion.tests.test_helpers.test_case import LinkingTestCase
 from recoleccion.utils.enums.linking_decision_options import LinkingDecisionOptions
 import recoleccion.tests.test_helpers.mocks as mck
+from recoleccion.management.commands.add_parties_to_authors import Command as AuthorsCommand
+from recoleccion.management.commands.add_parties_to_votes import Command as VotesCommand
 
 
 class UpdateVotesParties(LinkingTestCase):
@@ -90,7 +92,7 @@ class UpdateVotesParties(LinkingTestCase):
         PARTY_NAME = "PARTIDO JUSTICIALISTA"
         SIMILAR_NAME = "SOCIEDAD JUSTICIALISTA"
         party = Party.objects.create(main_denomination=PARTY_NAME)
-        ut.create_party_linking_decision(SIMILAR_NAME, PARTY_NAME, LinkingDecisionOptions.DENIED)
+        ut.create_party_linking_decision(SIMILAR_NAME, PARTY_NAME, LinkingDecisionOptions.DENIED, record_id=party.pk)
         settings.REAL_METHOD = Gazetteer.search
         settings.MESSY_INDEXES = [0]  # these are the indexes of the pending decisions messy records
         settings.CANONICAL_INDEXES = [0]  # these are the indexes of the pending decisions canonical records
@@ -122,7 +124,7 @@ class UpdateVotesParties(LinkingTestCase):
         PARTY_NAME = "PARTIDO JUSTICIALISTA"
         SIMILAR_NAME = "FRENTE PARA LA VICTORIA"
         party = Party.objects.create(main_denomination=PARTY_NAME)
-        ut.create_party_linking_decision(SIMILAR_NAME, PARTY_NAME, LinkingDecisionOptions.DENIED)
+        ut.create_party_linking_decision(SIMILAR_NAME, PARTY_NAME, LinkingDecisionOptions.DENIED, record_id=party.pk)
         original_vote = Vote.objects.create(
             person_name="Nombre", person_last_name="Apellido", party_name=SIMILAR_NAME, reference="Project"
         )
@@ -171,13 +173,14 @@ class UpdateVotesParties(LinkingTestCase):
         CANONICAL_NAME = "Partido Justicialista"
         MESSY_NAME = "Part. Justicialista"
         party = Party.objects.create(main_denomination=CANONICAL_NAME)
-        ut.create_party_linking_decision(MESSY_NAME, CANONICAL_NAME, LinkingDecisionOptions.DENIED)
+        ut.create_party_linking_decision(MESSY_NAME, CANONICAL_NAME, LinkingDecisionOptions.DENIED, record_id=party.pk)
         vote = Vote.objects.create(
             person_name="Nombre", person_last_name="Apellido", party_name=MESSY_NAME, reference="Project"
         )
         self.create_party_denominations(10, party)
         with mck.mock_method_side_effect(Gazetteer, "search", side_effect=mck.mock_linking_results):
-            call_command("add_parties_to_votes")
+            with mck.mock_method(VotesCommand, "check_for_party_creation", return_value=True):
+                call_command("add_parties_to_votes")
         vote.refresh_from_db()
         self.assertEqual(vote.party, None)
 
@@ -266,7 +269,7 @@ class UpdateAuthorsParties(LinkingTestCase):
         CANONICAL_NAME = "Partido Justicialista"
         MESSY_NAME = "Part. Justicialista"
         party = Party.objects.create(main_denomination=CANONICAL_NAME)
-        ut.create_party_linking_decision(MESSY_NAME, CANONICAL_NAME, LinkingDecisionOptions.DENIED)
+        ut.create_party_linking_decision(MESSY_NAME, CANONICAL_NAME, LinkingDecisionOptions.DENIED, record_id=party.pk)
         person = Person.objects.first()
         project = LawProject.objects.first()
         author = Authorship.objects.create(
@@ -274,6 +277,7 @@ class UpdateAuthorsParties(LinkingTestCase):
         )
         self.create_party_denominations(5, party)  # hay que hacer esto xq rompe con 1 canonical record
         with mck.mock_method_side_effect(Gazetteer, "search", side_effect=mck.mock_linking_results):
-            call_command("add_parties_to_authors")
+            with mck.mock_method(AuthorsCommand, "check_for_party_creation", return_value=True):
+                call_command("add_parties_to_authors")
         author.refresh_from_db()
         self.assertEqual(author.party, None)

@@ -28,7 +28,7 @@ class FakeResponse:
 
 
 def is_internal_mock_enabled():
-    return getattr(settings, "INTERNAL_MOCK_ENABLED", True)
+    return True
 
 
 def mock_method(mocked_class, method_name, return_value=None, new_callable=None):
@@ -46,15 +46,8 @@ def mock_method_side_effect(mocked_class, method_name, side_effect, autospec=Tru
 
 def mock_class_attribute(mocked_class, attribute_name, new_attribute_value):
     """Mocks an attribute of a class"""
-    mocked_class_name = mocked_class.__name__
-    if is_internal_mock_enabled():
-        patcher = patch.object(mocked_class, attribute_name, new=new_attribute_value)
-        return patcher
-    else:
-        # This function needs to return a context manager, so this must be used
-        patcher = patch.object(FakeClass, "fake_method", return_value=new_attribute_value)
-        return patcher
-
+    patcher = patch.object(mocked_class, attribute_name, new=new_attribute_value)
+    return patcher
 
 def mock_data_source_json(src_file):
     """Mocks a data source json file"""

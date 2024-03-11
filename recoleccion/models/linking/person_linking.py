@@ -19,8 +19,10 @@ class PersonLinkingDecision(LinkingDecision):
         return {"canonical_name": self.person.full_name}
 
     def __str__(self):
+        if not self.person:
+            return f"PersonLinkingDecision ({self.decision}): {self.messy_name} - {self.decision}"
         return (
-            "PersonLinkingDecision:\n"
+            f"PersonLinkingDecision ({self.decision}):\n"
             + f"Canonical name: {self.person.formal_full_name}\n"
             + f"Messy name: {self.messy_name}"
         )

@@ -1,4 +1,4 @@
-_id,diputado_id,diputado_apellido,diputado_nombre,diputado_género,diputado_distrito,mandato_inicio,mandato_fin,diputado_juramento,diputado_cese,diputado_bloque,bloque_inicio,bloque_fin
+_id,diputado_id,diputado_apellido,diputado_nombre,diputado_género,diputado_distrito,inicio_mandato,fin_mandato,diputado_juramento,diputado_cese,diputado_bloque,bloque_inicio,bloque_fin
 1462,HCDN2424,AGUIRRE,HILDA CLELIA,F,BUENOS AIRES,2017-12-10T00:00:00,2021-12-09T00:00:00,2017-12-06T00:00:00,2021-12-09T00:00:00,FRENTE DE TODOS,2019-12-10T00:00:00,2021-12-09T00:00:00
 1463,HCDN2437,VALLONE,ANDRES ALBERTO,M,SAN LUIS,2015-12-10T00:00:00,2019-12-09T00:00:00,2017-12-18T00:00:00,2019-12-09T00:00:00,COMPROMISO FEDERAL,2017-12-18T00:00:00,2018-02-05T00:00:00
 1464,HCDN2437,VALLONE,ANDRES ALBERTO,M,SAN LUIS,2015-12-10T00:00:00,2019-12-09T00:00:00,2017-12-18T00:00:00,2019-12-09T00:00:00,UNIDAD JUSTICIALISTA,2018-02-06T00:00:00,2019-12-09T00:00:00

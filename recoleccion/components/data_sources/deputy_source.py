@@ -16,15 +16,13 @@ class DeputiesHistory(DataSource):
         "apellido": "last_name",
         "distrito": "district",
         "bloque": "party",
-        "inicio": "start_of_term",
-        "cese": "end_of_term",
         "diputado_id": "deputy_id",
         "diputado_nombre": "name",
         "diputado_apellido": "last_name",
         "diputado_distrito": "district",
         "diputado_bloque": "party",
-        "mandato_inicio": "start_of_term",
-        "mandato_fin": "end_of_term",
+        "inicio_mandato": "start_of_term",
+        "fin_mandato": "end_of_term",
     }
 
     @classmethod
@@ -55,6 +53,7 @@ class CurrentDeputies(DataSource):
     """There isn't actually a resource for current deputies.
     We get the historic data and filter the ones that are current
     """
+
     csv_url = "https://www.diputados.gov.ar/system/modules/ar.gob.hcdn.diputados/formatters/generar-lista-diputados.csv"
     file_path = "recoleccion/files/diputados.csv"
 

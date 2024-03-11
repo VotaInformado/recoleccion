@@ -94,6 +94,10 @@ class PartyLinker(Linker):
         self.logger.info(f"Linked {len(dubious_matches)} parties")
         return dubious_mapping
 
+    def remove_linked_data(self, undefined_df: pd.DataFrame, linked_indexes: list) -> pd.DataFrame:
+        undefined_df = undefined_df.drop(index=linked_indexes)
+        return undefined_df
+
     def link_parties(self, data: pd.DataFrame, save_original_denominations=False) -> pd.DataFrame:
         """
         Receives a DF with columns: denomination, record_id
@@ -102,30 +106,26 @@ class PartyLinker(Linker):
         self.logger.info(f"Linking {len(data)} parties...")
         data = data.rename(columns={"id": "record_id"})
         try:
-            linked_parties = 0
             messy_data: dict = self.get_messy_data(data, save_original_denominations)
-            exactly_matched_data, unmatched_data = self.load_exact_matches(messy_data)
+            exactly_matched_data, undefined_data = self.load_exact_matches(messy_data)
             self.logger.info(f"Exactly matched {exactly_matched_data.shape[0]} parties")
-            manually_linked_data, undefined_data = self.apply_manual_linking(unmatched_data)
-            self.logger.info(f"{len(manually_linked_data)} previously made decisions were applied")
             undefined_data = self.reset_index(undefined_data)
             undefined_df = pd.DataFrame.from_dict(undefined_data, orient="index")
             try:
                 self.train(undefined_data)
             except IncompatibleLinkingDatasets as e:
                 undefined_df["party_id"] = None
-                merged_df = self.merge_dataframes(exactly_matched_data, manually_linked_data, undefined_df)
+                merged_df = self.merge_dataframes(exactly_matched_data, undefined_df)
                 if save_original_denominations:
                     merged_df["denomination"] = merged_df["denomination"].apply(lambda x: self.restore_denomination(x))
                 return merged_df
-
             certain, dubious, distinct = self.classify(undefined_data)
+            self.logger.info(f"{len(dubious)} records entered in the dubious range")
             certain_mapping = self.create_certain_mapping(undefined_df, certain)
             undefined_df["party_id"] = certain_mapping
             dubious_mapping = self.create_dubious_mapping(undefined_df, dubious)
             undefined_df["linking_id"] = dubious_mapping
-            self.logger.info(f"{len(distinct)} parties left will not be linked")
-
+            self.logger.info(f"{len(distinct)} parties will not be linked")
         except ValueError as e:
             if "first dataset is empty" in str(e) or "second dataset is empty" in str(e):
                 # Shouldn't be an error, just means that there are no matches
@@ -133,7 +133,7 @@ class PartyLinker(Linker):
                 self.logger.info("Linked 0 parties")
             else:
                 raise e
-        merged_df = self.merge_dataframes(exactly_matched_data, manually_linked_data, undefined_df)
+        merged_df = self.merge_dataframes(exactly_matched_data, undefined_df)
         if save_original_denominations:
             merged_df["denomination"] = merged_df["denomination"].apply(lambda x: self.restore_denomination(x))
         return merged_df
@@ -173,43 +173,6 @@ class PartyLinker(Linker):
                 return True
         return False
 
-    def apply_manual_linking(self, messy_data: dict) -> Tuple[pd.DataFrame, dict]:
-        """
-        Applies previously made decisions to the linking process. To be used before actually using the Gazetteer.
-        Receives messy_data, and links it using previously saved decisions
-        Returns approved_data, rejected_data and undefined_data
-        """
-        approved_data, rejected_data = [], []
-        undefined_data = {}
-        ud_index = 0
-        canonical_data: dict = self.get_canonical_data()
-
-        for messy_index, messy_record in messy_data.items():
-            messy_denomination = messy_record["denomination"]
-            decision_found = False
-            for canonical_index, canonical_record in canonical_data.items():
-                party_id = canonical_record["party_id"]
-                is_approved, party_id = self.approved_linking(party_id, messy_denomination)
-                if is_approved:
-                    messy_record: dict = messy_data[messy_index]
-                    messy_record["party_id"] = party_id
-                    approved_data.append(messy_record)
-                    decision_found = True
-                    break
-                elif self.rejected_linking(party_id, messy_denomination):
-                    messy_record: dict = messy_data[messy_index]
-                    messy_record["party_id"] = DENIED_INDICATOR
-                    # we have to differentiate between rejected and undefined
-                    rejected_data.append(messy_record)
-                    decision_found = True
-                    break
-            if not decision_found:
-                messy_record = messy_data[messy_index]
-                undefined_data[ud_index] = messy_record
-                ud_index += 1
-        manually_linked_data: pd.DataFrame = self.assemble_manually_linked_data(approved_data, rejected_data)
-        return manually_linked_data, undefined_data
-
     def _set_record_id(self, party_denomination_id: int, record_linking_id: int):
         party_id = PartyDenomination.objects.get(id=party_denomination_id).party_id
         classes = ["Authorship", "DeputySeat", "SenateSeat", "Vote"]
@@ -221,16 +184,24 @@ class PartyLinker(Linker):
             party_id=party_id
         ).denomination  # OJO: Denomination id != party id
 
-    def save_pending_linking_decision(self, canonical_record: dict, messy_record: dict) -> int:
+    def get_or_save_pending_linking_decision(
+        self, canonical_record: dict, messy_record: dict
+    ) -> Tuple[PartyLinkingDecision, bool]:
+        """
+        Receives a canonical record and a messy record
+        Checks if there is a pending decision for the pair, using canonical_record_id and messy_denomination
+        If there is one, returns the decision and False
+        If there isn't, creates a new decision and returns it with True
+        """
         party_id = self.get_record_id(canonical_record)
         messy_denomination = messy_record["denomination"]
         existing_decision = PartyLinkingDecision.objects.filter(
             party_id=party_id, messy_denomination=messy_denomination
         ).first()
         if existing_decision:
-            return existing_decision.uuid
+            return existing_decision, False
         new_decision = PartyLinkingDecision.objects.create(party_id=party_id, messy_denomination=messy_denomination)
-        return new_decision.uuid
+        return new_decision, True
 
     def get_linking_key(self, canonical_data_index: int, messy_record: dict):
         messy_denomination = messy_record["denomination"]

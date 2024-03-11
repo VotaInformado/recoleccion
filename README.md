@@ -45,18 +45,26 @@ python manage.py $command_name
 Where `$command_name` is the name of the command you want to run.
 
 Commands ideal order:  
- - load_law_projects
- - load_external_law_projects
- - load_law_projects_text
- - load_laws
- - load_current_deputies
- - load_current_senators
- - load_senators_history
- - load_deputies_history
- - load_deputies_day_orders
- - load_votes
- - load_senate_votes
- - load_deputies_votes
- - add_persons_from_votes (optional)
-
+- load_current_deputies
+- load_deputies_history
+- load_current_senators
+- load_senators_history
+- load_deputies_parties
+- load_senate_parties
+- load_laws
+- load_laws_text
+- load_deputies_law_projects
+- load_deputies_day_orders
+- load_senate_law_projects
+- load_law_projects_text
+- update_projects_status
+- update_projects_from_laws
+- load_deputies_votes
+- load_senate_votes
+- load_deputies_authors
+- load_senate_authors
+- add_parties_to_votes
+- add_parties_to_authors
+- add_parties_to_deputy_seats
+- add_parties_to_senate_seats
 

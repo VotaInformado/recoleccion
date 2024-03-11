@@ -24,8 +24,10 @@ class PartyLinkingDecision(LinkingDecision):
             records.update(party=self.party)
 
     def __str__(self):
+        if not self.party:
+            return f"PartyLinkingDecision ({self.decision}): {self.messy_denomination} - {self.decision}"
         return (
-            "PartyLinkingDecision:\n"
+            f"PartyLinkingDecision ({self.decision}):\n"
             + f"Canonical denomination: {self.party.main_denomination}\n"
             + f"Messy denomination: {self.messy_denomination}"
         )

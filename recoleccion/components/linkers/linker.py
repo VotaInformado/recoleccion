@@ -2,9 +2,10 @@ from typing import List
 from dedupe import Gazetteer, console_label
 import os
 import pandas as pd
-from recoleccion.exceptions.custom import IncompatibleLinkingDatasets
 
 # Project
+from recoleccion.exceptions.custom import IncompatibleLinkingDatasets
+from recoleccion.utils.enums.linking_decision_options import LinkingDecisionOptions
 import logging
 
 
@@ -79,7 +80,7 @@ class Linker:
         # If there is at least one match, then one of the tuples has, in its second element, a list with at least one
         return not any([len(x[1]) > 0 for x in possible_mappings])
 
-    def save_pending_linking_decision(self, canonical_record, messy_record):
+    def get_or_save_pending_linking_decision(self, canonical_record, messy_record):
         raise NotImplementedError
 
     def get_linking_key(self, canonical_data_index: int, messy_record: dict):
@@ -88,13 +89,18 @@ class Linker:
     def reset_index(self, data_as_dict: dict) -> dict:
         df = pd.DataFrame.from_dict(data_as_dict, orient="index")
         df = df.reset_index(drop=False)
-        result_dict = df.to_dict(orient='index')
+        result_dict = df.to_dict(orient="index")
         return result_dict
 
     def classify(self, messy_data: dict):
         """
         Receives a dict with the messy data
-        Returns 3 lists: certain_matches, undefined_matches, distinct_matches
+        Uses the Gazetteer to classify the data in certain, dubious and distinct matches.
+        For the dubious matches, it checks if there is a linking decision for the pair (messy, canonical)
+        If there isn't, it creates a new one (in PENDING state)
+        If there is one, and it has a definitive decision, it moves the record to certain or distinct matches
+        Otherwise, it leaves it in dubious matches
+        Finally, returns 3 lists: certain_matches, dubious_matches, distinct_matches
         """
         if not messy_data:
             return [], [], []  # this means no linking, see the usage of this function
@@ -114,6 +120,7 @@ class Linker:
         dubious_matches = []
         distinct_matches = []
         pending_decisions = {}
+        created_linking_decisions = existent_linking_decisions = previously_used_decisions = 0
 
         for messy_data_index, possible_maps in possible_mappings:
             if len(possible_maps) == 0:
@@ -129,19 +136,34 @@ class Linker:
             elif dubious_lower_limit < confidence_score < dubious_upper_limit:
                 key = self.get_linking_key(canonical_data_index, messy_record)
                 if key in pending_decisions:
-                    existing_id = pending_decisions[key]
-                    self.logger.info(f"Using existing pending linking decision (id {existing_id}) for key {key}")
-                    decision_id = existing_id
+                    decision, created = pending_decisions[key]
+                    self.logger.info(f"Using existing pending linking decision (id {decision.pk}) for key {key}")
                 else:
-                    decision_id = self.save_pending_linking_decision(canonical_record, messy_record)
-                    self.logger.info(f"Pending linking decision created (id {decision_id}) for key {key}")
-                pending_decisions[key] = decision_id
-                dubious_matches.append((messy_data_index, canonical_data_index, decision_id))
+                    decision, created = self.get_or_save_pending_linking_decision(canonical_record, messy_record)
+                    self.logger.info(f"Pending linking decision created (id {decision.uuid}) for key {key}")
+                    pending_decisions[key] = (decision, created)
+                if created:  # If the decision was just created, it will always be in PENDING
+                    created_linking_decisions += 1
+                    dubious_matches.append((messy_data_index, canonical_data_index, decision.uuid))
+                else:
+                    existent_linking_decisions += 1
+                    if decision.decision == LinkingDecisionOptions.APPROVED:
+                        self.logger.info("Using existing approved linking decision to move record into certain matches")
+                        certain_matches.append((messy_data_index, canonical_data_index))
+                        previously_used_decisions += 1
+                    elif decision.decision == LinkingDecisionOptions.DENIED:
+                        self.logger.info("Using existing denied linking decision to move record into distinct matches")
+                        distinct_matches.append((messy_data_index, canonical_data_index, confidence_score))
+                        previously_used_decisions += 1
+                    else:
+                        self.logger.info("Existing linking decision is pending")
+                        dubious_matches.append((messy_data_index, canonical_data_index, decision.uuid))
             elif confidence_score < dubious_lower_limit:
                 distinct_matches.append((messy_data_index, canonical_data_index, confidence_score))
 
         self._save_training(self.gazetteer)
         self.gazetteer.cleanup_training()
+        self.logger.info(f"{previously_used_decisions} previously used linking decisions were used")
         return certain_matches, dubious_matches, distinct_matches
 
     def confidence(self, match):

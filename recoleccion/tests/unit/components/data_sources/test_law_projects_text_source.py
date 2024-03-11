@@ -32,9 +32,9 @@ class SenateLawsProjectTextTestCase(TestCase):
         self.assertEqual(year, "23")
 
     def test_initial_text_is_retrieved_correctly_if_final_isnt_loaded(self):
-        text, link = SenateLawProjectsText._get_text("1047", "S", "2004")
         response = b"""<div role="tabpanel" class="tab-pane" id="textoDefinitivo">\n\t\t               \t\t\t\n\t\t\t\t\t\tEn proceso de carga\n\t\t\t\n\n \n\t</div>\n\n\t<div role="tabpanel" class="tab-pane" id="textoOriginal">\n\t\n\nSenado de la Naci\xc3\xb3n<br>\nSecretar\xc3\xada Parlamentaria<br>\nDirecci\xc3\xb3n Publicaciones<br>\n<br>\n(S-1047/04)<br>\n<br>\nPROYECTO DE LEY<br>\n<br>\nEl Senado y C\xc3\xa1mara de Diputados,...<br>\n<br>\nLEY ANTITERRORISTA<br></div>"""
-        with mock_method(Session, "post", return_value=FakeResponse(content=response)):
+        with mock_method(Session, "get", return_value=FakeResponse(content=response)):
+            text, link = SenateLawProjectsText._get_text("1047", "S", "2004")
             self.assertIn(
                 "LEY ANTITERRORISTA",
                 text,

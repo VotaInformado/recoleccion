@@ -7,6 +7,7 @@ from recoleccion.exceptions.custom import TextSummarizerException
 
 logger = logging.getLogger(__name__)
 
+
 class TextFormatter:
     MAX_TOKENS = 2048
     SYSTEM_CONTEXT = """

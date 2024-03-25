@@ -41,7 +41,6 @@ class LawProjectAuthorsSerializer(serializers.ModelSerializer):
             data["full_name"] = data["name"] + " " + data["last_name"]
         else:
             data["full_name"] = instance.person_name + " " + instance.person_last_name
-        data["party"] = data["party"]["main_denomination"]
         return data
 
 

@@ -32,12 +32,15 @@ class LawProjectAuthorsSerializer(serializers.ModelSerializer):
 
         return PersonModelSerializer(obj.person).data
 
-    def to_representation(self, instance):
+    def to_representation(self, instance: Authorship):
         # we put all the info at the top level
         data = super().to_representation(instance)
         data = {**data, **data.pop("person")}
         data.pop("person")
-        data["full_name"] = data["name"] + " " + data["last_name"]
+        if instance.person:
+            data["full_name"] = data["name"] + " " + data["last_name"]
+        else:
+            data["full_name"] = instance.person_name + " " + instance.person_last_name
         data["party"] = data["party"]["main_denomination"]
         return data
 

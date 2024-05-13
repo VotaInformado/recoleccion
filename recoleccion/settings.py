@@ -29,25 +29,15 @@ SECRET_KEY = "django-insecure-#covc2rqpt90ueh-$&u18u3b%wn^o)us#)7f^4k&lmfm7+=jss
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DEBUG", "False") == "True"
 
-ALLOWED_HOSTS = [
-    "vota-informado-recoleccion.sa-east-1.elasticbeanstalk.com",
-    "177.71.161.197",
-    "localhost",
-    "0.0.0.0",
-    "127.0.0.0",
-    "127.0.0.1",
-    "recoleccion",
-]
+DEFAULT_ALLOWED_HOSTS = "localhost,0.0.0.0,127.0.0.0,127.0.0.1"
+
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", DEFAULT_ALLOWED_HOSTS).split(",")
+
+DEFAULT_ALLOWED_ORIGNIS = "http://localhost:3000"
 
 # CORS
 # https://github.com/adamchainz/django-cors-headers
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "http://votainformado-staging.s3-website-sa-east-1.amazonaws.com",
-    "https://web-plum-one.vercel.app",
-    "https://www.votainformado.com.ar",
-]
-
+CORS_ALLOWED_ORIGINS = os.environ.get("CORS_ALLOWED_ORIGINS", DEFAULT_ALLOWED_ORIGNIS).split(",")
 
 # Application definition
 
@@ -179,10 +169,7 @@ LOGGING = {
     "disable_existing_loggers": False,
     "filters": {"require_debug_false": {"()": "django.utils.log.RequireDebugFalse"}},
     "formatters": {
-        "verbose": {
-            "format": "%(levelname)s %(asctime)s %(module)s "
-            "%(process)d %(thread)d %(message)s"
-        },
+        "verbose": {"format": "%(levelname)s %(asctime)s %(module)s " "%(process)d %(thread)d %(message)s"},
         "colored_formatter": {
             "()": "colorlog.ColoredFormatter",
             "format": "\n%(log_color)s%(levelname)-8s%(white)s(%(threadName)s) %(message)s",
@@ -226,8 +213,6 @@ SUMMARIZER_API_KEY = config.get("SUMMARIZER_API_KEY")
 SUMMARIZER_URL = config.get("SUMMARIZER_URL")
 
 # News
-LEGISLATOR_NEWS_ENABLED = ast.literal_eval(
-    config.get("LEGISLATOR_NEWS_ENABLED", "False")
-)
+LEGISLATOR_NEWS_ENABLED = ast.literal_eval(config.get("LEGISLATOR_NEWS_ENABLED", "False"))
 GLOBAL_NEWS_PROVIDER_API_KEY = config.get("GLOBAL_NEWS_PROVIDER_API_KEY")
 LEGISLATOR_NEWS_PROVIDER_API_KEY = config.get("LEGISLATOR_NEWS_PROVIDER_API_KEY")

@@ -1,13 +1,30 @@
-FROM python:3.10
-RUN apt-get update -y
+ARG PYTHON_VERSION=3.10-slim-bullseye
 
-COPY . /app
-RUN pip3 install -r /app/requirements.txt
+FROM python:${PYTHON_VERSION}
 
-WORKDIR /app
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
 
-COPY ./compose/prod/django/start /start
-RUN sed -i 's/\r//' /start
-RUN chmod +x /start
+# install psycopg2 dependencies.
+RUN apt-get update && apt-get install -y \
+    libpq-dev \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
 
-ENTRYPOINT ["/start"]
+RUN mkdir -p /code
+
+WORKDIR /code
+
+COPY requirements.txt /tmp/requirements.txt
+RUN set -ex && \
+    pip install --upgrade pip && \
+    pip install -r /tmp/requirements.txt && \
+    rm -rf /root/.cache/
+COPY . /code
+
+ENV SECRET_KEY "REr9n00SUvkCqkEPuPctCOlpVdBi9Ny9KXG5BtnAhDn1IQH8Va"
+RUN python manage.py collectstatic --noinput
+
+EXPOSE 8000
+
+CMD ["gunicorn", "--bind", ":8000", "--workers", "2", "recoleccion.wsgi"]
